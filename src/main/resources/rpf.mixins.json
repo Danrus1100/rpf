@@ -1,0 +1,19 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "com.danrus.rpf.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "client": [
+    "BakingResultMixin",
+    "ItemModelMixin",
+    "ModelBakeryMixin",
+    "ModelManagerMixin",
+    "RangeSelectItemModelMixin",
+    "SelectItemModelMixin",
+    "SelectItemModelUnbakedMixin",
+    "accessor.SelectItemModelAccessor"
+  ]
+}
