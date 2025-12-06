@@ -7,7 +7,7 @@
   "authors": [
     "${author}"
   ],
-  "license": "LGPL v3",
+  "license": "MIT",
   "icon": "assets/rpf/icon.png",
   "accessWidener": "rpf.accesswidener",
   "environment": "client",
