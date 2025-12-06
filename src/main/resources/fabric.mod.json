@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "id": "${id}",
+  "version": "${version}",
+  "name": "${name}",
+  "description": "${description}",
+  "authors": [
+    "${author}"
+  ],
+  "license": "LGPL v3",
+  "icon": "assets/rpf/icon.png",
+  "accessWidener": "rpf.accesswidener",
+  "environment": "client",
+  "mixins": [
+    "rpf.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.17",
+    "minecraft": "${mcdep}"
+  }
+}
