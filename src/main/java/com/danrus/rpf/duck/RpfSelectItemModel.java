@@ -9,4 +9,9 @@ import java.util.function.Supplier;
 
 public interface RpfSelectItemModel {
     void rpf$updateModelMapsGetter(Supplier<List<Map<ResourceLocation, ItemModel>>> getter);
+
+    interface Unbaked {
+        boolean rpf$delegate();
+        void rpf$setDeligation(boolean value);
+    }
 }

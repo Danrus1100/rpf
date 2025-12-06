@@ -18,22 +18,22 @@ import java.util.Map;
 import java.util.function.Supplier;
 
 @Mixin(SelectItemModel.class)
-public class SelectItemModelMixin implements RpfSelectItemModel {
+public class SelectItemModelMixin {
 
-    @Unique
-    private Supplier<List<Map<ResourceLocation, ItemModel>>> rpf$modelMapsGetter;
-
-    @Inject(
-            method = "<init>",
-            at = @At("RETURN")
-    )
-    private void rpf$selectItemModelInit(SelectItemModelProperty<?> property, SelectItemModel.ModelSelector<?> models, CallbackInfo ci) {
-        RpfModelManager manager = (RpfModelManager) Minecraft.getInstance().getModelManager();
-        this.rpf$updateModelMapsGetter(manager::rpf$getModelMaps);
-    }
-
-    @Override
-    public void rpf$updateModelMapsGetter(Supplier<List<Map<ResourceLocation, ItemModel>>> getter) {
-        this.rpf$modelMapsGetter = getter;
-    }
+//    @Unique
+//    private Supplier<List<Map<ResourceLocation, ItemModel>>> rpf$modelMapsGetter;
+//
+//    @Inject(
+//            method = "<init>",
+//            at = @At("RETURN")
+//    )
+//    private void rpf$selectItemModelInit(SelectItemModelProperty<?> property, SelectItemModel.ModelSelector<?> models, CallbackInfo ci) {
+//        RpfModelManager manager = (RpfModelManager) Minecraft.getInstance().getModelManager();
+//        this.rpf$updateModelMapsGetter(manager::rpf$getModelMaps);
+//    }
+//
+//    @Override
+//    public void rpf$updateModelMapsGetter(Supplier<List<Map<ResourceLocation, ItemModel>>> getter) {
+//        this.rpf$modelMapsGetter = getter;
+//    }
 }

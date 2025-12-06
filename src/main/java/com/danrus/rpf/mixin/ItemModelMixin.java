@@ -18,9 +18,26 @@ import org.spongepowered.asm.mixin.Unique;
 public class ItemModelMixin implements RpfItemModel {
     @Unique private boolean rpf$isFallbackModel = false;
     @Unique private boolean rpf$doDelegate = true;
+    @Unique private int rpf$fallbackId = -1;
 
     public void rpf$setFallback(){this.rpf$isFallbackModel = true;}
     public boolean rpf$isFallback(){return rpf$isFallbackModel;}
     public void rpf$setDeligation(boolean value) {rpf$doDelegate = value;}
     public boolean rpf$delegate() {return rpf$doDelegate;}
+
+    @Override
+    public void rpf$setFalbackId(int id) {
+        if (id < 0) {
+            throw new IllegalArgumentException("Fallback ID cannot be negative");
+        }
+        this.rpf$fallbackId = id;
+    }
+
+    @Override
+    public int rpf$getFallbackId() {
+        if (rpf$fallbackId == -1) {
+            throw new IllegalStateException("Fallback ID has not been set");
+        }
+        return rpf$fallbackId;
+    }
 }

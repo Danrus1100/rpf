@@ -6,4 +6,7 @@ public interface RpfItemModel {
 
     void rpf$setDeligation(boolean value);
     boolean rpf$delegate();
+
+    void rpf$setFalbackId(int id);
+    int rpf$getFallbackId();
 }
