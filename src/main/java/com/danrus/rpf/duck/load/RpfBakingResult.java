@@ -1,4 +1,4 @@
-package com.danrus.rpf.duck;
+package com.danrus.rpf.duck.load;
 
 import net.minecraft.client.renderer.item.ItemModel;
 import net.minecraft.client.resources.model.ModelBakery;

@@ -31,17 +31,14 @@ public class RpfClientItemInfoLoader {
     private static final Logger LOGGER = LogUtils.getLogger();
     private static final FileToIdConverter LISTER = FileToIdConverter.json("items");
 
-    // === 1. Основной входной метод ===
     public static CompletableFuture<List<LoadedClientInfos>> scheduleLoad(ResourceManager resourceManager, Executor executor) {
         RegistryAccess.Frozen registryAccess = ClientRegistryLayer.createRegistryAccess().compositeAccess();
 
-        // Используем listMatchingResourceStacks вместо listMatchingResources
         return CompletableFuture.supplyAsync(() -> LISTER.listMatchingResourceStacks(resourceManager), executor)
                 .thenCompose(stacks -> loadAllStacks(stacks, registryAccess, executor))
                 .thenApply(RpfClientItemInfoLoader::buildLayeredInfos);
     }
 
-    // === 2. Оркестратор загрузки всех стеков ===
     private static CompletableFuture<List<PendingStack>> loadAllStacks(
             Map<ResourceLocation, List<Resource>> stacks,
             RegistryAccess.Frozen registryAccess,
@@ -60,7 +57,6 @@ public class RpfClientItemInfoLoader {
         return Util.sequence(futures);
     }
 
-    // === 3. Обработка одного стека ресурсов (один ID, несколько версий) ===
     private static PendingStack processSingleStack(
             ResourceLocation fileLocation,
             List<Resource> resources,
@@ -79,7 +75,6 @@ public class RpfClientItemInfoLoader {
         return new PendingStack(id, loadedItems);
     }
 
-    // === 4. Парсинг конкретного ресурса ===
     @Nullable
     private static ClientItem parseResource(
             ResourceLocation id,
@@ -106,30 +101,24 @@ public class RpfClientItemInfoLoader {
         }
     }
 
-    // === 5. Сборка результатов в слои ===
     private static List<LoadedClientInfos> buildLayeredInfos(List<PendingStack> loadedStacks) {
-        // Определяем максимальную глубину стека
         int maxDepth = 0;
         for (PendingStack stack : loadedStacks) {
             maxDepth = Math.max(maxDepth, stack.items().size());
         }
 
-        // Создаем список карт (слоев)
         List<Map<ResourceLocation, ClientItem>> layers = new ArrayList<>(maxDepth);
         for (int i = 0; i < maxDepth; i++) {
             layers.add(new HashMap<>());
         }
 
-        // Заполняем слои
         for (PendingStack stack : loadedStacks) {
             List<ClientItem> items = stack.items();
             for (int i = 0; i < items.size(); i++) {
-                // i-й элемент кладем в i-й слой
                 layers.get(i).put(stack.id(), items.get(i));
             }
         }
 
-        // Оборачиваем каждый слой в LoadedClientInfos
         List<LoadedClientInfos> result = new ArrayList<>(maxDepth);
         for (Map<ResourceLocation, ClientItem> layer : layers) {
             result.add(new LoadedClientInfos(layer));
@@ -142,7 +131,6 @@ public class RpfClientItemInfoLoader {
     public record LoadedClientInfos(Map<ResourceLocation, ClientItem> contents) {
     }
 
-    // Вспомогательная запись для хранения списка распаршенных предметов для одного ID
     private record PendingStack(ResourceLocation id, List<ClientItem> items) {
     }
 }

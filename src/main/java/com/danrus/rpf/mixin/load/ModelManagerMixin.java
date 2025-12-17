@@ -1,10 +1,9 @@
-package com.danrus.rpf.mixin;
+package com.danrus.rpf.mixin.load;
 
 import com.danrus.rpf.RpfClientItemInfoLoader;
-import com.danrus.rpf.duck.RpfBakingResult;
-import com.danrus.rpf.duck.RpfItemModel;
-import com.danrus.rpf.duck.RpfModelBakery;
-import com.danrus.rpf.duck.RpfModelManager;
+import com.danrus.rpf.duck.load.RpfBakingResult;
+import com.danrus.rpf.duck.load.RpfModelBakery;
+import com.danrus.rpf.duck.load.RpfModelManager;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
@@ -22,18 +21,17 @@ import net.minecraft.util.profiling.Profiler;
 import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.util.profiling.Zone;
 import net.minecraft.world.level.block.state.BlockState;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
-import java.util.function.Supplier;
 
 @Mixin(value = ModelManager.class, priority = 2000)
 public abstract class ModelManagerMixin implements RpfModelManager {
@@ -126,10 +124,8 @@ public abstract class ModelManagerMixin implements RpfModelManager {
             ModelDiscovery modelDiscovery = new ModelDiscovery(blockModels, MissingBlockModel.missingModel());
             modelDiscovery.addSpecialModel(ItemModelGenerator.GENERATED_ITEM_MODEL_ID, new ItemModelGenerator());
 
-            // Регистрируем корни из блоков
             loadedModels.models().values().forEach(modelDiscovery::addRoot);
 
-            // Регистрируем корни из предметов (проходим по всем слоям)
             for (RpfClientItemInfoLoader.LoadedClientInfos layer : itemLayers) {
                 layer.contents().values().forEach((clientItem) -> modelDiscovery.addRoot(clientItem.model()));
             }
@@ -138,36 +134,30 @@ public abstract class ModelManagerMixin implements RpfModelManager {
         }
     }
 
-    @Inject(
-            method = "getItemModel",
-            at = @At("HEAD"),
-            cancellable = true
-    )
-    private void rpf$getItemModel(ResourceLocation modelLocation, CallbackInfoReturnable<ItemModel> cir) {
-        if (this.rpf$bakedItemStackModels == null) return;
-
-        ItemModel fallback = null;
-        /*
-        Несмотря на то что фолбэки определяются правильно, работа логики должна быть измениена в:
-           1) SelectItemModel.update (и в RangeSelect тоже надо примерно то же самое)
-           2) ItemModelResolver.appendItemLayers
-
-        я думаю, что можно в SelectItemModel передавать ссылку на rpf$bakedItemStackModels, и там если она фолбэчит то брать ItemModel от туда
-         */
-        for (Map<ResourceLocation, ItemModel> bakedItemStackModels : rpf$bakedItemStackModels) {
-            ItemModel model = bakedItemStackModels.get(modelLocation);
-            if (model != null && !((RpfItemModel) model).rpf$isFallback()) {
-                cir.setReturnValue(model);
-                return;
-            }
-            if (model != null && ((RpfItemModel) model).rpf$isFallback() && fallback == null) {
-                fallback = model;
-            }
-        }
-        if (fallback != null) {
-            cir.setReturnValue(fallback);
-        }
-    }
+//    @Inject(
+//            method = "getItemModel",
+//            at = @At("HEAD"),
+//            cancellable = true
+//    )
+//    private void rpf$getItemModel(ResourceLocation modelLocation, CallbackInfoReturnable<ItemModel> cir) {
+//        if (this.rpf$bakedItemStackModels == null) return;
+//
+//        ItemModel fallback = null;
+//        for (int i = 0; i < this.rpf$bakedItemStackModels.size(); i++) {
+//            Map<ResourceLocation, ItemModel> bakedItemStackModels = this.rpf$bakedItemStackModels.get(i);
+//            ItemModel model = bakedItemStackModels.get(modelLocation);
+//            if (model != null && !((RpfItemModel) model).rpf$isFallback()) {
+//                cir.setReturnValue(model);
+//                return;
+//            }
+//            if (model != null && ((RpfItemModel) model).rpf$isFallback() && fallback == null) {
+//                fallback = model;
+//            }
+//        }
+//        if (fallback != null) {
+//            cir.setReturnValue(fallback);
+//        }
+//    }
 
     @Inject(
             method = "apply",
@@ -186,5 +176,22 @@ public abstract class ModelManagerMixin implements RpfModelManager {
     @Override
     public List<Map<ResourceLocation, ItemModel>> rpf$getModelMaps() {
         return this.rpf$bakedItemStackModels;
+    }
+
+    @Override
+    public @Nullable ItemModel rpf$saveGetNextModel(int currentIndex, ResourceLocation location) {
+        if (this.rpf$bakedItemStackModels == null) {
+            return null;
+        }
+        int nextIndex = currentIndex + 1;
+        if (nextIndex >= this.rpf$bakedItemStackModels.size()) {
+            return null;
+        }
+        Map<ResourceLocation, ItemModel> nextLayer = this.rpf$bakedItemStackModels.get(nextIndex);
+        ItemModel model = nextLayer.get(location);
+        if (model == null) {
+            return null;
+        }
+        return model;
     }
 }

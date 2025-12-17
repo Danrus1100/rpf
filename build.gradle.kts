@@ -28,6 +28,7 @@ dependencies {
     })
     modImplementation("net.fabricmc:fabric-loader:${findProperty("deps.fabric")}")
     modImplementation("net.fabricmc.fabric-api:fabric-api:${findProperty("deps.fapi")}")
+    modImplementation(files("lib/RPRenames-1.21.8-0.9.2.jar"))
 }
 
 tasks.processResources {

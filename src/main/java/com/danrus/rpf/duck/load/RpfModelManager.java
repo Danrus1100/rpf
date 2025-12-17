@@ -1,12 +1,13 @@
-package com.danrus.rpf.duck;
+package com.danrus.rpf.duck.load;
 
 import net.minecraft.client.renderer.item.ItemModel;
 import net.minecraft.resources.ResourceLocation;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Map;
-import java.util.function.Supplier;
 
 public interface RpfModelManager {
     List<Map<ResourceLocation, ItemModel>> rpf$getModelMaps();
+    @Nullable ItemModel rpf$saveGetNextModel(int currentIndex, ResourceLocation location);
 }

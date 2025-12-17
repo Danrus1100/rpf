@@ -7,13 +7,16 @@
     "defaultRequire": 1
   },
   "client": [
-    "BakingResultMixin",
-    "ItemModelMixin",
-    "ModelBakeryMixin",
-    "ModelManagerMixin",
-    "RangeSelectItemModelMixin",
-    "SelectItemModelMixin",
-    "SelectItemModelUnbakedMixin",
-    "accessor.SelectItemModelAccessor"
+    "ItemModelResolverMixin",
+    "items.ItemModelMixin",
+    "items.ItemModelsMixin",
+    "items.block.BlockModelWrapperMixin",
+    "items.range.RangeSelectItemModelMixin",
+    "items.select.SelectItemModelMixin",
+    "items.select.UnbakedMixin",
+    "items.select.UnbakedSwitchMixin",
+    "load.BakingResultMixin",
+    "load.ModelBakeryMixin",
+    "load.ModelManagerMixin"
   ]
 }

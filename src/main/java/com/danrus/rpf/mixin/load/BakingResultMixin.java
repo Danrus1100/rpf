@@ -1,6 +1,6 @@
-package com.danrus.rpf.mixin;
+package com.danrus.rpf.mixin.load;
 
-import com.danrus.rpf.duck.RpfBakingResult;
+import com.danrus.rpf.duck.load.RpfBakingResult;
 import net.minecraft.client.renderer.item.ItemModel;
 import net.minecraft.client.resources.model.ModelBakery;
 import net.minecraft.resources.ResourceLocation;

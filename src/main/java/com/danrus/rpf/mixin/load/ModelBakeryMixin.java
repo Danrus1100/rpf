@@ -1,9 +1,11 @@
-package com.danrus.rpf.mixin;
+package com.danrus.rpf.mixin.load;
 
-import com.danrus.rpf.duck.RpfBakingResult;
-import com.danrus.rpf.duck.RpfModelBakery;
+import com.danrus.rpf.duck.load.RpfBakingResult;
+import com.danrus.rpf.duck.load.RpfModelBakery;
+import com.danrus.rpf.duck.load.RpfModelManager;
 import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.Util;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.geom.EntityModelSet;
 import net.minecraft.client.renderer.block.model.BlockStateModel;
 import net.minecraft.client.renderer.item.ClientItem;
@@ -57,12 +59,20 @@ public class ModelBakeryMixin implements RpfModelBakery {
                                 @Local CompletableFuture<Map<BlockState, BlockStateModel>> completableFuture) {
         List<CompletableFuture<Map<ResourceLocation, ItemModel>>> layerFutures = new ArrayList<>(this.rpf$clientItems.size());
 
-        for (Map<ResourceLocation, ClientItem> layer : this.rpf$clientItems) {
+        for (int i = 0; i < this.rpf$clientItems.size(); i++) {
+            int layerIndex = i;
+            Map<ResourceLocation, ClientItem> layer = this.rpf$clientItems.get(i);
             CompletableFuture<Map<ResourceLocation, ItemModel>> layerFuture = ParallelMapTransform.schedule(
                     layer,
                     (resourceLocation, clientItem) -> {
                         try {
-                            return clientItem.model().bake(new ItemModel.BakingContext(modelBakerImpl, this.entityModelSet, missingModels.item, clientItem.registrySwapper()));
+                            ItemModel model = clientItem.model().bake(new ItemModel.BakingContext(modelBakerImpl, this.entityModelSet, missingModels.item, clientItem.registrySwapper()));
+//                            if (model instanceof RpfDelegateItemModel delegateItemModel) {
+//                                int reversedIndex = this.rpf$clientItems.size() - layerIndex - 1;
+//                                LOGGER.info("Bake model: idx={}, reversedIdx={}, loc={}", layerIndex, reversedIndex, resourceLocation);
+//                                delegateItemModel.rpf$updateModelIndex(reversedIndex, resourceLocation);
+//                            }
+                            return model;
                         } catch (Exception exception) {
                             LOGGER.warn("Unable to bake item model: '{}'", resourceLocation, exception);
                             return null;
@@ -92,6 +102,22 @@ public class ModelBakeryMixin implements RpfModelBakery {
 
             ModelBakery.BakingResult result = new ModelBakery.BakingResult(missingModels, blockModels, flatItemModels, propertiesMap);
             ((RpfBakingResult) (Object) result).rpf$setItemModels(bakedLayers);
+            RpfModelManager manager = (RpfModelManager) Minecraft.getInstance().getModelManager();
+            for (int layerIndex = 0; layerIndex < bakedLayers.size(); layerIndex++) {
+                Map<ResourceLocation, ItemModel> layer = bakedLayers.get(layerIndex);
+                for (Map.Entry<ResourceLocation, ItemModel> entry : layer.entrySet()) {
+                    ResourceLocation loc = entry.getKey();
+                    ItemModel model = entry.getValue();
+//                    if (model instanceof SelectItemModel<?> select &&
+//                            model instanceof RpfDelegateItemModel delegateMeta) {
+//
+//                        ItemModel delegateModel = manager.rpf$saveGetNextModel(delegateMeta.rpf$getModelIndex(), delegateMeta.rpf$getModelLocation());
+//                        if (delegateModel instanceof SelectItemModel<?> nextSelect && nextSelect instanceof RpfModelSelectorHolder nextHolder) {
+//                            nextHolder.rpf$setModelSelector(new RpfChainedModelSelector(select.models, nextSelect.models));
+//                        }
+//                    }
+                }
+            }
 
             return result;
         }));
