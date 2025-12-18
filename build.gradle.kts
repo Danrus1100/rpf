@@ -52,3 +52,9 @@ tasks.processResources {
 
     filesMatching("fabric.mod.json") { expand(map) }
 }
+
+base {
+    archivesName.set(findProperty("mod.id") as String)
+}
+
+version = findProperty("mod.version") as String + "-" +findProperty("deps.mc") as String

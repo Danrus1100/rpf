@@ -2,6 +2,7 @@ package com.danrus.rpf.mixin.items;
 
 import com.danrus.rpf.api.RpfItemModel;
 import net.minecraft.client.renderer.item.*;
+import net.minecraft.resources.ResourceLocation;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 
@@ -18,6 +19,6 @@ import org.spongepowered.asm.mixin.Unique;
 public class ItemModelMixin implements RpfItemModel {
     @Unique private boolean rpf$isFallbackModel = false;
 
-    public void rpf$setFallback(){this.rpf$isFallbackModel = true;}
-    public boolean rpf$isFallback(){return rpf$isFallbackModel;}
+    public void rpf$setFallback(){ this.rpf$isFallbackModel = true; }
+    public boolean rpf$isFallback(){ return rpf$isFallbackModel; }
 }

@@ -11,6 +11,7 @@
     "items.ItemModelMixin",
     "items.ItemModelsMixin",
     "items.block.BlockModelWrapperMixin",
+    "items.block.UnbakedMixin",
     "items.range.RangeSelectItemModelMixin",
     "items.select.SelectItemModelMixin",
     "items.select.UnbakedMixin",

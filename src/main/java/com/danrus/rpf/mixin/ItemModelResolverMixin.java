@@ -1,5 +1,6 @@
 package com.danrus.rpf.mixin;
 
+import com.danrus.rpf.RpfModelIdentity;
 import com.danrus.rpf.api.RpfItemModel;
 import com.danrus.rpf.duck.load.RpfModelManager;
 import net.minecraft.client.Minecraft;
@@ -45,19 +46,23 @@ public class ItemModelResolverMixin<T, R> {
             Map<ResourceLocation, ItemModel> currentPack = packs.get(i);
             ItemModel model = currentPack.get(resourceLocation);
 
-            if (!(model instanceof RpfItemModel)) {
+            if (!(model instanceof RpfItemModel) && model != null) {
                 model.update(renderState, stack, (ItemModelResolver) (Object) this, displayContext, clientLevel, entity, seed);
+                ci.cancel();
                 return;
             }
 
             RpfItemModel rpfItemModel = (RpfItemModel) model;
             if (model != null) {
-                if (!rpfItemModel.rpf$testForDelegate(renderState, stack, (ItemModelResolver) (Object) this, displayContext, clientLevel, entity, seed)) {
+                if (!rpfItemModel.rpf$testForDelegate(renderState, stack, (ItemModelResolver) (Object) this, displayContext, clientLevel, entity, seed, resourceLocation)) {
+                    renderState.appendModelIdentityElement(new RpfModelIdentity(resourceLocation, i, true)); // for correct GUI rendering
                     model.update(renderState, stack, (ItemModelResolver) (Object) this, displayContext, clientLevel, entity, seed);
                     ci.cancel();
                     return;
                 }
             }
         }
+
+        renderState.appendModelIdentityElement(new RpfModelIdentity(resourceLocation, -1, false)); // no model found
     }
 }

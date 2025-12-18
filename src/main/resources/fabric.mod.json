@@ -11,6 +11,11 @@
   "icon": "assets/rpf/icon.png",
   "accessWidener": "rpf.accesswidener",
   "environment": "client",
+  "entrypoints": {
+    "client": [
+      "com.danrus.rpf.Rpf"
+    ]
+  },
   "mixins": [
     "rpf.mixins.json"
   ],

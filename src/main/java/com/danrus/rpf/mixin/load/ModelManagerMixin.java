@@ -1,6 +1,7 @@
 package com.danrus.rpf.mixin.load;
 
 import com.danrus.rpf.RpfClientItemInfoLoader;
+import com.danrus.rpf.compat.rprenames.impl.RenamesBridge;
 import com.danrus.rpf.duck.load.RpfBakingResult;
 import com.danrus.rpf.duck.load.RpfModelBakery;
 import com.danrus.rpf.duck.load.RpfModelManager;
@@ -8,6 +9,7 @@ import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.color.block.BlockColors;
 import net.minecraft.client.model.geom.EntityModelSet;
 import net.minecraft.client.renderer.SpecialBlockModelRenderer;
@@ -111,6 +113,13 @@ public abstract class ModelManagerMixin implements RpfModelManager {
         for (RpfClientItemInfoLoader.LoadedClientInfos layer : rpf$currentItemLayersFuture.join()) {
             rawLayers.add(layer.contents());
         }
+        if (RenamesBridge.active) {
+            RenamesBridge.itemSetter.accept(rawLayers);
+            RenamesBridge.parser.accept(
+                    Minecraft.getInstance().getResourceManager(),
+                    Profiler.get()
+            );
+        }
         return ((RpfModelBakery) original.call(entityModelSet, unbakedBlockStateModels, clientInfos, resolvedModels, missingModel)).rpf$setClientItems(rawLayers);
     }
 
@@ -133,31 +142,6 @@ public abstract class ModelManagerMixin implements RpfModelManager {
             return new ModelManager.ResolvedModels(modelDiscovery.missingModel(), modelDiscovery.resolve());
         }
     }
-
-//    @Inject(
-//            method = "getItemModel",
-//            at = @At("HEAD"),
-//            cancellable = true
-//    )
-//    private void rpf$getItemModel(ResourceLocation modelLocation, CallbackInfoReturnable<ItemModel> cir) {
-//        if (this.rpf$bakedItemStackModels == null) return;
-//
-//        ItemModel fallback = null;
-//        for (int i = 0; i < this.rpf$bakedItemStackModels.size(); i++) {
-//            Map<ResourceLocation, ItemModel> bakedItemStackModels = this.rpf$bakedItemStackModels.get(i);
-//            ItemModel model = bakedItemStackModels.get(modelLocation);
-//            if (model != null && !((RpfItemModel) model).rpf$isFallback()) {
-//                cir.setReturnValue(model);
-//                return;
-//            }
-//            if (model != null && ((RpfItemModel) model).rpf$isFallback() && fallback == null) {
-//                fallback = model;
-//            }
-//        }
-//        if (fallback != null) {
-//            cir.setReturnValue(fallback);
-//        }
-//    }
 
     @Inject(
             method = "apply",
