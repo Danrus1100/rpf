@@ -6,9 +6,11 @@ import com.danrus.rpf.duck.load.RpfModelBakery;
 import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.Util;
 import net.minecraft.client.model.geom.EntityModelSet;
+import net.minecraft.client.renderer.PlayerSkinRenderCache;
 import net.minecraft.client.renderer.block.model.BlockStateModel;
 import net.minecraft.client.renderer.item.ClientItem;
 import net.minecraft.client.renderer.item.ItemModel;
+import net.minecraft.client.resources.model.MaterialSet;
 import net.minecraft.client.resources.model.ModelBakery;
 import net.minecraft.client.resources.model.SpriteGetter;
 import net.minecraft.resources.ResourceLocation;
@@ -41,6 +43,14 @@ public class ModelBakeryMixin implements RpfModelBakery {
     @Final
     private EntityModelSet entityModelSet;
 
+    @Shadow
+    @Final
+    private PlayerSkinRenderCache playerSkinRenderCache;
+
+    @Shadow
+    @Final
+    private MaterialSet materials;
+
     @Override
     public ModelBakery rpf$setClientItems(List<Map<ResourceLocation, ClientItem>> items) {
         this.rpf$clientItems = items;
@@ -65,7 +75,7 @@ public class ModelBakeryMixin implements RpfModelBakery {
                     layer,
                     (resourceLocation, clientItem) -> {
                         try {
-                            ItemModel model = clientItem.model().bake(new ItemModel.BakingContext(modelBakerImpl, this.entityModelSet, missingModels.item, clientItem.registrySwapper()));
+                            ItemModel model = clientItem.model().bake(new ItemModel.BakingContext(modelBakerImpl, this.entityModelSet, materials, playerSkinRenderCache, missingModels.item, clientItem.registrySwapper()));
                             return model;
                         } catch (Exception exception) {
                             LOGGER.warn("Unable to bake item model: '{}'", resourceLocation, exception);

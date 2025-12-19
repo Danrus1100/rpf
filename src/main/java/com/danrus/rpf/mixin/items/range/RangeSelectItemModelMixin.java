@@ -8,6 +8,7 @@ import net.minecraft.client.renderer.item.ItemStackRenderState;
 import net.minecraft.client.renderer.item.RangeSelectItemModel;
 import net.minecraft.client.renderer.item.properties.numeric.RangeSelectItemModelProperty;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.ItemOwner;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
@@ -34,8 +35,8 @@ public abstract class RangeSelectItemModelMixin implements RpfItemModel {
     }
 
     @Override
-    public boolean rpf$testForDelegate(ItemStackRenderState renderState, ItemStack stack, ItemModelResolver itemModelResolver, ItemDisplayContext displayContext, @Nullable ClientLevel level, @Nullable LivingEntity entity, int seed, ResourceLocation itemModelId) {
+    public boolean rpf$testForDelegate(ItemStackRenderState renderState, ItemStack stack, ItemModelResolver itemModelResolver, ItemDisplayContext displayContext, @Nullable ClientLevel level, @Nullable ItemOwner owner, int seed, ResourceLocation itemModelId) {
         if (this.rpf$isFallback()) return true;
-        return (((RpfItemModel) fallback).rpf$testForDelegate(renderState, stack, itemModelResolver, displayContext, level, entity, seed, itemModelId));
+        return (((RpfItemModel) fallback).rpf$testForDelegate(renderState, stack, itemModelResolver, displayContext, level, owner, seed, itemModelId));
     }
 }

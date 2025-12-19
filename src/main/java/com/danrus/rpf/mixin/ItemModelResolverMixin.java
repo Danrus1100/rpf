@@ -10,6 +10,7 @@ import net.minecraft.client.renderer.item.ItemModelResolver;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.ItemOwner;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
@@ -26,10 +27,10 @@ import java.util.Map;
 public class ItemModelResolverMixin<T, R> {
     @Inject(
             method = "appendItemLayers",
-            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/item/ItemModel;update(Lnet/minecraft/client/renderer/item/ItemStackRenderState;Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/client/renderer/item/ItemModelResolver;Lnet/minecraft/world/item/ItemDisplayContext;Lnet/minecraft/client/multiplayer/ClientLevel;Lnet/minecraft/world/entity/LivingEntity;I)V"),
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/item/ItemModel;update(Lnet/minecraft/client/renderer/item/ItemStackRenderState;Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/client/renderer/item/ItemModelResolver;Lnet/minecraft/world/item/ItemDisplayContext;Lnet/minecraft/client/multiplayer/ClientLevel;Lnet/minecraft/world/entity/ItemOwner;I)V"),
             cancellable = true
     )
-    private void rpf$selectModel(ItemStackRenderState renderState, ItemStack stack, ItemDisplayContext displayContext, Level level, LivingEntity entity, int seed, CallbackInfo ci) {
+    private void rpf$selectModel(ItemStackRenderState renderState, ItemStack stack, ItemDisplayContext displayContext, Level level, ItemOwner owner, int seed, CallbackInfo ci) {
         ResourceLocation resourceLocation = stack.get(DataComponents.ITEM_MODEL);
         if (resourceLocation == null) return;
 
@@ -44,16 +45,16 @@ public class ItemModelResolverMixin<T, R> {
             ItemModel model = currentPack.get(resourceLocation);
 
             if (!(model instanceof RpfItemModel) && model != null) {
-                model.update(renderState, stack, (ItemModelResolver) (Object) this, displayContext, clientLevel, entity, seed);
+                model.update(renderState, stack, (ItemModelResolver) (Object) this, displayContext, clientLevel, owner, seed);
                 ci.cancel();
                 return;
             }
 
             RpfItemModel rpfItemModel = (RpfItemModel) model;
             if (model != null) {
-                if (!rpfItemModel.rpf$testForDelegate(renderState, stack, (ItemModelResolver) (Object) this, displayContext, clientLevel, entity, seed, resourceLocation)) {
+                if (!rpfItemModel.rpf$testForDelegate(renderState, stack, (ItemModelResolver) (Object) this, displayContext, clientLevel, owner, seed, resourceLocation)) {
                     renderState.appendModelIdentityElement(new RpfModelIdentity(resourceLocation, i, true)); // for correct GUI rendering
-                    model.update(renderState, stack, (ItemModelResolver) (Object) this, displayContext, clientLevel, entity, seed);
+                    model.update(renderState, stack, (ItemModelResolver) (Object) this, displayContext, clientLevel, owner, seed);
                     ci.cancel();
                     return;
                 }

@@ -7,6 +7,7 @@ import net.minecraft.client.renderer.item.ItemModelResolver;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
 import net.minecraft.client.renderer.item.SelectItemModel;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.ItemOwner;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
@@ -30,12 +31,12 @@ public abstract class SelectItemModelMixin<T> implements DelegateItemModel, RpfI
     }
 
     @Override
-    public boolean rpf$testForDelegate(ItemStackRenderState renderState, ItemStack stack, ItemModelResolver itemModelResolver, ItemDisplayContext displayContext, @Nullable ClientLevel level, @Nullable LivingEntity entity, int seed, ResourceLocation itemModelId) {
+    public boolean rpf$testForDelegate(ItemStackRenderState renderState, ItemStack stack, ItemModelResolver itemModelResolver, ItemDisplayContext displayContext, @Nullable ClientLevel level, @Nullable ItemOwner owner, int seed, ResourceLocation itemModelId) {
         if (!this.rpf$delegate) return false;
         if (this.rpf$isFallback()) return true;
         SelectItemModel<T> self = (SelectItemModel<T>) (Object) this;
-        T object = self.property.get(stack, level, entity, seed, displayContext);
+        T object = self.property.get(stack, level, owner == null ? null : owner.asLivingEntity(), seed, displayContext);
         RpfItemModel itemModel = (RpfItemModel) self.models.get(object, level);
-        return itemModel == null || itemModel.rpf$testForDelegate(renderState, stack, itemModelResolver, displayContext, level, entity, seed, itemModelId);
+        return itemModel == null || itemModel.rpf$testForDelegate(renderState, stack, itemModelResolver, displayContext, level, owner, seed, itemModelId);
     }
 }
