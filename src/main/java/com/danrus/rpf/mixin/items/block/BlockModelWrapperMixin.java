@@ -6,7 +6,7 @@ import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.item.BlockModelWrapper;
 import net.minecraft.client.renderer.item.ItemModelResolver;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.ItemOwner;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemDisplayContext;
@@ -18,13 +18,13 @@ import org.spongepowered.asm.mixin.Unique;
 @Mixin(BlockModelWrapper.class)
 public abstract class BlockModelWrapperMixin implements RpfItemModel, RpfBlockModelWrapper {
 
-    @Unique private ResourceLocation rpf$modelLink;
+    @Unique private Identifier rpf$modelLink;
 
-    public void rpf$setModelLink(ResourceLocation location) { this.rpf$modelLink = location; }
-    public ResourceLocation rpf$getModelLink() { return this.rpf$modelLink; }
+    public void rpf$setModelLink(Identifier location) { this.rpf$modelLink = location; }
+    public Identifier rpf$getModelLink() { return this.rpf$modelLink; }
 
     @Override
-    public boolean rpf$testForDelegate(ItemStackRenderState renderState, ItemStack stack, ItemModelResolver itemModelResolver, ItemDisplayContext displayContext, @Nullable ClientLevel level, @Nullable ItemOwner owner, int seed, ResourceLocation itemModelId) {
+    public boolean rpf$testForDelegate(ItemStackRenderState renderState, ItemStack stack, ItemModelResolver itemModelResolver, ItemDisplayContext displayContext, @Nullable ClientLevel level, @Nullable ItemOwner owner, int seed, Identifier itemModelId) {
         return this.rpf$isFallback()
                 
                 // try to predict is this model from vanilla resources

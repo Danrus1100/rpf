@@ -4,7 +4,7 @@ import com.danrus.rpf.api.RpfItemModel;
 import com.danrus.rpf.duck.load.RpfBakingResult;
 import com.danrus.rpf.duck.load.RpfModelBakery;
 import com.llamalad7.mixinextras.sugar.Local;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.client.model.geom.EntityModelSet;
 import net.minecraft.client.renderer.PlayerSkinRenderCache;
 import net.minecraft.client.renderer.block.model.BlockStateModel;
@@ -13,7 +13,7 @@ import net.minecraft.client.renderer.item.ItemModel;
 import net.minecraft.client.resources.model.MaterialSet;
 import net.minecraft.client.resources.model.ModelBakery;
 import net.minecraft.client.resources.model.SpriteGetter;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.thread.ParallelMapTransform;
 import net.minecraft.world.level.block.state.BlockState;
 import org.slf4j.Logger;
@@ -37,7 +37,7 @@ public class ModelBakeryMixin implements RpfModelBakery {
     private static final Logger LOGGER = LoggerFactory.getLogger("RpfModelBakery");
 
     @Unique
-    private List<Map<ResourceLocation, ClientItem>> rpf$clientItems;
+    private List<Map<Identifier, ClientItem>> rpf$clientItems;
 
     @Shadow
     @Final
@@ -52,7 +52,7 @@ public class ModelBakeryMixin implements RpfModelBakery {
     private MaterialSet materials;
 
     @Override
-    public ModelBakery rpf$setClientItems(List<Map<ResourceLocation, ClientItem>> items) {
+    public ModelBakery rpf$setClientItems(List<Map<Identifier, ClientItem>> items) {
         this.rpf$clientItems = items;
         return (ModelBakery) (Object) this;
     }
@@ -66,19 +66,19 @@ public class ModelBakeryMixin implements RpfModelBakery {
                                 @Local ModelBakery.MissingModels missingModels,
                                 @Local ModelBakery.ModelBakerImpl modelBakerImpl,
                                 @Local CompletableFuture<Map<BlockState, BlockStateModel>> completableFuture) {
-        List<CompletableFuture<Map<ResourceLocation, ItemModel>>> layerFutures = new ArrayList<>(this.rpf$clientItems.size());
+        List<CompletableFuture<Map<Identifier, ItemModel>>> layerFutures = new ArrayList<>(this.rpf$clientItems.size());
 
         for (int i = 0; i < this.rpf$clientItems.size(); i++) {
             int layerIndex = i;
-            Map<ResourceLocation, ClientItem> layer = this.rpf$clientItems.get(i);
-            CompletableFuture<Map<ResourceLocation, ItemModel>> layerFuture = ParallelMapTransform.schedule(
+            Map<Identifier, ClientItem> layer = this.rpf$clientItems.get(i);
+            CompletableFuture<Map<Identifier, ItemModel>> layerFuture = ParallelMapTransform.schedule(
                     layer,
-                    (resourceLocation, clientItem) -> {
+                    (Identifier, clientItem) -> {
                         try {
                             ItemModel model = clientItem.model().bake(new ItemModel.BakingContext(modelBakerImpl, this.entityModelSet, materials, playerSkinRenderCache, missingModels.item, clientItem.registrySwapper()));
                             return model;
                         } catch (Exception exception) {
-                            LOGGER.warn("Unable to bake item model: '{}'", resourceLocation, exception);
+                            LOGGER.warn("Unable to bake item model: '{}'", Identifier, exception);
                             return null;
                         }
                     },
@@ -87,20 +87,20 @@ public class ModelBakeryMixin implements RpfModelBakery {
             layerFutures.add(layerFuture);
         }
 
-        Map<ResourceLocation, ClientItem.Properties> propertiesMap = new HashMap<>();
-        for (Map<ResourceLocation, ClientItem> layer : this.rpf$clientItems) {
-            layer.forEach((resourceLocation, clientItem) -> {
+        Map<Identifier, ClientItem.Properties> propertiesMap = new HashMap<>();
+        for (Map<Identifier, ClientItem> layer : this.rpf$clientItems) {
+            layer.forEach((Identifier, clientItem) -> {
                 ClientItem.Properties properties = clientItem.properties();
                 if (!properties.equals(ClientItem.Properties.DEFAULT)) {
-                    propertiesMap.put(resourceLocation, properties);
+                    propertiesMap.put(Identifier, properties);
                 }
             });
         }
 
         cir.setReturnValue(completableFuture.thenCombine(Util.sequence(layerFutures), (blockModels, bakedLayers) -> {
 
-            Map<ResourceLocation, ItemModel> flatItemModels = new HashMap<>();
-            for (Map<ResourceLocation, ItemModel> layer : bakedLayers) {
+            Map<Identifier, ItemModel> flatItemModels = new HashMap<>();
+            for (Map<Identifier, ItemModel> layer : bakedLayers) {
                 flatItemModels.putAll(layer);
             }
 

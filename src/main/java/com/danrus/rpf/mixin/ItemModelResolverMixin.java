@@ -9,7 +9,7 @@ import net.minecraft.client.renderer.item.ItemModel;
 import net.minecraft.client.renderer.item.ItemModelResolver;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
 import net.minecraft.core.component.DataComponents;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.ItemOwner;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemDisplayContext;
@@ -31,18 +31,18 @@ public class ItemModelResolverMixin<T, R> {
             cancellable = true
     )
     private void rpf$selectModel(ItemStackRenderState renderState, ItemStack stack, ItemDisplayContext displayContext, Level level, ItemOwner owner, int seed, CallbackInfo ci) {
-        ResourceLocation resourceLocation = stack.get(DataComponents.ITEM_MODEL);
-        if (resourceLocation == null) return;
+        Identifier Identifier = stack.get(DataComponents.ITEM_MODEL);
+        if (Identifier == null) return;
 
         ClientLevel clientLevel = level instanceof ClientLevel cl ? cl : null;
 
         RpfModelManager rpfModelManager = (RpfModelManager) Minecraft.getInstance().getModelManager();
-        List<Map<ResourceLocation, ItemModel>> packs = rpfModelManager.rpf$getModelMaps();
+        List<Map<Identifier, ItemModel>> packs = rpfModelManager.rpf$getModelMaps();
         int packsCont = packs.size();
 
         for (int i = 0; i < packsCont; i++) {
-            Map<ResourceLocation, ItemModel> currentPack = packs.get(i);
-            ItemModel model = currentPack.get(resourceLocation);
+            Map<Identifier, ItemModel> currentPack = packs.get(i);
+            ItemModel model = currentPack.get(Identifier);
 
             if (!(model instanceof RpfItemModel) && model != null) {
                 model.update(renderState, stack, (ItemModelResolver) (Object) this, displayContext, clientLevel, owner, seed);
@@ -52,8 +52,8 @@ public class ItemModelResolverMixin<T, R> {
 
             RpfItemModel rpfItemModel = (RpfItemModel) model;
             if (model != null) {
-                if (!rpfItemModel.rpf$testForDelegate(renderState, stack, (ItemModelResolver) (Object) this, displayContext, clientLevel, owner, seed, resourceLocation)) {
-                    renderState.appendModelIdentityElement(new RpfModelIdentity(resourceLocation, i, true)); // for correct GUI rendering
+                if (!rpfItemModel.rpf$testForDelegate(renderState, stack, (ItemModelResolver) (Object) this, displayContext, clientLevel, owner, seed, Identifier)) {
+                    renderState.appendModelIdentityElement(new RpfModelIdentity(Identifier, i, true)); // for correct GUI rendering
                     model.update(renderState, stack, (ItemModelResolver) (Object) this, displayContext, clientLevel, owner, seed);
                     ci.cancel();
                     return;
@@ -61,6 +61,6 @@ public class ItemModelResolverMixin<T, R> {
             }
         }
 
-        renderState.appendModelIdentityElement(new RpfModelIdentity(resourceLocation, -1, false)); // no model found
+        renderState.appendModelIdentityElement(new RpfModelIdentity(Identifier, -1, false)); // no model found
     }
 }

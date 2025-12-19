@@ -20,7 +20,7 @@ import net.minecraft.client.renderer.item.ClientItem;
 import net.minecraft.client.renderer.item.ItemModel;
 import net.minecraft.client.renderer.texture.SpriteLoader;
 import net.minecraft.client.resources.model.*;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.profiling.Profiler;
 import net.minecraft.util.profiling.ProfilerFiller;
@@ -45,7 +45,7 @@ public abstract class ModelManagerMixin implements RpfModelManager {
     private static final Logger LOGGER = LoggerFactory.getLogger("RpfModelManager");
 
     @Unique
-    private List<Map<ResourceLocation, ItemModel>> rpf$bakedItemStackModels;
+    private List<Map<Identifier, ItemModel>> rpf$bakedItemStackModels;
 
     @Unique
     private static CompletableFuture<List<RpfClientItemInfoLoader.LoadedClientInfos>> rpf$currentItemLayersFuture;
@@ -67,7 +67,7 @@ public abstract class ModelManagerMixin implements RpfModelManager {
     private BlockColors blockColors;
 
     @Shadow
-    private static CompletableFuture<Map<ResourceLocation, UnbakedModel>> loadBlockModels(ResourceManager resourceManager, Executor executor) {
+    private static CompletableFuture<Map<Identifier, UnbakedModel>> loadBlockModels(ResourceManager resourceManager, Executor executor) {
         return null; // Shadowed implementation
     }
 
@@ -77,7 +77,7 @@ public abstract class ModelManagerMixin implements RpfModelManager {
     }
 
     @Shadow
-    private static CompletableFuture<ModelManager.ReloadState> loadModels(final SpriteLoader.Preparations preperations, ModelBakery modelBakery, Object2IntMap<BlockState> modelGroups, EntityModelSet entityModelSet, SpecialBlockModelRenderer specialBlockModelRenderer, Executor executor) {        return null;
+    private static CompletableFuture<ModelManager.ReloadState> loadModels(final SpriteLoader.Preparations preparations, final SpriteLoader.Preparations preparations2, ModelBakery modelBakery, Object2IntMap<BlockState> object2IntMap, EntityModelSet entityModelSet, SpecialBlockModelRenderer specialBlockModelRenderer, Executor executor) {        return null;
     }
 
     @Shadow
@@ -100,16 +100,16 @@ public abstract class ModelManagerMixin implements RpfModelManager {
             method = "net/minecraft/client/resources/model/ModelManager.method_65747(Ljava/util/concurrent/CompletableFuture;Ljava/util/concurrent/CompletableFuture;Ljava/util/concurrent/CompletableFuture;Ljava/lang/Void;)Lnet/minecraft/client/resources/model/ModelManager$ResolvedModels;",
             at = @At(value = "INVOKE", target = "Lnet/minecraft/client/resources/model/ModelManager;discoverModelDependencies(Ljava/util/Map;Lnet/minecraft/client/resources/model/BlockStateModelLoader$LoadedModels;Lnet/minecraft/client/resources/model/ClientItemInfoLoader$LoadedClientInfos;)Lnet/minecraft/client/resources/model/ModelManager$ResolvedModels;")
     )
-    private static ModelManager.ResolvedModels rpf$wrapDiscovery(Map<ResourceLocation, UnbakedModel> inputModels, BlockStateModelLoader.LoadedModels loadedModels, ClientItemInfoLoader.LoadedClientInfos loadedClientInfos, Operation<ModelManager.ResolvedModels> original) {
+    private static ModelManager.ResolvedModels rpf$wrapDiscovery(Map<Identifier, UnbakedModel> inputModels, BlockStateModelLoader.LoadedModels loadedModels, ClientItemInfoLoader.LoadedClientInfos loadedClientInfos, Operation<ModelManager.ResolvedModels> original) {
         return rpf$discoverModelDependencies(inputModels, loadedModels, rpf$currentItemLayersFuture.join());
     }
 
     @WrapOperation(
-            method = "net/minecraft/client/resources/model/ModelManager.method_65753(Ljava/util/concurrent/CompletableFuture;Ljava/util/concurrent/CompletableFuture;Ljava/util/concurrent/CompletableFuture;Ljava/util/concurrent/CompletableFuture;Ljava/util/concurrent/CompletableFuture;Ljava/util/concurrent/CompletableFuture;Ljava/util/concurrent/CompletableFuture;Ljava/util/concurrent/CompletableFuture;Ljava/util/concurrent/Executor;Ljava/lang/Void;)Ljava/util/concurrent/CompletionStage;",
+            method = "net/minecraft/client/resources/model/ModelManager.method_65753(Ljava/util/concurrent/CompletableFuture;Ljava/util/concurrent/CompletableFuture;Ljava/util/concurrent/CompletableFuture;Ljava/util/concurrent/CompletableFuture;Ljava/util/concurrent/CompletableFuture;Ljava/util/concurrent/CompletableFuture;Ljava/util/concurrent/CompletableFuture;Ljava/util/concurrent/CompletableFuture;Ljava/util/concurrent/CompletableFuture;Ljava/util/concurrent/Executor;Ljava/lang/Void;)Ljava/util/concurrent/CompletionStage;",
             at = @At(value = "NEW", target = "(Lnet/minecraft/client/model/geom/EntityModelSet;Lnet/minecraft/client/resources/model/MaterialSet;Lnet/minecraft/client/renderer/PlayerSkinRenderCache;Ljava/util/Map;Ljava/util/Map;Ljava/util/Map;Lnet/minecraft/client/resources/model/ResolvedModel;)Lnet/minecraft/client/resources/model/ModelBakery;")
     )
-    private ModelBakery rpf$redirectModelBakeryConstructor(EntityModelSet entityModelSet, MaterialSet materials, PlayerSkinRenderCache playerSkinRenderCache, Map<BlockState, BlockStateModel.UnbakedRoot> unbakedBlockStateModels, Map<ResourceLocation, ClientItem> clientInfos, Map<ResourceLocation, ResolvedModel> resolvedModels, ResolvedModel missingModel, Operation<ModelBakery> original) {
-        List<Map<ResourceLocation, ClientItem>> rawLayers = new ArrayList<>();
+    private ModelBakery rpf$redirectModelBakeryConstructor(EntityModelSet entityModelSet, MaterialSet materials, PlayerSkinRenderCache playerSkinRenderCache, Map<BlockState, BlockStateModel.UnbakedRoot> unbakedBlockStateModels, Map<Identifier, ClientItem> clientInfos, Map<Identifier, ResolvedModel> resolvedModels, ResolvedModel missingModel, Operation<ModelBakery> original) {
+        List<Map<Identifier, ClientItem>> rawLayers = new ArrayList<>();
         for (RpfClientItemInfoLoader.LoadedClientInfos layer : rpf$currentItemLayersFuture.join()) {
             rawLayers.add(layer.contents());
         }
@@ -132,7 +132,7 @@ public abstract class ModelManagerMixin implements RpfModelManager {
 
     @Unique
     private static ModelManager.ResolvedModels rpf$discoverModelDependencies(
-            Map<ResourceLocation, UnbakedModel> blockModels,
+            Map<Identifier, UnbakedModel> blockModels,
             BlockStateModelLoader.LoadedModels loadedModels,
             List<RpfClientItemInfoLoader.LoadedClientInfos> itemLayers
     ) {
@@ -165,12 +165,12 @@ public abstract class ModelManagerMixin implements RpfModelManager {
     }
 
     @Override
-    public List<Map<ResourceLocation, ItemModel>> rpf$getModelMaps() {
+    public List<Map<Identifier, ItemModel>> rpf$getModelMaps() {
         return this.rpf$bakedItemStackModels;
     }
 
     @Override
-    public @Nullable ItemModel rpf$saveGetNextModel(int currentIndex, ResourceLocation location) {
+    public @Nullable ItemModel rpf$saveGetNextModel(int currentIndex, Identifier location) {
         if (this.rpf$bakedItemStackModels == null) {
             return null;
         }
@@ -178,7 +178,7 @@ public abstract class ModelManagerMixin implements RpfModelManager {
         if (nextIndex >= this.rpf$bakedItemStackModels.size()) {
             return null;
         }
-        Map<ResourceLocation, ItemModel> nextLayer = this.rpf$bakedItemStackModels.get(nextIndex);
+        Map<Identifier, ItemModel> nextLayer = this.rpf$bakedItemStackModels.get(nextIndex);
         ItemModel model = nextLayer.get(location);
         if (model == null) {
             return null;
