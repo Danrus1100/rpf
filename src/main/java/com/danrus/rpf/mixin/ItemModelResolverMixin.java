@@ -24,9 +24,6 @@ import java.util.Map;
 
 @Mixin(ItemModelResolver.class)
 public class ItemModelResolverMixin<T, R> {
-
-    //FIXME: hate this code: thread-unsave, but idk how to do better
-
     @Inject(
             method = "appendItemLayers",
             at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/item/ItemModel;update(Lnet/minecraft/client/renderer/item/ItemStackRenderState;Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/client/renderer/item/ItemModelResolver;Lnet/minecraft/world/item/ItemDisplayContext;Lnet/minecraft/client/multiplayer/ClientLevel;Lnet/minecraft/world/entity/LivingEntity;I)V"),

@@ -15,5 +15,9 @@ public final class RenamesBridge {
 
     public static Consumer<List<Map<ResourceLocation, ClientItem>>> itemSetter = null;
     public static BiConsumer<ResourceManager, ProfilerFiller> parser = null;
+
+    public static void update() {
+        RpRenamesCompat.update();
+    }
 }
 

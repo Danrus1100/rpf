@@ -119,6 +119,7 @@ public abstract class ModelManagerMixin implements RpfModelManager {
                     Minecraft.getInstance().getResourceManager(),
                     Profiler.get()
             );
+            RenamesBridge.update();
         }
         return ((RpfModelBakery) original.call(entityModelSet, unbakedBlockStateModels, clientInfos, resolvedModels, missingModel)).rpf$setClientItems(rawLayers);
     }

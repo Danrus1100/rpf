@@ -1,6 +1,7 @@
 package com.danrus.rpf.compat.rprenames.impl;
 
 import com.HiWord9.RPRenames.mod.RPRenames;
+import com.HiWord9.RPRenames.mod.RPRenamesItemGroup;
 
 public class RpRenamesCompat {
 
@@ -13,5 +14,9 @@ public class RpRenamesCompat {
 
 //        RPRenames.renamesManager.parsers.add(parser);
         RPRenames.renamesManager.parsers.remove(RPRenames.itemModelParser);
+    }
+
+    public static void update() {
+        RPRenamesItemGroup.update();
     }
 }
