@@ -15,7 +15,21 @@ repositories {
 }
 
 loom {
-    accessWidenerPath = file("src/main/resources/rpf.accesswidener")
+    accessWidenerPath = rootProject.file("src/main/resources/rpf.accesswidener")
+}
+
+stonecutter{
+    replacements {
+        string {
+            direction = eval(current.version, ">=1.21.11")
+            replace("ResourceLocation", "Identifier")
+        }
+
+        string {
+            direction = eval(current.version, ">=1.21.10")
+            replace("LivingEntity", "ItemOwner")
+        }
+    }
 }
 
 dependencies {
@@ -28,7 +42,9 @@ dependencies {
     })
     modImplementation("net.fabricmc:fabric-loader:${findProperty("deps.fabric")}")
     modImplementation("net.fabricmc.fabric-api:fabric-api:${findProperty("deps.fapi")}")
-    modImplementation(files("lib/RPRenames-1.21.8-0.9.2.jar"))
+    if (findProperty("deps.mc").toString() == "1.21.8") {
+        modImplementation(rootProject.files("lib/RPRenames-1.21.8-0.9.2.jar"))
+    }
 }
 
 tasks.processResources {

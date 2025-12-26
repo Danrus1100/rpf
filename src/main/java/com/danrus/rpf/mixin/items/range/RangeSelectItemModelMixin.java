@@ -8,7 +8,7 @@ import net.minecraft.client.renderer.item.ItemStackRenderState;
 import net.minecraft.client.renderer.item.RangeSelectItemModel;
 import net.minecraft.client.renderer.item.properties.numeric.RangeSelectItemModelProperty;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ItemOwner;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
@@ -30,12 +30,21 @@ public abstract class RangeSelectItemModelMixin implements RpfItemModel {
             at = @At("TAIL")
     )
     private void rpf$init(RangeSelectItemModelProperty property, float scale, float[] thresholds, ItemModel[] models, ItemModel fallback, CallbackInfo ci){
-        ((RpfItemModel) fallback).rpf$setFallback();
+        ((RpfItemModel) fallback).rpf$markAsFallback();
     }
 
     @Override
-    public boolean rpf$testForDelegate(ItemStackRenderState renderState, ItemStack stack, ItemModelResolver itemModelResolver, ItemDisplayContext displayContext, @Nullable ClientLevel level, @Nullable LivingEntity entity, int seed, ResourceLocation itemModelId) {
+    public boolean rpf$testForDelegate(
+            ItemStackRenderState renderState,
+            ItemStack stack,
+            ItemModelResolver itemModelResolver,
+            ItemDisplayContext displayContext,
+            @Nullable ClientLevel level,
+            @Nullable ItemOwner owner,
+            int seed,
+            ResourceLocation itemModelId
+    ) {
         if (this.rpf$isFallback()) return true;
-        return (((RpfItemModel) fallback).rpf$testForDelegate(renderState, stack, itemModelResolver, displayContext, level, entity, seed, itemModelId));
+        return (((RpfItemModel) fallback).rpf$testForDelegate(renderState, stack, itemModelResolver, displayContext, level, owner, seed, itemModelId));
     }
 }

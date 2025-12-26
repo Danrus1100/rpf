@@ -19,6 +19,6 @@ import org.spongepowered.asm.mixin.Unique;
 public class ItemModelMixin implements RpfItemModel {
     @Unique private boolean rpf$isFallbackModel = false;
 
-    public void rpf$setFallback(){ this.rpf$isFallbackModel = true; }
+    public void rpf$markAsFallback(){ this.rpf$isFallbackModel = true; }
     public boolean rpf$isFallback(){ return rpf$isFallbackModel; }
 }

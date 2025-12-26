@@ -1,12 +1,14 @@
 package com.danrus.rpf.api;
 
-// item model must implement this if it has fallback
+/**
+ * An interface for item models that can delegate their rendering to other packs
+ */
 public interface DelegateItemModel {
-    boolean rpf$delegate();
+    boolean rpf$getDelegation();
     void rpf$setDeligation(boolean value);
 
     interface Unbaked {
-        boolean rpf$delegate();
+        boolean rpf$getDelegation();
         void rpf$setDeligation(boolean value);
     }
 }

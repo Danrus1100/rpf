@@ -49,12 +49,12 @@ public class UnbakedMixin implements DelegateItemModel.Unbaked {
             at = @At("RETURN")
     )
     private void rpf$setFallbackModel(ItemModel.BakingContext context, CallbackInfoReturnable<ItemModel> cir, @Local ItemModel itemModel) {
-        ((RpfItemModel) itemModel).rpf$setFallback();
+        ((RpfItemModel) itemModel).rpf$markAsFallback();
     }
 
 
     @Override
-    public boolean rpf$delegate() {
+    public boolean rpf$getDelegation() {
         return rpf$doDelegate;
     }
 

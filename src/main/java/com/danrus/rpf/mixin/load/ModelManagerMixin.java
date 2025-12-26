@@ -12,10 +12,12 @@ import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.color.block.BlockColors;
 import net.minecraft.client.model.geom.EntityModelSet;
+import net.minecraft.client.renderer.PlayerSkinRenderCache;
 import net.minecraft.client.renderer.SpecialBlockModelRenderer;
 import net.minecraft.client.renderer.block.model.ItemModelGenerator;
 import net.minecraft.client.renderer.item.ClientItem;
 import net.minecraft.client.renderer.item.ItemModel;
+import net.minecraft.client.renderer.texture.SpriteLoader;
 import net.minecraft.client.resources.model.*;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
@@ -54,12 +56,18 @@ public abstract class ModelManagerMixin implements RpfModelManager {
     @Shadow
     private ModelBakery.MissingModels missingModels;
 
-    @Shadow
+    //? if <= 1.21.8 {
+    /*@Shadow
     @Final
     private AtlasSet atlases;
-
+    *///? } else {
     @Shadow
-    private int maxMipmapLevels;
+    @Final
+    private AtlasManager atlasManager;
+    //?}
+
+    //? if <=1.21.8
+    //@Shadow private int maxMipmapLevels;
 
     @Shadow
     @Final
@@ -75,13 +83,22 @@ public abstract class ModelManagerMixin implements RpfModelManager {
         return null; // Shadowed implementation
     }
 
-    @Shadow
+    //? if <=1.21.8 {
+    /*@Shadow
     private static CompletableFuture<ModelManager.ReloadState> loadModels(Map<ResourceLocation, AtlasSet.StitchResult> atlases, ModelBakery modelBakery, Object2IntMap<BlockState> modelGroups, EntityModelSet entityModelSet, SpecialBlockModelRenderer specialBlockModelRenderer, Executor executor) {
         return null;
     }
+    *///? } else {
+    private static CompletableFuture<ModelManager.ReloadState> loadModels(final SpriteLoader.Preparations preperations, ModelBakery modelBakery, Object2IntMap<BlockState> modelGroups, EntityModelSet entityModelSet, SpecialBlockModelRenderer specialBlockModelRenderer, Executor executor) {
+        return null;
+    }
+    //? }
 
     @Shadow
-    protected abstract void apply(ModelManager.ReloadState reloadState, ProfilerFiller profiler);
+    protected abstract void apply(ModelManager.ReloadState reloadState
+            //? if <=1.21.8
+            //, ProfilerFiller profiler
+    );
 
     @WrapOperation(
             method = "reload",
@@ -104,11 +121,30 @@ public abstract class ModelManagerMixin implements RpfModelManager {
         return rpf$discoverModelDependencies(inputModels, loadedModels, rpf$currentItemLayersFuture.join());
     }
 
+    @Unique
+    private static final String redirectModelBakeryConstructorTarget =
+            //? if 1.21.8
+            /*"net/minecraft/client/resources/model/ModelManager.method_65753(Ljava/util/Map;Ljava/util/concurrent/CompletableFuture;Ljava/util/concurrent/CompletableFuture;Ljava/util/concurrent/CompletableFuture;Ljava/util/concurrent/CompletableFuture;Ljava/util/concurrent/CompletableFuture;Ljava/util/concurrent/CompletableFuture;Ljava/util/concurrent/CompletableFuture;Ljava/util/concurrent/Executor;Ljava/lang/Void;)Ljava/util/concurrent/CompletionStage;";*/
+            //? if 1.21.10
+            "net/minecraft/client/resources/model/ModelManager.method_65753(Ljava/util/concurrent/CompletableFuture;Ljava/util/concurrent/CompletableFuture;Ljava/util/concurrent/CompletableFuture;Ljava/util/concurrent/CompletableFuture;Ljava/util/concurrent/CompletableFuture;Ljava/util/concurrent/CompletableFuture;Ljava/util/concurrent/CompletableFuture;Ljava/util/concurrent/CompletableFuture;Ljava/util/concurrent/Executor;Ljava/lang/Void;)Ljava/util/concurrent/CompletionStage;";
+
+    @Unique
+    private static final String redirectModelBakeryConstructorBakeryTarget =
+            //? if 1.21.8
+            /*"(Lnet/minecraft/client/model/geom/EntityModelSet;Ljava/util/Map;Ljava/util/Map;Ljava/util/Map;Lnet/minecraft/client/resources/model/ResolvedModel;)Lnet/minecraft/client/resources/model/ModelBakery;";*/
+            //? if 1.21.10
+            "(Lnet/minecraft/client/model/geom/EntityModelSet;Lnet/minecraft/client/resources/model/MaterialSet;Lnet/minecraft/client/renderer/PlayerSkinRenderCache;Ljava/util/Map;Ljava/util/Map;Ljava/util/Map;Lnet/minecraft/client/resources/model/ResolvedModel;)Lnet/minecraft/client/resources/model/ModelBakery;";
+
     @WrapOperation(
-            method = "net/minecraft/client/resources/model/ModelManager.method_65753(Ljava/util/Map;Ljava/util/concurrent/CompletableFuture;Ljava/util/concurrent/CompletableFuture;Ljava/util/concurrent/CompletableFuture;Ljava/util/concurrent/CompletableFuture;Ljava/util/concurrent/CompletableFuture;Ljava/util/concurrent/CompletableFuture;Ljava/util/concurrent/CompletableFuture;Ljava/util/concurrent/Executor;Ljava/lang/Void;)Ljava/util/concurrent/CompletionStage;",
-            at = @At(value = "NEW", target = "(Lnet/minecraft/client/model/geom/EntityModelSet;Ljava/util/Map;Ljava/util/Map;Ljava/util/Map;Lnet/minecraft/client/resources/model/ResolvedModel;)Lnet/minecraft/client/resources/model/ModelBakery;")
+            method = redirectModelBakeryConstructorTarget,
+            at = @At(value = "NEW", target = redirectModelBakeryConstructorBakeryTarget)
     )
-    private static ModelBakery rpf$redirectModelBakeryConstructor(EntityModelSet entityModelSet, Map unbakedBlockStateModels, Map clientInfos, Map resolvedModels, ResolvedModel missingModel, Operation<ModelBakery> original) {
+    private static ModelBakery rpf$redirectModelBakeryConstructor
+            //? if 1.21.8
+            /*(EntityModelSet entityModelSet, Map unbakedBlockStateModels, Map clientInfos, Map resolvedModels, ResolvedModel missingModel, Operation<ModelBakery> original)*/
+            //? if 1.21.10
+            (EntityModelSet entityModelSet, MaterialSet materials, PlayerSkinRenderCache playerSkinRenderCache, Map unbakedBlockStateModels, Map clientInfos, Map resolvedModels, ResolvedModel missingModel, Operation<ModelBakery> original)
+    {
         List<Map<ResourceLocation, ClientItem>> rawLayers = new ArrayList<>();
         for (RpfClientItemInfoLoader.LoadedClientInfos layer : rpf$currentItemLayersFuture.join()) {
             rawLayers.add(layer.contents());
@@ -121,7 +157,12 @@ public abstract class ModelManagerMixin implements RpfModelManager {
             );
             RenamesBridge.update();
         }
-        return ((RpfModelBakery) original.call(entityModelSet, unbakedBlockStateModels, clientInfos, resolvedModels, missingModel)).rpf$setClientItems(rawLayers);
+        return ((RpfModelBakery) original.call
+                //? if 1.21.8
+                /*(entityModelSet, unbakedBlockStateModels, clientInfos, resolvedModels, missingModel)*/
+                //? if 1.21.10
+                (entityModelSet, materials, playerSkinRenderCache, unbakedBlockStateModels, clientInfos, resolvedModels, missingModel)
+        ).rpf$setClientItems(rawLayers);
     }
 
     @Unique
@@ -148,7 +189,13 @@ public abstract class ModelManagerMixin implements RpfModelManager {
             method = "apply",
             at = @At(value = "INVOKE", target = "Lnet/minecraft/client/resources/model/ModelBakery$BakingResult;itemStackModels()Ljava/util/Map;")
     )
-    private void rpf$apply(ModelManager.ReloadState reloadState, ProfilerFiller profiler, CallbackInfo ci, @Local ModelBakery.BakingResult bakingResult) {
+    private void rpf$apply(
+            ModelManager.ReloadState reloadState,
+            //? if <= 1.21.8
+            /*ProfilerFiller profiler,*/
+            CallbackInfo ci,
+            @Local ModelBakery.BakingResult bakingResult
+    ) {
         try {
             this.rpf$bakedItemStackModels = ((RpfBakingResult) (Object) bakingResult).rpf$geItemModels().reversed(); // "reversed" to put vanilla RP down of list
         } catch (ClassCastException e) {

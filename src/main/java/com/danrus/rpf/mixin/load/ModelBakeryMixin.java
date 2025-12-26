@@ -41,6 +41,21 @@ public class ModelBakeryMixin implements RpfModelBakery {
     @Final
     private EntityModelSet entityModelSet;
 
+    //? if >=1.21.10{
+
+    @Shadow
+    @Final
+    private net.minecraft.client.renderer.PlayerSkinRenderCache playerSkinRenderCache;
+
+    @Shadow
+    @Final
+    private net.minecraft.client.resources.model.MaterialSet materials;
+
+    //? }
+
+
+
+
     @Override
     public ModelBakery rpf$setClientItems(List<Map<ResourceLocation, ClientItem>> items) {
         this.rpf$clientItems = items;
@@ -65,7 +80,15 @@ public class ModelBakeryMixin implements RpfModelBakery {
                     layer,
                     (resourceLocation, clientItem) -> {
                         try {
-                            ItemModel model = clientItem.model().bake(new ItemModel.BakingContext(modelBakerImpl, this.entityModelSet, missingModels.item, clientItem.registrySwapper()));
+                            ItemModel model = clientItem.model().bake(new ItemModel.BakingContext(
+                                    modelBakerImpl,
+                                    this.entityModelSet,
+                                    //? if >=1.21.10{
+                                    materials,
+                                    playerSkinRenderCache,
+                                    //?}
+                                    missingModels.item,
+                                    clientItem.registrySwapper()));
                             return model;
                         } catch (Exception exception) {
                             LOGGER.warn("Unable to bake item model: '{}'", resourceLocation, exception);

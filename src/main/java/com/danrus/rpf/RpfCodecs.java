@@ -15,7 +15,7 @@ public class RpfCodecs {
                     SelectItemModel.UnbakedSwitch.MAP_CODEC.forGetter(SelectItemModel.Unbaked::unbakedSwitch),
                     ItemModels.CODEC.optionalFieldOf("fallback").forGetter(SelectItemModel.Unbaked::fallback),
                     Codec.BOOL.optionalFieldOf("delegate", true).forGetter((model) -> {
-                        return DelegateItemModel.Unbaked.class.cast(model).rpf$delegate();
+                        return DelegateItemModel.Unbaked.class.cast(model).rpf$getDelegation();
                     })
             ).apply(instance, ((unbakedSwitch, fallback, delegate) -> {
                 SelectItemModel.Unbaked model = new SelectItemModel.Unbaked(unbakedSwitch, fallback);
