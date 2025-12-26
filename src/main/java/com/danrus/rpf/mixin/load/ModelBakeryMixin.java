@@ -43,7 +43,7 @@ public class ModelBakeryMixin implements RpfModelBakery {
 
     //? if >=1.21.10{
 
-    @Shadow
+    /*@Shadow
     @Final
     private net.minecraft.client.renderer.PlayerSkinRenderCache playerSkinRenderCache;
 
@@ -51,7 +51,7 @@ public class ModelBakeryMixin implements RpfModelBakery {
     @Final
     private net.minecraft.client.resources.model.MaterialSet materials;
 
-    //? }
+    *///? }
 
 
 
@@ -84,9 +84,9 @@ public class ModelBakeryMixin implements RpfModelBakery {
                                     modelBakerImpl,
                                     this.entityModelSet,
                                     //? if >=1.21.10{
-                                    materials,
+                                    /*materials,
                                     playerSkinRenderCache,
-                                    //?}
+                                    *///?}
                                     missingModels.item,
                                     clientItem.registrySwapper()));
                             return model;

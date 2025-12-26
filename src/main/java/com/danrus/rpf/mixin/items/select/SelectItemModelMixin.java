@@ -7,7 +7,7 @@ import net.minecraft.client.renderer.item.ItemModelResolver;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
 import net.minecraft.client.renderer.item.SelectItemModel;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.ItemOwner;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
@@ -37,7 +37,7 @@ public abstract class SelectItemModelMixin<T> implements DelegateItemModel, RpfI
             ItemModelResolver itemModelResolver,
             ItemDisplayContext displayContext,
             @Nullable ClientLevel level,
-            @Nullable ItemOwner owner,
+            @Nullable LivingEntity owner,
             int seed,
             ResourceLocation itemModelId
     ) {
@@ -46,7 +46,7 @@ public abstract class SelectItemModelMixin<T> implements DelegateItemModel, RpfI
         SelectItemModel<T> self = (SelectItemModel<T>) (Object) this;
         T object = self.property.get(stack, level, owner == null ? null : owner
                 //? if >=1.21.10
-                .asLivingEntity()
+                //.asLivingEntity()
                 , seed, displayContext);
         RpfItemModel itemModel = (RpfItemModel) self.models.get(object, level);
         return itemModel == null || itemModel.rpf$testForDelegate(renderState, stack, itemModelResolver, displayContext, level, owner, seed, itemModelId);
