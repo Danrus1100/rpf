@@ -47,6 +47,9 @@ public abstract class ModelManagerMixin implements RpfModelManager {
     private List<Map<ResourceLocation, ItemModel>> rpf$bakedItemStackModels;
 
     @Unique
+    private List<Map<ResourceLocation, ClientItem.Properties>> rpf$itemProperties;
+
+    @Unique
     private static final ClientItemInfoLoader.LoadedClientInfos EMPTY_LOADED_INFOS =
             new ClientItemInfoLoader.LoadedClientInfos(Map.of());
 
@@ -79,18 +82,6 @@ public abstract class ModelManagerMixin implements RpfModelManager {
     private static Object2IntMap<BlockState> buildModelGroups(BlockColors blockColors, BlockStateModelLoader.LoadedModels loadedModels) {
         return null; // Shadowed implementation
     }
-
-//    //? if <=1.21.8 {
-//    /*@Shadow
-//    private static CompletableFuture<ModelManager.ReloadState> loadModels(Map<ResourceLocation, AtlasSet.StitchResult> atlases, ModelBakery modelBakery, Object2IntMap<BlockState> modelGroups, EntityModelSet entityModelSet, SpecialBlockModelRenderer specialBlockModelRenderer, Executor executor) {
-//        return null;
-//    }
-//    *///? } else {
-//    @Shadow
-//    private static CompletableFuture<ModelManager.ReloadState> loadModels(final SpriteLoader.Preparations preperations, ModelBakery modelBakery, Object2IntMap<BlockState> modelGroups, EntityModelSet entityModelSet, SpecialBlockModelRenderer specialBlockModelRenderer, Executor executor) {
-//        return null;
-//    }
-//    //? }
 
     @Shadow
     protected abstract void apply(ModelManager.ReloadState reloadState
@@ -197,7 +188,9 @@ public abstract class ModelManagerMixin implements RpfModelManager {
             @Local ModelBakery.BakingResult bakingResult
     ) {
         try {
-            this.rpf$bakedItemStackModels = ((RpfBakingResult) (Object) bakingResult).rpf$geItemModels().reversed(); // "reversed" to put vanilla RP down of list
+            RpfBakingResult result = ((RpfBakingResult) (Object) bakingResult);
+            this.rpf$bakedItemStackModels = result.rpf$geItemModels().reversed(); // "reversed" to put vanilla RP down of list
+            this.rpf$itemProperties = result.rpf$getItemProperties().reversed();
         } catch (ClassCastException e) {
             throw new IllegalStateException("ModelBakery.BakingResult bakingResult is not instance of RpfBakingResult!");
         } catch (Exception e2) {
@@ -211,19 +204,7 @@ public abstract class ModelManagerMixin implements RpfModelManager {
     }
 
     @Override
-    public @Nullable ItemModel rpf$saveGetNextModel(int currentIndex, ResourceLocation location) {
-        if (this.rpf$bakedItemStackModels == null) {
-            return null;
-        }
-        int nextIndex = currentIndex + 1;
-        if (nextIndex >= this.rpf$bakedItemStackModels.size()) {
-            return null;
-        }
-        Map<ResourceLocation, ItemModel> nextLayer = this.rpf$bakedItemStackModels.get(nextIndex);
-        ItemModel model = nextLayer.get(location);
-        if (model == null) {
-            return null;
-        }
-        return model;
+    public List<Map<ResourceLocation, ClientItem.Properties>> rpf$getItemPropertiesMaps() {
+        return this.rpf$itemProperties;
     }
 }

@@ -7,3 +7,5 @@ accessible class net/minecraft/client/resources/model/ModelManager$ResolvedModel
 
 accessible field net/minecraft/client/renderer/item/SelectItemModel property Lnet/minecraft/client/renderer/item/properties/select/SelectItemModelProperty;
 accessible field net/minecraft/client/renderer/item/SelectItemModel models Lnet/minecraft/client/renderer/item/SelectItemModel$ModelSelector;
+
+accessible method net/minecraft/client/renderer/item/RangeSelectItemModel lastIndexLessOrEqual ([FF)I

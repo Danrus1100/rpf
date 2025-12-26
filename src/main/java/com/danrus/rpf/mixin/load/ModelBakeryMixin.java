@@ -99,15 +99,16 @@ public class ModelBakeryMixin implements RpfModelBakery {
             );
             layerFutures.add(layerFuture);
         }
-
-        Map<ResourceLocation, ClientItem.Properties> propertiesMap = new HashMap<>();
+        List<Map<ResourceLocation, ClientItem.Properties>> propertiesLayers = new ArrayList<>(this.rpf$clientItems.size());
         for (Map<ResourceLocation, ClientItem> layer : this.rpf$clientItems) {
+            Map<ResourceLocation, ClientItem.Properties> propertiesMap = new HashMap<>();
             layer.forEach((resourceLocation, clientItem) -> {
                 ClientItem.Properties properties = clientItem.properties();
                 if (!properties.equals(ClientItem.Properties.DEFAULT)) {
                     propertiesMap.put(resourceLocation, properties);
                 }
             });
+            propertiesLayers.add(propertiesMap);
         }
 
         cir.setReturnValue(completableFuture.thenCombine(Util.sequence(layerFutures), (blockModels, bakedLayers) -> {
@@ -117,8 +118,8 @@ public class ModelBakeryMixin implements RpfModelBakery {
                 flatItemModels.putAll(layer);
             }
 
-            ModelBakery.BakingResult result = new ModelBakery.BakingResult(missingModels, blockModels, flatItemModels, propertiesMap);
-            ((RpfBakingResult) (Object) result).rpf$setItemModels(bakedLayers);
+            ModelBakery.BakingResult result = new ModelBakery.BakingResult(missingModels, blockModels, flatItemModels, Map.of());
+            ((RpfBakingResult) (Object) result).rpf$setItemProperties(propertiesLayers).rpf$setItemModels(bakedLayers);
 
             return result;
         }));
