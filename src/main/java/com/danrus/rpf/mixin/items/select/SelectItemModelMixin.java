@@ -44,7 +44,7 @@ public abstract class SelectItemModelMixin<T> implements DelegateItemModel, RpfI
         if (!this.rpf$delegate) return false;
         if (this.rpf$isFallback()) return true;
         SelectItemModel<T> self = (SelectItemModel<T>) (Object) this;
-        T object = self.property.get(stack, level, owner
+        T object = self.property.get(stack, level, owner == null ? null : owner
                 //? if >=1.21.10
                 .asLivingEntity()
                 , seed, displayContext);

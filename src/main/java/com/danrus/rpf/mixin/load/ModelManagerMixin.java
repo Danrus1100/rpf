@@ -1,5 +1,6 @@
 package com.danrus.rpf.mixin.load;
 
+import com.danrus.rpf.Rpf;
 import com.danrus.rpf.RpfClientItemInfoLoader;
 import com.danrus.rpf.compat.rprenames.impl.RenamesBridge;
 import com.danrus.rpf.duck.load.RpfBakingResult;
@@ -47,9 +48,6 @@ public abstract class ModelManagerMixin implements RpfModelManager {
     private List<Map<ResourceLocation, ItemModel>> rpf$bakedItemStackModels;
 
     @Unique
-    private static CompletableFuture<List<RpfClientItemInfoLoader.LoadedClientInfos>> rpf$currentItemLayersFuture;
-
-    @Unique
     private static final ClientItemInfoLoader.LoadedClientInfos EMPTY_LOADED_INFOS =
             new ClientItemInfoLoader.LoadedClientInfos(Map.of());
 
@@ -89,6 +87,7 @@ public abstract class ModelManagerMixin implements RpfModelManager {
         return null;
     }
     *///? } else {
+    @Shadow
     private static CompletableFuture<ModelManager.ReloadState> loadModels(final SpriteLoader.Preparations preperations, ModelBakery modelBakery, Object2IntMap<BlockState> modelGroups, EntityModelSet entityModelSet, SpecialBlockModelRenderer specialBlockModelRenderer, Executor executor) {
         return null;
     }
@@ -109,7 +108,7 @@ public abstract class ModelManagerMixin implements RpfModelManager {
     )
     private CompletableFuture<ClientItemInfoLoader.LoadedClientInfos> rpf$wrapClientItemInfoLoader(ResourceManager resourceManager, Executor executor, Operation<CompletableFuture<ClientItemInfoLoader.LoadedClientInfos>> original) {
         LOGGER.info("[RPF] Start to schedule items!");
-        rpf$currentItemLayersFuture = RpfClientItemInfoLoader.scheduleLoad(resourceManager, executor);
+        Rpf.rpf$currentItemLayersFuture = RpfClientItemInfoLoader.scheduleLoad(resourceManager, executor);
         return CompletableFuture.completedFuture(EMPTY_LOADED_INFOS);
     }
 
@@ -118,7 +117,7 @@ public abstract class ModelManagerMixin implements RpfModelManager {
             at = @At(value = "INVOKE", target = "Lnet/minecraft/client/resources/model/ModelManager;discoverModelDependencies(Ljava/util/Map;Lnet/minecraft/client/resources/model/BlockStateModelLoader$LoadedModels;Lnet/minecraft/client/resources/model/ClientItemInfoLoader$LoadedClientInfos;)Lnet/minecraft/client/resources/model/ModelManager$ResolvedModels;")
     )
     private static ModelManager.ResolvedModels rpf$wrapDiscovery(Map<ResourceLocation, UnbakedModel> inputModels, BlockStateModelLoader.LoadedModels loadedModels, ClientItemInfoLoader.LoadedClientInfos loadedClientInfos, Operation<ModelManager.ResolvedModels> original) {
-        return rpf$discoverModelDependencies(inputModels, loadedModels, rpf$currentItemLayersFuture.join());
+        return rpf$discoverModelDependencies(inputModels, loadedModels, Rpf.rpf$currentItemLayersFuture.join());
     }
 
     @Unique
@@ -146,7 +145,7 @@ public abstract class ModelManagerMixin implements RpfModelManager {
             (EntityModelSet entityModelSet, MaterialSet materials, PlayerSkinRenderCache playerSkinRenderCache, Map unbakedBlockStateModels, Map clientInfos, Map resolvedModels, ResolvedModel missingModel, Operation<ModelBakery> original)
     {
         List<Map<ResourceLocation, ClientItem>> rawLayers = new ArrayList<>();
-        for (RpfClientItemInfoLoader.LoadedClientInfos layer : rpf$currentItemLayersFuture.join()) {
+        for (RpfClientItemInfoLoader.LoadedClientInfos layer : Rpf.rpf$currentItemLayersFuture.join()) {
             rawLayers.add(layer.contents());
         }
         if (RenamesBridge.active) {
