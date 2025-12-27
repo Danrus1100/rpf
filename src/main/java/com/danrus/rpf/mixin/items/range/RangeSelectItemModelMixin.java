@@ -70,7 +70,7 @@ public abstract class RangeSelectItemModelMixin implements RpfItemModel, Delegat
             int seed,
             ResourceLocation itemModelId
     ) {
-        if (this.rpf$isFallback()) return true;
+        if (this.rpf$isFallback()) return this.rpf$delegate;
         float f = property.get(stack, level, owner, seed) * scale;
         ItemModel itemModel;
         if (Float.isNaN(f)) {
@@ -78,6 +78,9 @@ public abstract class RangeSelectItemModelMixin implements RpfItemModel, Delegat
         } else {
             int i = RangeSelectItemModel.lastIndexLessOrEqual(thresholds, f);
             itemModel = i == -1 ? this.fallback : models[i];
+        }
+        if (!(itemModel instanceof RpfItemModel)) {
+            return RpfItemModel.super.rpf$testForDelegate(renderState, stack, itemModelResolver, displayContext, level, owner, seed, itemModelId);
         }
         return (((RpfItemModel) itemModel).rpf$testForDelegate(renderState, stack, itemModelResolver, displayContext, level, owner, seed, itemModelId));
     }

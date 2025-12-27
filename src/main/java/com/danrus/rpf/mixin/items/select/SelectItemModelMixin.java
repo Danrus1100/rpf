@@ -3,6 +3,7 @@ package com.danrus.rpf.mixin.items.select;
 import com.danrus.rpf.api.DelegateItemModel;
 import com.danrus.rpf.api.RpfItemModel;
 import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.renderer.item.ItemModel;
 import net.minecraft.client.renderer.item.ItemModelResolver;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
 import net.minecraft.client.renderer.item.SelectItemModel;
@@ -48,7 +49,12 @@ public abstract class SelectItemModelMixin<T> implements DelegateItemModel, RpfI
                 //? if >=1.21.10
                 //.asLivingEntity()
                 , seed, displayContext);
-        RpfItemModel itemModel = (RpfItemModel) self.models.get(object, level);
-        return itemModel == null || itemModel.rpf$testForDelegate(renderState, stack, itemModelResolver, displayContext, level, owner, seed, itemModelId);
+        ItemModel itemModel = self.models.get(object, level);
+
+        if (!(itemModel instanceof RpfItemModel)) {
+            return itemModel == null || RpfItemModel.super.rpf$testForDelegate(renderState, stack, itemModelResolver, displayContext, level, owner, seed, itemModelId);
+        }
+
+        return itemModel == null || ((RpfItemModel)itemModel).rpf$testForDelegate(renderState, stack, itemModelResolver, displayContext, level, owner, seed, itemModelId);
     }
 }

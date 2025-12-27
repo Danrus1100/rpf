@@ -1,2 +1,2 @@
- - small stability improvements
- - Missing model fix
+ - Fixed manual `range_dispatch` delegation control
+ - Fixed possible game crashes if another mod adds its own Item Model Definition 

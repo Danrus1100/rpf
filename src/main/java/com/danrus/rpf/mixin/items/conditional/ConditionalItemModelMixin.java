@@ -33,7 +33,7 @@ public abstract class ConditionalItemModelMixin implements RpfItemModel {
 
     @Override
     public boolean rpf$testForDelegate(ItemStackRenderState renderState, ItemStack stack, ItemModelResolver itemModelResolver, ItemDisplayContext displayContext, @Nullable ClientLevel level, @Nullable LivingEntity owner, int seed, ResourceLocation itemModelId) {
-        return ((RpfItemModel)(property.get(
+        ItemModel model = (property.get(
                 stack,
                 level,
                 owner == null ? null : owner
@@ -42,6 +42,11 @@ public abstract class ConditionalItemModelMixin implements RpfItemModel {
                 ,
                 seed,
                 displayContext
-        ) ? onTrue : onFalse)).rpf$testForDelegate(renderState, stack, itemModelResolver, displayContext, level, owner, seed, itemModelId);
+        ) ? onTrue : onFalse);
+
+        if (model instanceof RpfItemModel rpfItemModel) {
+            return rpfItemModel.rpf$testForDelegate(renderState, stack, itemModelResolver, displayContext, level, owner, seed, itemModelId);
+        }
+        return RpfItemModel.super.rpf$testForDelegate(renderState, stack, itemModelResolver, displayContext, level, owner, seed, itemModelId);
     }
 }
