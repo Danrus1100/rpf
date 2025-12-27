@@ -207,4 +207,9 @@ public abstract class ModelManagerMixin implements RpfModelManager {
     public List<Map<ResourceLocation, ClientItem.Properties>> rpf$getItemPropertiesMaps() {
         return this.rpf$itemProperties;
     }
+
+    @Override
+    public ItemModel rpf$getMissingModel() {
+        return missingModels.item();
+    }
 }

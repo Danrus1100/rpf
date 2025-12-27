@@ -28,9 +28,7 @@ public abstract class UnbakedSwitchMixin <P extends SelectItemModelProperty<T>, 
     private boolean delegation;
 
     @Shadow
-    private SelectItemModel.ModelSelector<T> createModelGetter(Object2ObjectMap<T, ItemModel> models, @Nullable RegistryContextSwapper contextSwapper) {
-        return null;
-    }
+    protected abstract SelectItemModel.ModelSelector<T> createModelGetter(Object2ObjectMap<T, ItemModel> models, @Nullable RegistryContextSwapper contextSwapper);
 
     @Inject(
             method = "bake",

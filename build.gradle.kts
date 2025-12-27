@@ -1,5 +1,6 @@
 plugins {
     id("fabric-loom") version "1.13-SNAPSHOT"
+    id("me.modmuss50.mod-publish-plugin") version "0.8.4"
     id("java")
 }
 
@@ -7,6 +8,16 @@ fun opt(name: String, consumer: (prop: String) -> Unit) {
     (findProperty(name) as? String?)
         ?.let(consumer)
 }
+
+fun prop(name: String) : String {
+    return findProperty(name)?.toString() ?: throw IllegalArgumentException("Missing property: $name")
+}
+
+val mainBranch = "multiversion"
+val gitBranchName = providers.exec {
+    commandLine("git", "rev-parse", "--abbrev-ref", "HEAD")
+}.standardOutput.asText.map { it.trim() }.get()
+val minecraft = property("deps.mc") as String
 
 repositories {
     mavenCentral()
@@ -81,6 +92,52 @@ tasks.processResources {
 
 base {
     archivesName.set(findProperty("mod.id") as String)
+}
+
+publishMods {
+    val modrinthToken = findProperty("modrinth-token")
+    val curseforgeToken = findProperty("curseforge-token")
+    val discordWebhookDR = findProperty("discord-webhook")
+    val discordWebhookDry = findProperty("discord-webhook-dry")
+
+    dryRun = gitBranchName != mainBranch
+
+    type = STABLE
+
+    file.set(tasks.named("remapJar").flatMap { (it as org.gradle.jvm.tasks.Jar).archiveFile })
+
+    changelog = rootProject.file("CHANGELOG.md").readText()
+
+    val loaders = prop("pub.target.platforms").split(' ')
+    loaders.forEach(modLoaders::add)
+    displayName = "PRF ${prop("mod.version")} for ${minecraft}"
+    version = "${prop("mod.version")}-${minecraft}"
+
+    val targets = prop("pub.target.versions").split(' ')
+    modrinth {
+        projectId = prop("publish.modrinth")
+        accessToken = modrinthToken.toString()
+        targets.forEach(minecraftVersions::add)
+    }
+
+    curseforge {
+        projectId = prop("publish.curseforge")
+        accessToken = curseforgeToken.toString()
+        projectSlug = prop("pub.slug")
+        targets.forEach(minecraftVersions::add)
+    }
+
+    if (targets.contains("1.21.8") && loaders.contains("fabric")) {
+        discord ("DR freak mods anonuncement") {
+            webhookUrl = discordWebhookDR.toString()
+            dryRunWebhookUrl = discordWebhookDry.toString()
+
+            username  = prop("mod.name")
+            avatarUrl = "https://github.com/Danrus1100/rpf/blob/main/src/main/resources/assets/rpf/icon.png?raw=true"
+
+            content = changelog.map{ "# " + prop("mod.version") + " version here! \n\n" + rootProject.file("CHANGELOG.md").readText() +"\n\n<@&1426901890582581248>" }
+        }
+    }
 }
 
 version = findProperty("mod.version") as String + "-" +findProperty("deps.mc") as String

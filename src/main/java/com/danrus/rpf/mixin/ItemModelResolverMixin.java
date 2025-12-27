@@ -62,10 +62,11 @@ public class ItemModelResolverMixin<T, R> {
             if (model != null) {
                 if (!rpfItemModel.rpf$testForDelegate(renderState, stack, (ItemModelResolver) (Object) this, displayContext, clientLevel, entity, seed, resourceLocation) || i == packsCont - 1) {
                     ClientItem.Properties properties = rpfModelManager.rpf$getItemPropertiesMaps().get(i).get(resourceLocation);
-                    if (properties != null) {
-                        renderState.setOversizedInGui(properties.oversizedInGui());
-                        this.componentsToProperties.put(stack.getComponents(), properties);
+                    if (properties == null) {
+                        properties = ClientItem.Properties.DEFAULT;
                     }
+                    renderState.setOversizedInGui(properties.oversizedInGui());
+                    this.componentsToProperties.put(stack.getComponents(), properties);
                     renderState.appendModelIdentityElement(new RpfModelIdentity(resourceLocation, i, true)); // for correct GUI rendering
                     model.update(renderState, stack, (ItemModelResolver) (Object) this, displayContext, clientLevel, entity, seed);
                     ci.cancel();
@@ -75,6 +76,7 @@ public class ItemModelResolverMixin<T, R> {
         }
 
         renderState.appendModelIdentityElement(new RpfModelIdentity(resourceLocation, -1, false)); // no model found
+        rpfModelManager.rpf$getMissingModel().update(renderState, stack, (ItemModelResolver) (Object) this, displayContext, clientLevel, entity, seed);
         ci.cancel();
     }
 
@@ -85,7 +87,7 @@ public class ItemModelResolverMixin<T, R> {
     )
     private void rpf$shouldPlaySwapAnimation(ItemStack stack, CallbackInfoReturnable<Boolean> cir) {
         ResourceLocation resourceLocation = stack.get(DataComponents.ITEM_MODEL);
-        ClientItem.Properties properties = this.componentsToProperties.get(stack.getComponents());
+        ClientItem.Properties properties = this.componentsToProperties.get(stack.getComponents()); // FIXME: not the best way to get properties
         if (resourceLocation == null || properties == null) {
             cir.setReturnValue(true);
             return;
