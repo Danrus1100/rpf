@@ -1,5 +1,6 @@
 package com.danrus.rpf.api;
 
+import com.danrus.rpf.logging.ModelTestsResultCollector;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.item.ItemModelResolver;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
@@ -24,7 +25,9 @@ public interface RpfItemModel {
             @Nullable ClientLevel level,
             @Nullable LivingEntity owner,
             int seed,
-            ResourceLocation itemModelId
+            ResourceLocation itemModelId,
+            String packName,
+            ModelTestsResultCollector collector
     ) {
         return rpf$isFallback();
     }

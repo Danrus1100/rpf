@@ -1,8 +1,9 @@
 package com.danrus.rpf.mixin.load;
 
 import com.danrus.rpf.Rpf;
-import com.danrus.rpf.RpfClientItemInfoLoader;
+import com.danrus.rpf.core.RpfClientItemInfoLoader;
 import com.danrus.rpf.compat.rprenames.impl.RenamesBridge;
+import com.danrus.rpf.core.SignedItemModel;
 import com.danrus.rpf.duck.load.RpfBakingResult;
 import com.danrus.rpf.duck.load.RpfModelBakery;
 import com.danrus.rpf.duck.load.RpfModelManager;
@@ -13,11 +14,9 @@ import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.color.block.BlockColors;
 import net.minecraft.client.model.geom.EntityModelSet;
-import net.minecraft.client.renderer.SpecialBlockModelRenderer;
 import net.minecraft.client.renderer.block.model.ItemModelGenerator;
 import net.minecraft.client.renderer.item.ClientItem;
 import net.minecraft.client.renderer.item.ItemModel;
-import net.minecraft.client.renderer.texture.SpriteLoader;
 import net.minecraft.client.resources.model.*;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
@@ -25,7 +24,6 @@ import net.minecraft.util.profiling.Profiler;
 import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.util.profiling.Zone;
 import net.minecraft.world.level.block.state.BlockState;
-import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongepowered.asm.mixin.*;
@@ -44,7 +42,8 @@ public abstract class ModelManagerMixin implements RpfModelManager {
     private static final Logger LOGGER = LoggerFactory.getLogger("RpfModelManager");
 
     @Unique
-    private List<Map<ResourceLocation, ItemModel>> rpf$bakedItemStackModels;
+//    private List<Map<ResourceLocation, ItemModel>> rpf$bakedItemStackModels;
+    private List<Map<ResourceLocation, SignedItemModel>> rpf$bakedItemStackSignetModels;
 
     @Unique
     private List<Map<ResourceLocation, ClientItem.Properties>> rpf$itemProperties;
@@ -189,7 +188,7 @@ public abstract class ModelManagerMixin implements RpfModelManager {
     ) {
         try {
             RpfBakingResult result = ((RpfBakingResult) (Object) bakingResult);
-            this.rpf$bakedItemStackModels = result.rpf$geItemModels().reversed(); // "reversed" to put vanilla RP down of list
+            this.rpf$bakedItemStackSignetModels = result.rpf$getItemSignedModels().reversed(); // "reversed" to put vanilla RP down of list
             this.rpf$itemProperties = result.rpf$getItemProperties().reversed();
         } catch (ClassCastException e) {
             throw new IllegalStateException("ModelBakery.BakingResult bakingResult is not instance of RpfBakingResult!");
@@ -198,9 +197,10 @@ public abstract class ModelManagerMixin implements RpfModelManager {
         }
     }
 
+
     @Override
-    public List<Map<ResourceLocation, ItemModel>> rpf$getModelMaps() {
-        return this.rpf$bakedItemStackModels;
+    public List<Map<ResourceLocation, SignedItemModel>> rpf$getSignedModels() {
+        return rpf$bakedItemStackSignetModels;
     }
 
     @Override

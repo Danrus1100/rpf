@@ -1,5 +1,6 @@
-package com.danrus.rpf;
+package com.danrus.rpf.core;
 
+import com.danrus.rpf.duck.RpfClientItem;
 import com.google.gson.JsonElement;
 import com.mojang.logging.LogUtils;
 import com.mojang.serialization.DynamicOps;
@@ -85,7 +86,7 @@ public class RpfClientItemInfoLoader {
             PlaceholderLookupProvider placeholders = new PlaceholderLookupProvider(registryAccess);
             DynamicOps<JsonElement> ops = placeholders.createSerializationContext(JsonOps.INSTANCE);
 
-            return ClientItem.CODEC
+            ClientItem clientItem = ClientItem.CODEC
                     .parse(ops, StrictJsonParser.parse(reader))
                     .ifError(error -> LOGGER.error("Couldn't parse item model '{}' from pack '{}': {}",
                             id, resource.sourcePackId(), error.message()))
@@ -94,6 +95,12 @@ public class RpfClientItemInfoLoader {
                             ? item.withRegistrySwapper(placeholders.createSwapper())
                             : item)
                     .orElse(null);
+
+            if (clientItem != null) {
+                RpfClientItem.class.cast(clientItem).rpf$setPackName(resource.sourcePackId());
+            }
+
+            return clientItem;
 
         } catch (Exception e) {
             LOGGER.error("Failed to open item model {} from pack '{}'", id, resource.sourcePackId(), e);

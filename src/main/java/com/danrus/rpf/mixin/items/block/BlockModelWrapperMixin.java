@@ -2,6 +2,7 @@ package com.danrus.rpf.mixin.items.block;
 
 import com.danrus.rpf.api.RpfItemModel;
 import com.danrus.rpf.duck.item.RpfBlockModelWrapper;
+import com.danrus.rpf.logging.ModelTestsResultCollector;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.item.BlockModelWrapper;
 import net.minecraft.client.renderer.item.ItemModelResolver;
@@ -31,12 +32,19 @@ public abstract class BlockModelWrapperMixin implements RpfItemModel, RpfBlockMo
             @Nullable ClientLevel level,
             @Nullable LivingEntity owner,
             int seed,
-            ResourceLocation itemModelId
+            ResourceLocation itemModelId,
+            String packName,
+            ModelTestsResultCollector collector
     ){
-        return this.rpf$isFallback()
+        boolean delegate = this.rpf$isFallback()
                 
                 // try to predict is this model from vanilla resources
                 && this.rpf$modelLink.getNamespace().equals(itemModelId.getNamespace())
-                && this.rpf$modelLink.getPath().contains(itemModelId.getPath());
+                && this.rpf$modelLink.getPath().contains(itemModelId.getPath());\
+        delegate
+                ? collector.touchDelegate(this.getClass().getSimpleName() + ": " + rpf$getModelLink().toString(), itemModelId)
+                : collector.touchAllow(this.getClass().getSimpleName() + ": " + rpf$getModelLink().toString(), itemModelId);
+
+        return delegate;
     }
 }

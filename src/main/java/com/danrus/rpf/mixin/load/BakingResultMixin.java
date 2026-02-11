@@ -1,5 +1,6 @@
 package com.danrus.rpf.mixin.load;
 
+import com.danrus.rpf.core.SignedItemModel;
 import com.danrus.rpf.duck.load.RpfBakingResult;
 import net.minecraft.client.renderer.item.ClientItem;
 import net.minecraft.client.renderer.item.ItemModel;
@@ -15,20 +16,20 @@ import java.util.Map;
 public class BakingResultMixin implements RpfBakingResult {
 
     @Unique
-    private List<Map<ResourceLocation, ItemModel>> modelsList;
+    private List<Map<ResourceLocation, SignedItemModel>> modelsList;
 
     @Unique
     private List<Map<ResourceLocation, ClientItem.Properties>> propertiesList;
 
     @Override
-    public ModelBakery.BakingResult rpf$setItemModels(List<Map<ResourceLocation, ItemModel>> models) {
-        modelsList = models;
+    public ModelBakery.BakingResult rpf$setSignedItemModels(List<Map<ResourceLocation, SignedItemModel>> models) {
+        this.modelsList = models;
         return (ModelBakery.BakingResult) (Object) this;
     }
 
     @Override
-    public List<Map<ResourceLocation, ItemModel>> rpf$geItemModels() {
-        return modelsList;
+    public List<Map<ResourceLocation, SignedItemModel>> rpf$getItemSignedModels() {
+        return List.of();
     }
 
     @Override

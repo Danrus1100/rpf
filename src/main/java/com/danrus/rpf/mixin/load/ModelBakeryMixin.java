@@ -1,6 +1,8 @@
 package com.danrus.rpf.mixin.load;
 
 import com.danrus.rpf.api.RpfItemModel;
+import com.danrus.rpf.core.SignedItemModel;
+import com.danrus.rpf.duck.RpfClientItem;
 import com.danrus.rpf.duck.load.RpfBakingResult;
 import com.danrus.rpf.duck.load.RpfModelBakery;
 import com.llamalad7.mixinextras.sugar.Local;
@@ -71,12 +73,10 @@ public class ModelBakeryMixin implements RpfModelBakery {
                                 @Local ModelBakery.MissingModels missingModels,
                                 @Local ModelBakery.ModelBakerImpl modelBakerImpl,
                                 @Local CompletableFuture<Map<BlockState, BlockStateModel>> completableFuture) {
-        List<CompletableFuture<Map<ResourceLocation, ItemModel>>> layerFutures = new ArrayList<>(this.rpf$clientItems.size());
+        List<CompletableFuture<Map<ResourceLocation, SignedItemModel>>> layerFutures = new ArrayList<>(this.rpf$clientItems.size());
 
-        for (int i = 0; i < this.rpf$clientItems.size(); i++) {
-            int layerIndex = i;
-            Map<ResourceLocation, ClientItem> layer = this.rpf$clientItems.get(i);
-            CompletableFuture<Map<ResourceLocation, ItemModel>> layerFuture = ParallelMapTransform.schedule(
+        for (Map<ResourceLocation, ClientItem> layer : this.rpf$clientItems) {
+            CompletableFuture<Map<ResourceLocation, SignedItemModel>> layerFuture = ParallelMapTransform.schedule(
                     layer,
                     (resourceLocation, clientItem) -> {
                         try {
@@ -89,7 +89,7 @@ public class ModelBakeryMixin implements RpfModelBakery {
                                     *///?}
                                     missingModels.item,
                                     clientItem.registrySwapper()));
-                            return model;
+                            return new SignedItemModel(RpfClientItem.class.cast(clientItem).rpf$getPackName(), model);
                         } catch (Exception exception) {
                             LOGGER.warn("Unable to bake item model: '{}'", resourceLocation, exception);
                             return null;
@@ -113,13 +113,13 @@ public class ModelBakeryMixin implements RpfModelBakery {
 
         cir.setReturnValue(completableFuture.thenCombine(Util.sequence(layerFutures), (blockModels, bakedLayers) -> {
 
-            Map<ResourceLocation, ItemModel> flatItemModels = new HashMap<>();
-            for (Map<ResourceLocation, ItemModel> layer : bakedLayers) {
+            Map<ResourceLocation, SignedItemModel> flatItemModels = new HashMap<>();
+            for (Map<ResourceLocation, SignedItemModel> layer : bakedLayers) {
                 flatItemModels.putAll(layer);
             }
 
-            ModelBakery.BakingResult result = new ModelBakery.BakingResult(missingModels, blockModels, flatItemModels, Map.of());
-            ((RpfBakingResult) (Object) result).rpf$setItemProperties(propertiesLayers).rpf$setItemModels(bakedLayers);
+            ModelBakery.BakingResult result = new ModelBakery.BakingResult(missingModels, blockModels, Map.of(), Map.of());
+            ((RpfBakingResult) (Object) result).rpf$setItemProperties(propertiesLayers).rpf$setSignedItemModels(bakedLayers);
 
             return result;
         }));
