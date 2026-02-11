@@ -73,7 +73,6 @@ public abstract class RangeSelectItemModelMixin implements RpfItemModel, Delegat
             String packName,
             ModelTestsResultCollector collector
     ) {
-        if (this.rpf$isFallback()) return this.rpf$delegate;
         float f = property.get(stack, level, owner, seed) * scale;
         ItemModel itemModel;
         if (Float.isNaN(f)) {
