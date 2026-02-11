@@ -40,10 +40,12 @@ public abstract class BlockModelWrapperMixin implements RpfItemModel, RpfBlockMo
                 
                 // try to predict is this model from vanilla resources
                 && this.rpf$modelLink.getNamespace().equals(itemModelId.getNamespace())
-                && this.rpf$modelLink.getPath().contains(itemModelId.getPath());\
-        delegate
-                ? collector.touchDelegate(this.getClass().getSimpleName() + ": " + rpf$getModelLink().toString(), itemModelId)
-                : collector.touchAllow(this.getClass().getSimpleName() + ": " + rpf$getModelLink().toString(), itemModelId);
+                && this.rpf$modelLink.getPath().contains(itemModelId.getPath());
+        if (delegate) {
+            collector.touchDelegate(this.getClass().getSimpleName() + ": " + rpf$getModelLink().toString(), itemModelId);
+        } else {
+            collector.touchAllow(this.getClass().getSimpleName() + ": " + rpf$getModelLink().toString(), itemModelId);
+        }
 
         return delegate;
     }

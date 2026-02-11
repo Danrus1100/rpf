@@ -1,6 +1,7 @@
 package com.danrus.rpf.mixin.items.conditional;
 
 import com.danrus.rpf.api.RpfItemModel;
+import com.danrus.rpf.logging.ModelTestsResultCollector;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.item.ConditionalItemModel;
 import net.minecraft.client.renderer.item.ItemModel;
@@ -32,8 +33,8 @@ public abstract class ConditionalItemModelMixin implements RpfItemModel {
     private ItemModel onFalse;
 
     @Override
-    public boolean rpf$testForDelegate(ItemStackRenderState renderState, ItemStack stack, ItemModelResolver itemModelResolver, ItemDisplayContext displayContext, @Nullable ClientLevel level, @Nullable LivingEntity owner, int seed, ResourceLocation itemModelId) {
-        ItemModel model = (property.get(
+    public boolean rpf$testForDelegate(ItemStackRenderState renderState, ItemStack stack, ItemModelResolver itemModelResolver, ItemDisplayContext displayContext, @Nullable ClientLevel level, @Nullable LivingEntity owner, int seed, ResourceLocation itemModelId, String packName, ModelTestsResultCollector collector) {
+        boolean isTrue = property.get(
                 stack,
                 level,
                 owner == null ? null : owner
@@ -42,11 +43,13 @@ public abstract class ConditionalItemModelMixin implements RpfItemModel {
                 ,
                 seed,
                 displayContext
-        ) ? onTrue : onFalse);
+        );
+        ItemModel model = isTrue ? onTrue : onFalse;
 
         if (model instanceof RpfItemModel rpfItemModel) {
-            return rpfItemModel.rpf$testForDelegate(renderState, stack, itemModelResolver, displayContext, level, owner, seed, itemModelId);
+            collector.touchNext(this.getClass().getSimpleName() + " (" + isTrue + ")", itemModelId);
+            return rpfItemModel.rpf$testForDelegate(renderState, stack, itemModelResolver, displayContext, level, owner, seed, itemModelId, packName, collector);
         }
-        return RpfItemModel.super.rpf$testForDelegate(renderState, stack, itemModelResolver, displayContext, level, owner, seed, itemModelId);
+        return this.rpf$isFallback();
     }
 }

@@ -113,12 +113,14 @@ public class ModelBakeryMixin implements RpfModelBakery {
 
         cir.setReturnValue(completableFuture.thenCombine(Util.sequence(layerFutures), (blockModels, bakedLayers) -> {
 
-            Map<ResourceLocation, SignedItemModel> flatItemModels = new HashMap<>();
+            Map<ResourceLocation, ItemModel> flatItemModels = new HashMap<>();
             for (Map<ResourceLocation, SignedItemModel> layer : bakedLayers) {
-                flatItemModels.putAll(layer);
+                for (Map.Entry<ResourceLocation, SignedItemModel> m : layer.entrySet()) {
+                    flatItemModels.put(m.getKey(), m.getValue().model());
+                }
             }
 
-            ModelBakery.BakingResult result = new ModelBakery.BakingResult(missingModels, blockModels, Map.of(), Map.of());
+            ModelBakery.BakingResult result = new ModelBakery.BakingResult(missingModels, blockModels, flatItemModels, Map.of());
             ((RpfBakingResult) (Object) result).rpf$setItemProperties(propertiesLayers).rpf$setSignedItemModels(bakedLayers);
 
             return result;

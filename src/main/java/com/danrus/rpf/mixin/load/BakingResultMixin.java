@@ -29,7 +29,7 @@ public class BakingResultMixin implements RpfBakingResult {
 
     @Override
     public List<Map<ResourceLocation, SignedItemModel>> rpf$getItemSignedModels() {
-        return List.of();
+        return modelsList;
     }
 
     @Override

@@ -2,6 +2,7 @@ package com.danrus.rpf.mixin.items.range;
 
 import com.danrus.rpf.api.DelegateItemModel;
 import com.danrus.rpf.api.RpfItemModel;
+import com.danrus.rpf.logging.ModelTestsResultCollector;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.item.ItemModel;
 import net.minecraft.client.renderer.item.ItemModelResolver;
@@ -68,7 +69,9 @@ public abstract class RangeSelectItemModelMixin implements RpfItemModel, Delegat
             @Nullable ClientLevel level,
             @Nullable LivingEntity owner,
             int seed,
-            ResourceLocation itemModelId
+            ResourceLocation itemModelId,
+            String packName,
+            ModelTestsResultCollector collector
     ) {
         if (this.rpf$isFallback()) return this.rpf$delegate;
         float f = property.get(stack, level, owner, seed) * scale;
@@ -80,8 +83,9 @@ public abstract class RangeSelectItemModelMixin implements RpfItemModel, Delegat
             itemModel = i == -1 ? this.fallback : models[i];
         }
         if (!(itemModel instanceof RpfItemModel)) {
-            return RpfItemModel.super.rpf$testForDelegate(renderState, stack, itemModelResolver, displayContext, level, owner, seed, itemModelId);
+            return this.rpf$getDelegation();
         }
-        return (((RpfItemModel) itemModel).rpf$testForDelegate(renderState, stack, itemModelResolver, displayContext, level, owner, seed, itemModelId));
+        collector.touchNext(this.getClass().getSimpleName() + ": property " + property.toString() + ", value " + f, itemModelId);
+        return (((RpfItemModel) itemModel).rpf$testForDelegate(renderState, stack, itemModelResolver, displayContext, level, owner, seed, itemModelId, packName, collector));
     }
 }
