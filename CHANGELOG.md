@@ -1,2 +1,2 @@
- - Fixed manual `range_dispatch` delegation control
- - Fixed possible game crashes if another mod adds its own Item Model Definition 
+ - Fixed bugs related with `select` and `conditional` models
+ - added logging system (type /rpf_toggle_debug to see it)

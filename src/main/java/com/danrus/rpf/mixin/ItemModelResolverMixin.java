@@ -15,8 +15,8 @@ import net.minecraft.client.renderer.item.ItemModelResolver;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
 import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.core.component.DataComponents;
-import net.minecraft.resources.Identifier;
-import net.minecraft.world.entity.ItemOwner;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -43,8 +43,8 @@ public class ItemModelResolverMixin<T, R> {
             at = @At("HEAD"),
             cancellable = true
     )
-    private void rpf$selectModel(ItemStackRenderState renderState, ItemStack stack, ItemDisplayContext displayContext, Level level, ItemOwner entity, int seed, CallbackInfo ci) {
-        Identifier resourceLocation = stack.get(DataComponents.ITEM_MODEL);
+    private void rpf$selectModel(ItemStackRenderState renderState, ItemStack stack, ItemDisplayContext displayContext, Level level, LivingEntity entity, int seed, CallbackInfo ci) {
+        ResourceLocation resourceLocation = stack.get(DataComponents.ITEM_MODEL);
         if (resourceLocation == null) return;
 
         ClientLevel clientLevel = level instanceof ClientLevel cl ? cl : null;
@@ -52,12 +52,12 @@ public class ItemModelResolverMixin<T, R> {
         ModelTestsResultCollector collector = new ModelTestsResultCollector();
 
         RpfModelManager rpfModelManager = (RpfModelManager) Minecraft.getInstance().getModelManager();
-        List<Map<Identifier, SignedItemModel>> packs = rpfModelManager.rpf$getSignedModels();
+        List<Map<ResourceLocation, SignedItemModel>> packs = rpfModelManager.rpf$getSignedModels();
         int packsCont = packs.size();
 
         for (int i = 0; i < packsCont; i++) {
             try {
-                Map<Identifier, SignedItemModel> currentPack = packs.get(i);
+                Map<ResourceLocation, SignedItemModel> currentPack = packs.get(i);
                 SignedItemModel model = currentPack.get(resourceLocation);
 
                 if (!(model.model() instanceof RpfItemModel)) {
@@ -92,7 +92,7 @@ public class ItemModelResolverMixin<T, R> {
     }
 
     @Unique
-    private void updateMissingModel(Identifier resourceLocation, RpfModelManager modelManager, ItemStackRenderState renderState, ModelTestsResultCollector collector, ItemStack stack, ItemDisplayContext displayContext, @Nullable ClientLevel level, @Nullable ItemOwner owner, int seed){
+    private void updateMissingModel(ResourceLocation resourceLocation, RpfModelManager modelManager, ItemStackRenderState renderState, ModelTestsResultCollector collector, ItemStack stack, ItemDisplayContext displayContext, @Nullable ClientLevel level, @Nullable LivingEntity owner, int seed){
         renderState.appendModelIdentityElement(new RpfModelIdentity(resourceLocation, -1, false)); // no model found
         modelManager.rpf$getMissingModel().update(renderState, stack, (ItemModelResolver) (Object) this, displayContext, level, owner, seed);
         collector.touchModelNotFound(resourceLocation);
@@ -105,7 +105,7 @@ public class ItemModelResolverMixin<T, R> {
             cancellable = true
     )
     private void rpf$shouldPlaySwapAnimation(ItemStack stack, CallbackInfoReturnable<Boolean> cir) {
-        Identifier resourceLocation = stack.get(DataComponents.ITEM_MODEL);
+        ResourceLocation resourceLocation = stack.get(DataComponents.ITEM_MODEL);
         ClientItem.Properties properties = this.componentsToProperties.get(stack.getComponents()); // FIXME: not the best way to get properties
         if (resourceLocation == null || properties == null) {
             cir.setReturnValue(true);

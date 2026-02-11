@@ -2,7 +2,7 @@ package com.danrus.rpf.mixin.items;
 
 import com.danrus.rpf.api.RpfItemModel;
 import net.minecraft.client.renderer.item.*;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 

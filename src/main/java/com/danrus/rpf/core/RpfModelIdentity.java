@@ -1,9 +1,9 @@
 package com.danrus.rpf.core;
 
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 
 public record RpfModelIdentity(
-        Identifier location,
+        ResourceLocation location,
         int selectedPack,
         boolean delegate
 ) {}

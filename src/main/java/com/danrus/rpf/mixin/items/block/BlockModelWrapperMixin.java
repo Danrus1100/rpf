@@ -7,8 +7,8 @@ import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.item.BlockModelWrapper;
 import net.minecraft.client.renderer.item.ItemModelResolver;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
-import net.minecraft.resources.Identifier;
-import net.minecraft.world.entity.ItemOwner;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
@@ -18,10 +18,10 @@ import org.spongepowered.asm.mixin.Unique;
 @Mixin(BlockModelWrapper.class)
 public abstract class BlockModelWrapperMixin implements RpfItemModel, RpfBlockModelWrapper {
 
-    @Unique private Identifier rpf$modelLink;
+    @Unique private ResourceLocation rpf$modelLink;
 
-    public void rpf$setModelLink(Identifier location) { this.rpf$modelLink = location; }
-    public Identifier rpf$getModelLink() { return this.rpf$modelLink; }
+    public void rpf$setModelLink(ResourceLocation location) { this.rpf$modelLink = location; }
+    public ResourceLocation rpf$getModelLink() { return this.rpf$modelLink; }
 
     @Override
     public boolean rpf$testForDelegate(
@@ -30,9 +30,9 @@ public abstract class BlockModelWrapperMixin implements RpfItemModel, RpfBlockMo
             ItemModelResolver itemModelResolver,
             ItemDisplayContext displayContext,
             @Nullable ClientLevel level,
-            @Nullable ItemOwner owner,
+            @Nullable LivingEntity owner,
             int seed,
-            Identifier itemModelId,
+            ResourceLocation itemModelId,
             String packName,
             ModelTestsResultCollector collector
     ){

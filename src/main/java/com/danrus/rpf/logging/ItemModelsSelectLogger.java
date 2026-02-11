@@ -1,6 +1,6 @@
 package com.danrus.rpf.logging;
 
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -9,14 +9,14 @@ import java.util.List;
 
 public class ItemModelsSelectLogger {
     private static final Logger LOGGER = LoggerFactory.getLogger(ItemModelsSelectLogger.class);
-    private final List<Identifier> alreadyLogged = new ArrayList<>();
+    private final List<ResourceLocation> alreadyLogged = new ArrayList<>();
 
-    public boolean isItemLogged(Identifier location) {
+    public boolean isItemLogged(ResourceLocation location) {
         return alreadyLogged.contains(location);
     }
 
     public void info(ModelTestsResultCollector collector) {
-        Identifier location = collector.getModelLocation();
+        ResourceLocation location = collector.getModelLocation();
         if (alreadyLogged.contains(location)) return;
         alreadyLogged.add(location);
         LOGGER.info("Info for {}", location.toString());
@@ -24,7 +24,7 @@ public class ItemModelsSelectLogger {
     }
 
     public void error(ModelTestsResultCollector collector) {
-        Identifier location = collector.getModelLocation();
+        ResourceLocation location = collector.getModelLocation();
         LOGGER.info("Error for {}", location.toString());
         collector.getStringsToLog().forEach(s -> LOGGER.error(" - {}", s));
     }
