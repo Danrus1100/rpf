@@ -9,8 +9,8 @@ import net.minecraft.client.renderer.item.ItemModelResolver;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
 import net.minecraft.client.renderer.item.RangeSelectItemModel;
 import net.minecraft.client.renderer.item.properties.numeric.RangeSelectItemModelProperty;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.entity.ItemOwner;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
@@ -67,9 +67,9 @@ public abstract class RangeSelectItemModelMixin implements RpfItemModel, Delegat
             ItemModelResolver itemModelResolver,
             ItemDisplayContext displayContext,
             @Nullable ClientLevel level,
-            @Nullable LivingEntity owner,
+            @Nullable ItemOwner owner,
             int seed,
-            ResourceLocation itemModelId,
+            Identifier itemModelId,
             String packName,
             ModelTestsResultCollector collector
     ) {
@@ -85,7 +85,7 @@ public abstract class RangeSelectItemModelMixin implements RpfItemModel, Delegat
         if (!(itemModel instanceof RpfItemModel)) {
             return this.rpf$getDelegation();
         }
-        collector.touchNext(this.getClass().getSimpleName() + ": property " + property.toString() + ", value " + f, itemModelId);
+        collector.touchNext(this.getClass().getSimpleName() + ": property " + property.toString() + ", value " + f, packName, itemModelId);
         return (((RpfItemModel) itemModel).rpf$testForDelegate(renderState, stack, itemModelResolver, displayContext, level, owner, seed, itemModelId, packName, collector));
     }
 }

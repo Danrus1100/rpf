@@ -15,11 +15,12 @@ import net.minecraft.client.renderer.item.ItemModelResolver;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
 import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.core.component.DataComponents;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.entity.ItemOwner;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -37,16 +38,13 @@ public class ItemModelResolverMixin<T, R> {
     @Unique
     private final Map<DataComponentMap, ClientItem.Properties> componentsToProperties = new HashMap<>();
 
-    @Unique
-    private final ItemModelsSelectLogger logger = new ItemModelsSelectLogger();
-
     @Inject(
             method = "appendItemLayers",
             at = @At("HEAD"),
             cancellable = true
     )
-    private void rpf$selectModel(ItemStackRenderState renderState, ItemStack stack, ItemDisplayContext displayContext, Level level, LivingEntity entity, int seed, CallbackInfo ci) {
-        ResourceLocation resourceLocation = stack.get(DataComponents.ITEM_MODEL);
+    private void rpf$selectModel(ItemStackRenderState renderState, ItemStack stack, ItemDisplayContext displayContext, Level level, ItemOwner entity, int seed, CallbackInfo ci) {
+        Identifier resourceLocation = stack.get(DataComponents.ITEM_MODEL);
         if (resourceLocation == null) return;
 
         ClientLevel clientLevel = level instanceof ClientLevel cl ? cl : null;
@@ -54,40 +52,51 @@ public class ItemModelResolverMixin<T, R> {
         ModelTestsResultCollector collector = new ModelTestsResultCollector();
 
         RpfModelManager rpfModelManager = (RpfModelManager) Minecraft.getInstance().getModelManager();
-        List<Map<ResourceLocation, SignedItemModel>> packs = rpfModelManager.rpf$getSignedModels();
+        List<Map<Identifier, SignedItemModel>> packs = rpfModelManager.rpf$getSignedModels();
         int packsCont = packs.size();
 
         for (int i = 0; i < packsCont; i++) {
-            Map<ResourceLocation, SignedItemModel> currentPack = packs.get(i);
-            SignedItemModel model = currentPack.get(resourceLocation);
+            try {
+                Map<Identifier, SignedItemModel> currentPack = packs.get(i);
+                SignedItemModel model = currentPack.get(resourceLocation);
 
-            if (!(model.model() instanceof RpfItemModel) && model.model() != null) {
-                model.model().update(renderState, stack, (ItemModelResolver) (Object) this, displayContext, clientLevel, entity, seed);
-                ci.cancel();
-                return;
+                if (!(model.model() instanceof RpfItemModel)) {
+                    model.model().update(renderState, stack, (ItemModelResolver) (Object) this, displayContext, clientLevel, entity, seed);
+                    ci.cancel();
+                    return;
+                }
+
+                if (!model.testForDelegate(renderState, stack, (ItemModelResolver) (Object) this, displayContext, clientLevel, entity, seed, resourceLocation, collector) || i == packsCont - 1) {
+                    ClientItem.Properties properties = rpfModelManager.rpf$getItemPropertiesMaps().get(i).get(resourceLocation);
+                    if (properties == null) {
+                        properties = ClientItem.Properties.DEFAULT;
+                    }
+                    renderState.setOversizedInGui(properties.oversizedInGui());
+                    this.componentsToProperties.put(stack.getComponents(), properties);
+                    renderState.appendModelIdentityElement(new RpfModelIdentity(resourceLocation, i, true)); // for correct GUI rendering
+                    model.update(renderState, stack, (ItemModelResolver) (Object) this, displayContext, clientLevel, entity, seed);
+                    if (Rpf.debug) {
+                        Rpf.getItemLogger().info(collector);
+                    }
+                    ci.cancel();
+                    return;
+                }
+            } catch (Exception e) {
+//                e.printStackTrace(); //TODO: remove
             }
 
-            if (!model.testForDelegate(renderState, stack, (ItemModelResolver) (Object) this, displayContext, clientLevel, entity, seed, resourceLocation, collector) || i == packsCont - 1) {
-                ClientItem.Properties properties = rpfModelManager.rpf$getItemPropertiesMaps().get(i).get(resourceLocation);
-                if (properties == null) {
-                    properties = ClientItem.Properties.DEFAULT;
-                }
-                renderState.setOversizedInGui(properties.oversizedInGui());
-                this.componentsToProperties.put(stack.getComponents(), properties);
-                renderState.appendModelIdentityElement(new RpfModelIdentity(resourceLocation, i, true)); // for correct GUI rendering
-                model.update(renderState, stack, (ItemModelResolver) (Object) this, displayContext, clientLevel, entity, seed);
-                if (Rpf.debug) {
-                    logger.info(collector);
-                }
-                ci.cancel();
-                return;
-            }
         }
 
-        renderState.appendModelIdentityElement(new RpfModelIdentity(resourceLocation, -1, false)); // no model found
-        rpfModelManager.rpf$getMissingModel().update(renderState, stack, (ItemModelResolver) (Object) this, displayContext, clientLevel, entity, seed);
-        logger.error(collector);
+        updateMissingModel(resourceLocation, rpfModelManager, renderState, collector, stack, displayContext, clientLevel, entity, seed);
         ci.cancel();
+    }
+
+    @Unique
+    private void updateMissingModel(Identifier resourceLocation, RpfModelManager modelManager, ItemStackRenderState renderState, ModelTestsResultCollector collector, ItemStack stack, ItemDisplayContext displayContext, @Nullable ClientLevel level, @Nullable ItemOwner owner, int seed){
+        renderState.appendModelIdentityElement(new RpfModelIdentity(resourceLocation, -1, false)); // no model found
+        modelManager.rpf$getMissingModel().update(renderState, stack, (ItemModelResolver) (Object) this, displayContext, level, owner, seed);
+        collector.touchModelNotFound(resourceLocation);
+        Rpf.getItemLogger().error(collector);
     }
 
     @Inject(
@@ -96,7 +105,7 @@ public class ItemModelResolverMixin<T, R> {
             cancellable = true
     )
     private void rpf$shouldPlaySwapAnimation(ItemStack stack, CallbackInfoReturnable<Boolean> cir) {
-        ResourceLocation resourceLocation = stack.get(DataComponents.ITEM_MODEL);
+        Identifier resourceLocation = stack.get(DataComponents.ITEM_MODEL);
         ClientItem.Properties properties = this.componentsToProperties.get(stack.getComponents()); // FIXME: not the best way to get properties
         if (resourceLocation == null || properties == null) {
             cir.setReturnValue(true);

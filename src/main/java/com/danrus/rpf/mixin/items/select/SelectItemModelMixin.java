@@ -8,8 +8,8 @@ import net.minecraft.client.renderer.item.ItemModel;
 import net.minecraft.client.renderer.item.ItemModelResolver;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
 import net.minecraft.client.renderer.item.SelectItemModel;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.entity.ItemOwner;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
@@ -39,28 +39,29 @@ public abstract class SelectItemModelMixin<T> implements DelegateItemModel, RpfI
             ItemModelResolver itemModelResolver,
             ItemDisplayContext displayContext,
             @Nullable ClientLevel level,
-            @Nullable LivingEntity owner,
+            @Nullable ItemOwner owner,
             int seed,
-            ResourceLocation itemModelId,
+            Identifier itemModelId,
             String packName,
             ModelTestsResultCollector collector
     ) {
         if (!this.rpf$delegate) return false;
-        if (this.rpf$isFallback()) return true;
+//        if (this.rpf$isFallback()) return true;
         SelectItemModel<T> self = (SelectItemModel<T>) (Object) this;
         T object = self.property.get(stack, level, owner == null ? null : owner
                 //? if >=1.21.10
-                //.asLivingEntity()
+                .asLivingEntity()
                 , seed, displayContext);
         ItemModel itemModel = self.models.get(object, level);
 
         if (!(itemModel instanceof RpfItemModel)) {
             return itemModel == null || this.rpf$getDelegation();
         }
-        if (itemModel != null) {
-            collector.touchNext(this.getClass().getSimpleName() + " proprety:" + object.toString(), itemModelId);
-            return ((RpfItemModel)itemModel).rpf$testForDelegate(renderState, stack, itemModelResolver, displayContext, level, owner, seed, itemModelId, packName, collector);
+        if (itemModel != null && itemModel instanceof RpfItemModel rpfItemModel) {
+            collector.touchNext(this.getClass().getSimpleName() + " proprety: " + object.toString(), packName, itemModelId);
+            return rpfItemModel.rpf$testForDelegate(renderState, stack, itemModelResolver, displayContext, level, owner, seed, itemModelId, packName, collector);
         } else {
+            collector.touchDelegate(this.getClass().getSimpleName() + " proprety: " + object.toString(), packName, itemModelId);
             return false;
         }
     }

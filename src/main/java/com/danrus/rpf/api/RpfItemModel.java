@@ -4,8 +4,8 @@ import com.danrus.rpf.logging.ModelTestsResultCollector;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.item.ItemModelResolver;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.entity.ItemOwner;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
@@ -23,12 +23,16 @@ public interface RpfItemModel {
             ItemModelResolver itemModelResolver,
             ItemDisplayContext displayContext,
             @Nullable ClientLevel level,
-            @Nullable LivingEntity owner,
+            @Nullable ItemOwner owner,
             int seed,
-            ResourceLocation itemModelId,
+            Identifier itemModelId,
             String packName,
             ModelTestsResultCollector collector
     ) {
-        return rpf$isFallback();
+        if (!rpf$isFallback()) {
+            collector.touchDelegate(this.getClass().getSimpleName(), packName, itemModelId);
+            return false;
+        }
+        return true;
     }
 }

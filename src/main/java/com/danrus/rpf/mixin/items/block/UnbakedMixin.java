@@ -12,7 +12,7 @@ import net.minecraft.client.renderer.item.BlockModelWrapper;
 import net.minecraft.client.renderer.item.ItemModel;
 import net.minecraft.client.renderer.item.ModelRenderProperties;
 import net.minecraft.client.renderer.item.SelectItemModel;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -32,10 +32,10 @@ public class UnbakedMixin {
 
     @Shadow
     @Final
-    private ResourceLocation model;
+    private Identifier model;
 
     //? if <=1.21.10 {
-    @Inject(
+    /*@Inject(
             method = "bake",
             at = @At("RETURN"),
             cancellable = true
@@ -45,8 +45,8 @@ public class UnbakedMixin {
         ((RpfBlockModelWrapper) modelWrapper).rpf$setModelLink(this.model);
         cir.setReturnValue(modelWrapper);
     }
-    //?} else {
-    /*@WrapOperation(
+    *///?} else {
+    @WrapOperation(
             method = "bake",
             at = @At(value = "NEW", target = "(Ljava/util/List;Ljava/util/List;Lnet/minecraft/client/renderer/item/ModelRenderProperties;Ljava/util/function/Function;)Lnet/minecraft/client/renderer/item/BlockModelWrapper;")
     )
@@ -55,6 +55,6 @@ public class UnbakedMixin {
         ((RpfBlockModelWrapper) wrapper).rpf$setModelLink(this.model);
         return wrapper;
     }
-    *///?}
+    //?}
 
 }
