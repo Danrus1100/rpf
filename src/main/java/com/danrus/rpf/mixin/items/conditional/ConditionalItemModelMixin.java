@@ -33,7 +33,7 @@ public abstract class ConditionalItemModelMixin implements RpfItemModel {
     private ItemModel onFalse;
 
     @Override
-    public boolean rpf$testForDelegate(ItemStackRenderState renderState, ItemStack stack, ItemModelResolver itemModelResolver, ItemDisplayContext displayContext, @Nullable ClientLevel level, @Nullable LivingEntity owner, int seed, ResourceLocation itemModelId, String packName, ModelTestsResultCollector collector) {
+    public boolean rpf$doDelegate(ItemStackRenderState renderState, ItemStack stack, ItemModelResolver itemModelResolver, ItemDisplayContext displayContext, @Nullable ClientLevel level, @Nullable LivingEntity owner, @Nullable ItemModel prev, int seed, ResourceLocation itemModelId, String packName, ModelTestsResultCollector collector) {
         boolean isTrue = property.get(
                 stack,
                 level,
@@ -45,10 +45,16 @@ public abstract class ConditionalItemModelMixin implements RpfItemModel {
                 displayContext
         );
         ItemModel model = isTrue ? onTrue : onFalse;
-
+        if (prev != null && this.rpf$isFallback()) {
+            ((RpfItemModel) onTrue).rpf$markAsFallback();
+            ((RpfItemModel) onFalse).rpf$markAsFallback();
+        }
+        if (prev == null) {
+            ((RpfItemModel) onFalse).rpf$markAsFallback();
+        }
         if (model instanceof RpfItemModel rpfItemModel) {
             collector.touchNext(this.getClass().getSimpleName() + " (" + isTrue + ")", packName, itemModelId);
-            return rpfItemModel.rpf$testForDelegate(renderState, stack, itemModelResolver, displayContext, level, owner, seed, itemModelId, packName, collector);
+            return rpfItemModel.rpf$doDelegate(renderState, stack, itemModelResolver, displayContext, level, owner, (ItemModel) (Object) this, seed, itemModelId, packName, collector);
         }
         return this.rpf$isFallback();
     }

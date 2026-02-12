@@ -105,6 +105,9 @@ public class RpfClientItemInfoLoader {
         } catch (Exception e) {
             LOGGER.error("Failed to open item model {} from pack '{}'", id, resource.sourcePackId(), e);
             return null;
+        } catch (Error error) {
+            LOGGER.error("Unexpected error item model {} from pack '{}'", id, resource.sourcePackId(), error);
+            return null;
         }
     }
 

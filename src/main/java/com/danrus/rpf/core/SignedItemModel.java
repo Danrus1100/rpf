@@ -16,7 +16,7 @@ public record SignedItemModel(
         String name,
         ItemModel model
 ) {
-    public boolean testForDelegate(
+    public boolean doDelegate(
             ItemStackRenderState renderState,
             ItemStack stack,
             ItemModelResolver itemModelResolver,
@@ -28,21 +28,23 @@ public record SignedItemModel(
             ModelTestsResultCollector collector
     ) {
         if (model == null) return false;
-        if (model instanceof RpfItemModel rpfItemModel) {
-            return rpfItemModel.rpf$testForDelegate(
+        try {
+            return ((RpfItemModel)model).rpf$doDelegate(
                 renderState,
                 stack,
                 itemModelResolver,
                 displayContext,
                 level,
                 owner,
+                null,
                 seed,
                 itemModelId,
                 name,
                 collector
             );
+        } catch (Exception ignored) {
+            return false;
         }
-        return false;
     }
 
     public void update(ItemStackRenderState renderState, ItemStack stack, ItemModelResolver itemModelResolver, ItemDisplayContext displayContext, @Nullable ClientLevel level, @Nullable LivingEntity owner, int seed) {

@@ -5,6 +5,7 @@ import com.danrus.rpf.duck.item.RpfBlockModelWrapper;
 import com.danrus.rpf.logging.ModelTestsResultCollector;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.item.BlockModelWrapper;
+import net.minecraft.client.renderer.item.ItemModel;
 import net.minecraft.client.renderer.item.ItemModelResolver;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
 import net.minecraft.resources.ResourceLocation;
@@ -24,13 +25,14 @@ public abstract class BlockModelWrapperMixin implements RpfItemModel, RpfBlockMo
     public ResourceLocation rpf$getModelLink() { return this.rpf$modelLink; }
 
     @Override
-    public boolean rpf$testForDelegate(
+    public boolean rpf$doDelegate(
             ItemStackRenderState renderState,
             ItemStack stack,
             ItemModelResolver itemModelResolver,
             ItemDisplayContext displayContext,
             @Nullable ClientLevel level,
             @Nullable LivingEntity owner,
+            @Nullable ItemModel prev,
             int seed,
             ResourceLocation itemModelId,
             String packName,

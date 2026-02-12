@@ -33,19 +33,23 @@ public abstract class SelectItemModelMixin<T> implements DelegateItemModel, RpfI
 
     @SuppressWarnings("unchecked")
     @Override
-    public boolean rpf$testForDelegate(
+    public boolean rpf$doDelegate(
             ItemStackRenderState renderState,
             ItemStack stack,
             ItemModelResolver itemModelResolver,
             ItemDisplayContext displayContext,
             @Nullable ClientLevel level,
             @Nullable LivingEntity owner,
+            @Nullable ItemModel prev,
             int seed,
             ResourceLocation itemModelId,
             String packName,
             ModelTestsResultCollector collector
     ) {
-        if (!this.rpf$delegate) return false;
+        if (!this.rpf$delegate) {
+            collector.touchAllow(this.getClass().getSimpleName() + " force cancle delegate", packName, itemModelId);
+            return false;
+        }
 //        if (this.rpf$isFallback()) return true;
         SelectItemModel<T> self = (SelectItemModel<T>) (Object) this;
         T object = self.property.get(stack, level, owner == null ? null : owner
@@ -54,16 +58,14 @@ public abstract class SelectItemModelMixin<T> implements DelegateItemModel, RpfI
                 , seed, displayContext);
         ItemModel itemModel = self.models.get(object, level);
 
-        if (!(itemModel instanceof RpfItemModel)) {
-            return itemModel == null || this.rpf$getDelegation();
-        }
-        if (itemModel != null && itemModel instanceof RpfItemModel rpfItemModel) {
+        if (itemModel instanceof RpfItemModel rpfItemModel) {
+            if (prev != null && this.rpf$isFallback()) rpfItemModel.rpf$markAsFallback();
             String propertyValue = object != null ? object.toString() : "null";
-            collector.touchNext(this.getClass().getSimpleName() + " proprety: " + propertyValue, packName, itemModelId);
-            return rpfItemModel.rpf$testForDelegate(renderState, stack, itemModelResolver, displayContext, level, owner, seed, itemModelId, packName, collector);
+            collector.touchNext(this.getClass().getSimpleName() + " proprety: " + propertyValue, packName, itemModelId, rpfItemModel.rpf$isFallback());
+            return rpfItemModel.rpf$doDelegate(renderState, stack, itemModelResolver, displayContext, level, owner, (ItemModel) (Object) this, seed, itemModelId, packName, collector);
         } else {
             collector.touchDelegate(this.getClass().getSimpleName() + " proprety: " + object.toString(), packName, itemModelId);
-            return false;
+            return itemModel == null || this.rpf$getDelegation();
         }
     }
 }

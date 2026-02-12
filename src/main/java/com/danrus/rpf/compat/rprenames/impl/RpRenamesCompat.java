@@ -1,6 +1,6 @@
 package com.danrus.rpf.compat.rprenames.impl;
 
-//? if <=1.21.8 {
+//? if rprenames {
 import com.HiWord9.RPRenames.mod.RPRenames;
 import com.HiWord9.RPRenames.mod.RPRenamesItemGroup;
 //? }
@@ -8,7 +8,7 @@ import com.HiWord9.RPRenames.mod.RPRenamesItemGroup;
 public class RpRenamesCompat {
 
     public static void init() {
-        //? if <=1.21.8 {
+        //? if rprenames {
         RpfParser parser = new RpfParser(RPRenames.renamesManager);
 
         RenamesBridge.itemSetter = parser::updateClientItem;
@@ -20,7 +20,7 @@ public class RpRenamesCompat {
     }
 
     public static void update() {
-        //? if <=1.21.8
+        //? if rprenames
         RPRenamesItemGroup.update();
     }
 }

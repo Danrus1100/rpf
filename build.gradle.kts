@@ -13,6 +13,8 @@ fun prop(name: String) : String {
     return findProperty(name)?.toString() ?: throw IllegalArgumentException("Missing property: $name")
 }
 
+fun propExists(name: String) = project.properties.containsKey(name)
+
 val mainBranch = "multiversion"
 val gitBranchName = providers.exec {
     commandLine("git", "rev-parse", "--abbrev-ref", "HEAD")
@@ -63,8 +65,8 @@ dependencies {
     })
     modImplementation("net.fabricmc:fabric-loader:${findProperty("deps.fabric")}")
     modImplementation("net.fabricmc.fabric-api:fabric-api:${findProperty("deps.fapi")}")
-    if (findProperty("deps.mc").toString() == "1.21.8") {
-        modImplementation(rootProject.files("lib/RPRenames-1.21.8-0.9.2.jar"))
+    opt("deps.rprenames") {
+        modImplementation(rootProject.files("lib/${it}.jar"))
     }
 }
 
@@ -138,6 +140,14 @@ publishMods {
             content = changelog.map{ "# " + prop("mod.version") + " version here! \n\n" + rootProject.file("CHANGELOG.md").readText() +"\n\n<@&1426901890582581248>" }
         }
     }
+}
+
+stonecutter {
+//    constants {
+//        "rprenames" to propExists("deps.rprenames")
+//    }
+    val isRpRenames = propExists("deps.rprenames")
+    constants["rprenames"] = isRpRenames
 }
 
 version = findProperty("mod.version") as String + "-" +findProperty("deps.mc") as String

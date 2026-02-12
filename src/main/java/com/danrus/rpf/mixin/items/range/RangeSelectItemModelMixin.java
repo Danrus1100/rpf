@@ -22,6 +22,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import java.util.Arrays;
+
 @Mixin(RangeSelectItemModel.class)
 public abstract class RangeSelectItemModelMixin implements RpfItemModel, DelegateItemModel {
     @Shadow
@@ -57,26 +59,32 @@ public abstract class RangeSelectItemModelMixin implements RpfItemModel, Delegat
             at = @At("TAIL")
     )
     private void rpf$init(RangeSelectItemModelProperty property, float scale, float[] thresholds, ItemModel[] models, ItemModel fallback, CallbackInfo ci){
-        ((RpfItemModel) fallback).rpf$markAsFallback();
+        ((RpfItemModel) this.fallback).rpf$markAsFallback();
     }
 
     @Override
-    public boolean rpf$testForDelegate(
+    public boolean rpf$doDelegate(
             ItemStackRenderState renderState,
             ItemStack stack,
             ItemModelResolver itemModelResolver,
             ItemDisplayContext displayContext,
             @Nullable ClientLevel level,
             @Nullable LivingEntity owner,
+            @Nullable ItemModel prev,
             int seed,
             ResourceLocation itemModelId,
             String packName,
             ModelTestsResultCollector collector
     ) {
+        if (prev != null && this.rpf$isFallback()) {
+            Arrays.stream(models).forEach(model -> ((RpfItemModel) model).rpf$markAsFallback());
+        }
         float f = property.get(stack, level, owner, seed) * scale;
+        boolean isFallback = false;
         ItemModel itemModel;
         if (Float.isNaN(f)) {
             itemModel = this.fallback;
+            isFallback = true;
         } else {
             int i = RangeSelectItemModel.lastIndexLessOrEqual(thresholds, f);
             itemModel = i == -1 ? this.fallback : models[i];
@@ -84,7 +92,7 @@ public abstract class RangeSelectItemModelMixin implements RpfItemModel, Delegat
         if (!(itemModel instanceof RpfItemModel)) {
             return this.rpf$getDelegation();
         }
-        collector.touchNext(this.getClass().getSimpleName() + ": property " + property.toString() + ", value " + f, packName, itemModelId);
-        return (((RpfItemModel) itemModel).rpf$testForDelegate(renderState, stack, itemModelResolver, displayContext, level, owner, seed, itemModelId, packName, collector));
+        collector.touchNext(this.getClass().getSimpleName() + ": property " + property.toString() + ", value " + f, packName, itemModelId, isFallback);
+        return (((RpfItemModel) itemModel).rpf$doDelegate(renderState, stack, itemModelResolver, displayContext, level, owner, (ItemModel) (Object) this, seed, itemModelId, packName, collector));
     }
 }

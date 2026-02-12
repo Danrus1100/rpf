@@ -13,12 +13,21 @@ public class ModelTestsResultCollector {
         touch("Not Found", "Unknown", location, TestResultType.ERROR);
     }
 
+    public void touchNextFallback(String itemModelType, String packName, ResourceLocation location) {
+        touch(itemModelType, packName, location, TestResultType.NEXT_TEST_FALLBACK);
+    }
+
     public void touchAllow(String itemModelType, String packName, ResourceLocation location) {
         touch(itemModelType, packName, location, TestResultType.ALLOW_UPDATE);
     }
 
     public void touchDelegate(String itemModelType, String packName, ResourceLocation location) {
         touch(itemModelType, packName, location, TestResultType.DELEGATE);
+    }
+
+    public void touchNext(String itemModelType, String packName, ResourceLocation location, boolean fallback) {
+        if ( fallback ) { touch(itemModelType, packName, location, TestResultType.NEXT_TEST_FALLBACK); }
+        else {touch(itemModelType, packName, location, TestResultType.NEXT_TEST);}
     }
 
     public void touchNext(String itemModelType, String packName, ResourceLocation location) {
@@ -51,6 +60,7 @@ public class ModelTestsResultCollector {
         ALLOW_UPDATE,
         DELEGATE,
         NEXT_TEST,
+        NEXT_TEST_FALLBACK,
         ERROR
     }
 }

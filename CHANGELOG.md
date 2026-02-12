@@ -1,2 +1,3 @@
  - Fixed bugs related with `select` and `conditional` models
+ - Fixed
  - added logging system (type /rpf_toggle_debug to see it)

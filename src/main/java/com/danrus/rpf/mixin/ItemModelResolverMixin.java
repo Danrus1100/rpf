@@ -5,12 +5,10 @@ import com.danrus.rpf.core.RpfModelIdentity;
 import com.danrus.rpf.api.RpfItemModel;
 import com.danrus.rpf.core.SignedItemModel;
 import com.danrus.rpf.duck.load.RpfModelManager;
-import com.danrus.rpf.logging.ItemModelsSelectLogger;
 import com.danrus.rpf.logging.ModelTestsResultCollector;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.item.ClientItem;
-import net.minecraft.client.renderer.item.ItemModel;
 import net.minecraft.client.renderer.item.ItemModelResolver;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
 import net.minecraft.core.component.DataComponentMap;
@@ -66,7 +64,7 @@ public class ItemModelResolverMixin<T, R> {
                     return;
                 }
 
-                if (!model.testForDelegate(renderState, stack, (ItemModelResolver) (Object) this, displayContext, clientLevel, entity, seed, resourceLocation, collector) || i == packsCont - 1) {
+                if (!model.doDelegate(renderState, stack, (ItemModelResolver) (Object) this, displayContext, clientLevel, entity, seed, resourceLocation, collector) || i == packsCont - 1) {
                     ClientItem.Properties properties = rpfModelManager.rpf$getItemPropertiesMaps().get(i).get(resourceLocation);
                     if (properties == null) {
                         properties = ClientItem.Properties.DEFAULT;
