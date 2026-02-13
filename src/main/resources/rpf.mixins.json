@@ -14,6 +14,7 @@
     "items.block.BlockModelWrapperMixin",
     "items.block.UnbakedMixin",
     "items.composite.CompositeModelMixin",
+    "items.composite.CompositeModelUnbakedMixin",
     "items.conditional.ConditionalItemModelMixin",
     "items.empty.EmptyModelMixin",
     "items.range.RangeSelectItemModelMixin",

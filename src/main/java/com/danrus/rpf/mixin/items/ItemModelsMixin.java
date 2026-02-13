@@ -25,4 +25,12 @@ public class ItemModelsMixin {
     private static <I, V> ExtraCodecs.LateBoundIdMapper<I, V> rpf$redirectRangeMapCodec(ExtraCodecs.LateBoundIdMapper instance, I id, V value, Operation<ExtraCodecs.LateBoundIdMapper<I, V>> original){
         return original.call(instance, id, RpfCodecs.MAP_CODEC_RANGE);
     }
+
+    @WrapOperation(
+            method = "bootstrap",
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/util/ExtraCodecs$LateBoundIdMapper;put(Ljava/lang/Object;Ljava/lang/Object;)Lnet/minecraft/util/ExtraCodecs$LateBoundIdMapper;", ordinal = 4)
+    )
+    private static <I, V> ExtraCodecs.LateBoundIdMapper<I, V> rpf$redirectCompositeMapCodec(ExtraCodecs.LateBoundIdMapper instance, I id, V value, Operation<ExtraCodecs.LateBoundIdMapper<I, V>> original){
+        return original.call(instance, id, RpfCodecs.MAP_CODEC_COMPOSITE);
+    }
 }

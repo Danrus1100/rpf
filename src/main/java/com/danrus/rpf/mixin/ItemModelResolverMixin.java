@@ -57,6 +57,7 @@ public class ItemModelResolverMixin<T, R> {
             try {
                 Map<ResourceLocation, SignedItemModel> currentPack = packs.get(i);
                 SignedItemModel model = currentPack.get(resourceLocation);
+                collector.resetShift();
 
                 if (!(model.model() instanceof RpfItemModel)) {
                     model.model().update(renderState, stack, (ItemModelResolver) (Object) this, displayContext, clientLevel, entity, seed);

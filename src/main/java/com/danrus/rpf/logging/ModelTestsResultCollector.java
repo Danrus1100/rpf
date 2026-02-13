@@ -8,6 +8,7 @@ import java.util.List;
 
 public class ModelTestsResultCollector {
     private final List<TestResultUnit> units = new LinkedList<>();
+    private int currentShift = 0;
 
     public void touchModelNotFound(ResourceLocation location) {
         touch("Not Found", "Unknown", location, TestResultType.ERROR);
@@ -34,8 +35,25 @@ public class ModelTestsResultCollector {
         touch(itemModelType, packName, location, TestResultType.NEXT_TEST);
     }
 
+    public void touchInfo(String itemModelType, String packName, ResourceLocation location) {
+        touch(itemModelType, packName, location, TestResultType.INFO);
+    }
+
+
+    public void pushShift() {
+        currentShift++;
+    }
+
+    public void popShift() {
+        currentShift--;
+    }
+
+    public void resetShift() {
+        currentShift = 0;
+    }
+
     private void touch(String itemModelType, String packName, ResourceLocation location, TestResultType resultType) {
-        units.add(new TestResultUnit(itemModelType, packName, location, resultType));
+        units.add(new TestResultUnit(itemModelType, packName, location, resultType, currentShift));
     }
 
     public ResourceLocation getModelLocation() { // FIXME: hack, i made this under my beer
@@ -50,9 +68,11 @@ public class ModelTestsResultCollector {
         return strings;
     }
 
-    private record TestResultUnit(String itemModelType, String packName, ResourceLocation itemModel, TestResultType result) {
+    private record TestResultUnit(String itemModelType, String packName, ResourceLocation itemModel, TestResultType result, int shift) {
+
         public String toPrint() {
-            return "Pack " + packName + ": action " + String.join(" ", itemModelType, itemModel.toString(), result.toString());
+            String shiftString = "  ".repeat(shift);
+            return shiftString + "Pack " + packName + ": action " + String.join(" ", itemModelType, itemModel.toString(), result.toString());
         }
     }
 
@@ -61,6 +81,7 @@ public class ModelTestsResultCollector {
         DELEGATE,
         NEXT_TEST,
         NEXT_TEST_FALLBACK,
+        INFO,
         ERROR
     }
 }

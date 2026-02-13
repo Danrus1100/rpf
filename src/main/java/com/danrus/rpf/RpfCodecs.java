@@ -1,9 +1,11 @@
 package com.danrus.rpf;
 
 import com.danrus.rpf.api.DelegateItemModel;
+import com.danrus.rpf.duck.item.RpfCompositeModel;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.client.renderer.item.CompositeModel;
 import net.minecraft.client.renderer.item.ItemModels;
 import net.minecraft.client.renderer.item.RangeSelectItemModel;
 import net.minecraft.client.renderer.item.SelectItemModel;
@@ -39,4 +41,15 @@ public class RpfCodecs {
                         DelegateItemModel.Unbaked.class.cast(model).rpf$setDeligation(delegate);
                         return model;
                     })));
+
+    public static final MapCodec<CompositeModel.Unbaked> MAP_CODEC_COMPOSITE = RecordCodecBuilder.mapCodec(
+            (instance) -> instance.group(
+                    ItemModels.CODEC.listOf().fieldOf("models").forGetter(CompositeModel.Unbaked::models),
+                    Codec.STRING.optionalFieldOf("delegate_strategy", "one_do_delegate").forGetter((model) -> RpfCompositeModel.Unbaked.class.cast(model).rpf$getDelegateStrategy().name().toLowerCase())
+                    ).apply(instance, (models, delegateStrategy) -> {
+                        CompositeModel.Unbaked model = new CompositeModel.Unbaked(models);
+                        RpfCompositeModel.DelegateStrategy strategy = RpfCompositeModel.DelegateStrategy.valueOf(delegateStrategy.toUpperCase());
+                        RpfCompositeModel.Unbaked.class.cast(model).rpf$setDelegateStrategy(strategy);
+                        return model;
+            }));
 }

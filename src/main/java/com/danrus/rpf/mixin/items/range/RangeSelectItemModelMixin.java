@@ -76,6 +76,10 @@ public abstract class RangeSelectItemModelMixin implements RpfItemModel, Delegat
             String packName,
             ModelTestsResultCollector collector
     ) {
+        if (!this.rpf$delegate) {
+            collector.touchAllow(this.getClass().getSimpleName() + " force cancel delegate", packName, itemModelId);
+            return false;
+        }
         if (prev != null && this.rpf$isFallback()) {
             Arrays.stream(models).forEach(model -> ((RpfItemModel) model).rpf$markAsFallback());
         }

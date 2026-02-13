@@ -47,7 +47,7 @@ public abstract class SelectItemModelMixin<T> implements DelegateItemModel, RpfI
             ModelTestsResultCollector collector
     ) {
         if (!this.rpf$delegate) {
-            collector.touchAllow(this.getClass().getSimpleName() + " force cancle delegate", packName, itemModelId);
+            collector.touchAllow(this.getClass().getSimpleName() + " force cancel delegate", packName, itemModelId);
             return false;
         }
 //        if (this.rpf$isFallback()) return true;
