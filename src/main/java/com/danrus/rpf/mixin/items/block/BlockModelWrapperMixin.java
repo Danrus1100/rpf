@@ -44,9 +44,9 @@ public abstract class BlockModelWrapperMixin implements RpfItemModel, RpfBlockMo
                 && this.rpf$modelLink.getNamespace().equals(itemModelId.getNamespace())
                 && this.rpf$modelLink.getPath().contains(itemModelId.getPath());
         if (delegate) {
-            collector.touchDelegate(this.getClass().getSimpleName() + ": " + rpf$getModelLink().toString(), packName, itemModelId);
+            collector.delegate(this.getClass().getSimpleName() + ": " + rpf$getModelLink().toString(), packName);
         } else {
-            collector.touchAllow(this.getClass().getSimpleName() + ": " + rpf$getModelLink().toString(), packName, itemModelId);
+            collector.hit(this.getClass().getSimpleName() + ": " + rpf$getModelLink().toString(), packName);
         }
 
         return delegate;

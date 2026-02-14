@@ -77,7 +77,7 @@ public abstract class RangeSelectItemModelMixin implements RpfItemModel, Delegat
             ModelTestsResultCollector collector
     ) {
         if (!this.rpf$delegate) {
-            collector.touchAllow(this.getClass().getSimpleName() + " force cancel delegate", packName, itemModelId);
+            collector.hit(this.getClass().getSimpleName() + " force cancel delegate", packName);
             return false;
         }
         if (prev != null && this.rpf$isFallback()) {
@@ -96,7 +96,7 @@ public abstract class RangeSelectItemModelMixin implements RpfItemModel, Delegat
         if (!(itemModel instanceof RpfItemModel)) {
             return this.rpf$getDelegation();
         }
-        collector.touchNext(this.getClass().getSimpleName() + ": property " + property.toString() + ", value " + f, packName, itemModelId, isFallback);
+        collector.next(this.getClass().getSimpleName() + ": property " + property.toString() + ", value " + f, packName, isFallback);
         return (((RpfItemModel) itemModel).rpf$doDelegate(renderState, stack, itemModelResolver, displayContext, level, owner, (ItemModel) (Object) this, seed, itemModelId, packName, collector));
     }
 }

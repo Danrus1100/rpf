@@ -1,82 +1,54 @@
 package com.danrus.rpf.logging;
 
+import com.danrus.rpf.Rpf;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
-public class ModelTestsResultCollector {
-    private final List<TestResultUnit> units = new LinkedList<>();
-    private int currentShift = 0;
+public interface ModelTestsResultCollector {
 
-    public void touchModelNotFound(ResourceLocation location) {
-        touch("Not Found", "Unknown", location, TestResultType.ERROR);
+    default void touchModelNotFound() {
+        touch("Not Found", "Unknown", ModelTestsResultCollector.TestResultType.ERROR);
     }
 
-    public void touchNextFallback(String itemModelType, String packName, ResourceLocation location) {
-        touch(itemModelType, packName, location, TestResultType.NEXT_TEST_FALLBACK);
+    default void hit(String itemModelType, String packName) {
+        touch(itemModelType, packName, ModelTestsResultCollector.TestResultType.ALLOW_UPDATE);
     }
 
-    public void touchAllow(String itemModelType, String packName, ResourceLocation location) {
-        touch(itemModelType, packName, location, TestResultType.ALLOW_UPDATE);
+    default void delegate(String itemModelType, String packName) {
+        touch(itemModelType, packName, ModelTestsResultCollector.TestResultType.DELEGATE);
     }
 
-    public void touchDelegate(String itemModelType, String packName, ResourceLocation location) {
-        touch(itemModelType, packName, location, TestResultType.DELEGATE);
+    default void next(String itemModelType, String packName, boolean fallback) {
+        if ( fallback ) { touch(itemModelType, packName, ModelTestsResultCollector.TestResultType.NEXT_TEST_FALLBACK); }
+        else { touch(itemModelType, packName, ModelTestsResultCollector.TestResultType.NEXT_TEST); }
     }
 
-    public void touchNext(String itemModelType, String packName, ResourceLocation location, boolean fallback) {
-        if ( fallback ) { touch(itemModelType, packName, location, TestResultType.NEXT_TEST_FALLBACK); }
-        else {touch(itemModelType, packName, location, TestResultType.NEXT_TEST);}
+    default void next(String itemModelType, String packName) {
+        touch(itemModelType, packName, ModelTestsResultCollector.TestResultType.NEXT_TEST);
     }
 
-    public void touchNext(String itemModelType, String packName, ResourceLocation location) {
-        touch(itemModelType, packName, location, TestResultType.NEXT_TEST);
-    }
-
-    public void touchInfo(String itemModelType, String packName, ResourceLocation location) {
-        touch(itemModelType, packName, location, TestResultType.INFO);
+    default void info(String itemModelType, String packName) {
+        touch(itemModelType, packName, ModelTestsResultCollector.TestResultType.INFO);
     }
 
 
-    public void pushShift() {
-        currentShift++;
+    default void pushShift(){}
+    default void popShift(){}
+    default void resetShift(){}
+
+    default void touch(String itemModelType, String packName, ModelTestsResultCollector.TestResultType resultType){}
+
+    default ResourceLocation getModelLocation() {
+        return ResourceLocation.fromNamespaceAndPath(Rpf.MOD_ID, "dummy");
     }
 
-    public void popShift() {
-        currentShift--;
+    default List<String> getStringsToLog() {
+        return new ArrayList<>();
     }
 
-    public void resetShift() {
-        currentShift = 0;
-    }
-
-    private void touch(String itemModelType, String packName, ResourceLocation location, TestResultType resultType) {
-        units.add(new TestResultUnit(itemModelType, packName, location, resultType, currentShift));
-    }
-
-    public ResourceLocation getModelLocation() { // FIXME: hack, i made this under my beer
-        return units.getFirst().itemModel();
-    }
-
-    public List<String> getStringsToLog() {
-        List<String> strings = new ArrayList<>(units.size());
-        for (TestResultUnit unit : units) {
-            strings.add(unit.toPrint());
-        }
-        return strings;
-    }
-
-    private record TestResultUnit(String itemModelType, String packName, ResourceLocation itemModel, TestResultType result, int shift) {
-
-        public String toPrint() {
-            String shiftString = "  ".repeat(shift);
-            return shiftString + "Pack " + packName + ": action " + String.join(" ", itemModelType, itemModel.toString(), result.toString());
-        }
-    }
-
-    private enum TestResultType {
+    public enum TestResultType {
         ALLOW_UPDATE,
         DELEGATE,
         NEXT_TEST,

@@ -53,7 +53,7 @@ public abstract class ConditionalItemModelMixin implements RpfItemModel {
             ((RpfItemModel) onFalse).rpf$markAsFallback();
         }
         if (model instanceof RpfItemModel rpfItemModel) {
-            collector.touchNext(this.getClass().getSimpleName() + " (" + isTrue + ")", packName, itemModelId);
+            collector.next(this.getClass().getSimpleName() + " (" + isTrue + ")", packName);
             return rpfItemModel.rpf$doDelegate(renderState, stack, itemModelResolver, displayContext, level, owner, (ItemModel) (Object) this, seed, itemModelId, packName, collector);
         }
         return this.rpf$isFallback();

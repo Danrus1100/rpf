@@ -14,6 +14,7 @@ import java.util.concurrent.CompletableFuture;
 
 public class Rpf implements ClientModInitializer {
 
+    public static String MOD_ID = "rpf";
     public static CompletableFuture<List<RpfClientItemInfoLoader.LoadedClientInfos>> rpf$currentItemLayersFuture;
     private static final ItemModelsSelectLogger ITEM_LOGGER = new ItemModelsSelectLogger();
     public static boolean debug;

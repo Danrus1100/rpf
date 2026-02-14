@@ -6,6 +6,9 @@ import com.danrus.rpf.api.RpfItemModel;
 import com.danrus.rpf.core.SignedItemModel;
 import com.danrus.rpf.duck.load.RpfModelManager;
 import com.danrus.rpf.logging.ModelTestsResultCollector;
+import com.danrus.rpf.logging.ModelTestsResultCollectorImpl;
+import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.item.ClientItem;
@@ -35,19 +38,19 @@ public class ItemModelResolverMixin<T, R> {
 
     @Unique
     private final Map<DataComponentMap, ClientItem.Properties> componentsToProperties = new HashMap<>();
+    @Unique
+    private static final ModelTestsResultCollector DUMMY_COLLECTOR = new ModelTestsResultCollector(){};
 
-    @Inject(
-            method = "appendItemLayers",
-            at = @At("HEAD"),
-            cancellable = true
+    @WrapMethod(
+            method = "appendItemLayers"
     )
-    private void rpf$selectModel(ItemStackRenderState renderState, ItemStack stack, ItemDisplayContext displayContext, Level level, LivingEntity entity, int seed, CallbackInfo ci) {
+    private void rpf$selectModel(ItemStackRenderState renderState, ItemStack stack, ItemDisplayContext displayContext, Level level, LivingEntity entity, int seed, Operation<Void> original) {
         ResourceLocation resourceLocation = stack.get(DataComponents.ITEM_MODEL);
         if (resourceLocation == null) return;
 
         ClientLevel clientLevel = level instanceof ClientLevel cl ? cl : null;
 
-        ModelTestsResultCollector collector = new ModelTestsResultCollector();
+        ModelTestsResultCollector collector = Rpf.debug ? new ModelTestsResultCollectorImpl(resourceLocation) : DUMMY_COLLECTOR;
 
         RpfModelManager rpfModelManager = (RpfModelManager) Minecraft.getInstance().getModelManager();
         List<Map<ResourceLocation, SignedItemModel>> packs = rpfModelManager.rpf$getSignedModels();
@@ -61,7 +64,6 @@ public class ItemModelResolverMixin<T, R> {
 
                 if (!(model.model() instanceof RpfItemModel)) {
                     model.model().update(renderState, stack, (ItemModelResolver) (Object) this, displayContext, clientLevel, entity, seed);
-                    ci.cancel();
                     return;
                 }
 
@@ -77,7 +79,6 @@ public class ItemModelResolverMixin<T, R> {
                     if (Rpf.debug) {
                         Rpf.getItemLogger().info(collector);
                     }
-                    ci.cancel();
                     return;
                 }
             } catch (Exception e) {
@@ -85,16 +86,15 @@ public class ItemModelResolverMixin<T, R> {
             }
 
         }
-
-        updateMissingModel(resourceLocation, rpfModelManager, renderState, collector, stack, displayContext, clientLevel, entity, seed);
-        ci.cancel();
+        renderState.appendModelIdentityElement(new RpfModelIdentity(resourceLocation, -1, false));
+        original.call(renderState, stack, displayContext, level, entity, seed);
     }
 
     @Unique
     private void updateMissingModel(ResourceLocation resourceLocation, RpfModelManager modelManager, ItemStackRenderState renderState, ModelTestsResultCollector collector, ItemStack stack, ItemDisplayContext displayContext, @Nullable ClientLevel level, @Nullable LivingEntity owner, int seed){
         renderState.appendModelIdentityElement(new RpfModelIdentity(resourceLocation, -1, false)); // no model found
         modelManager.rpf$getMissingModel().update(renderState, stack, (ItemModelResolver) (Object) this, displayContext, level, owner, seed);
-        collector.touchModelNotFound(resourceLocation);
+        collector.touchModelNotFound();
         Rpf.getItemLogger().error(collector);
     }
 
