@@ -1,6 +1,9 @@
 package com.danrus.rpf.mixin;
 
 import com.danrus.rpf.Rpf;
+import com.danrus.rpf.api.event.RpfEvent;
+import com.danrus.rpf.api.event.type.MissingModelUpdateEvent;
+import com.danrus.rpf.api.event.type.PreModelResolveEvent;
 import com.danrus.rpf.core.RpfModelIdentity;
 import com.danrus.rpf.api.RpfItemModel;
 import com.danrus.rpf.core.SignedItemModel;
@@ -26,6 +29,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -53,10 +57,25 @@ public class ItemModelResolverMixin<T, R> {
         List<Map<ResourceLocation, SignedItemModel>> packs = rpfModelManager.rpf$getSignedModels();
         int packsCont = packs.size();
 
+        List<SignedItemModel> candidates = new ArrayList<>();
         for (int i = 0; i < packsCont; i++) {
+            Map<ResourceLocation, SignedItemModel> currentPack = packs.get(i);
+            SignedItemModel model = currentPack.get(resourceLocation);
+            if (model != null) {
+                candidates.add(model);
+            }
+        }
+
+        RpfEvent preEvent = new PreModelResolveEvent(resourceLocation, candidates, collector, renderState, stack, (ItemModelResolver) (Object) this, displayContext, clientLevel, entity, seed);
+        Rpf.getEventBus().post(preEvent);
+        if (preEvent.isCancelled()) {
+            ci.cancel();
+            return;
+        }
+//        for (int i = 0; i < packsCont; i++) {
+        for (int i = candidates.size() - 1; i >= 0; i--) { // iterate in reverse to check higher priority packs first
             try {
-                Map<ResourceLocation, SignedItemModel> currentPack = packs.get(i);
-                SignedItemModel model = currentPack.get(resourceLocation);
+                SignedItemModel model = candidates.get(i);
                 collector.resetShift();
 
                 if (!(model.model() instanceof RpfItemModel)) {
@@ -92,6 +111,9 @@ public class ItemModelResolverMixin<T, R> {
 
     @Unique
     private void updateMissingModel(ResourceLocation resourceLocation, RpfModelManager modelManager, ItemStackRenderState renderState, ModelTestsResultCollector collector, ItemStack stack, ItemDisplayContext displayContext, @Nullable ClientLevel level, @Nullable LivingEntity owner, int seed){
+        RpfEvent event = new MissingModelUpdateEvent(resourceLocation, renderState, stack, (ItemModelResolver) (Object) this, displayContext, level, owner, seed, collector);
+        Rpf.getEventBus().post(event);
+        if (event.isCancelled()) return;
         renderState.appendModelIdentityElement(new RpfModelIdentity(resourceLocation, -1, false)); // no model found
         modelManager.rpf$getMissingModel().update(renderState, stack, (ItemModelResolver) (Object) this, displayContext, level, owner, seed);
         collector.touchModelNotFound(resourceLocation);

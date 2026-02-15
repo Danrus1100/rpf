@@ -1,5 +1,6 @@
 package com.danrus.rpf;
 
+import com.danrus.rpf.api.event.RpfEventBus;
 import com.danrus.rpf.compat.rprenames.impl.RpRenamesCompat;
 import com.danrus.rpf.core.RpfClientItemInfoLoader;
 import com.danrus.rpf.logging.ItemModelsSelectLogger;
@@ -16,6 +17,7 @@ public class Rpf implements ClientModInitializer {
 
     public static CompletableFuture<List<RpfClientItemInfoLoader.LoadedClientInfos>> rpf$currentItemLayersFuture;
     private static final ItemModelsSelectLogger ITEM_LOGGER = new ItemModelsSelectLogger();
+    private static final RpfEventBus EVENT_BUS = new RpfEventBus();
     public static boolean debug;
 
     @Override
@@ -32,6 +34,10 @@ public class Rpf implements ClientModInitializer {
         if (FabricLoader.getInstance().isModLoaded("rprenames")) {
             RpRenamesCompat.init();
         }
+    }
+
+    public static RpfEventBus getEventBus() {
+        return EVENT_BUS;
     }
 
     public static ItemModelsSelectLogger getItemLogger() {
