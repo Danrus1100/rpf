@@ -1,6 +1,8 @@
 package com.danrus.rpf.mixin.load;
 
+import com.danrus.rpf.Rpf;
 import com.danrus.rpf.api.RpfItemModel;
+import com.danrus.rpf.api.event.type.PostBakeEvent;
 import com.danrus.rpf.core.SignedItemModel;
 import com.danrus.rpf.duck.RpfClientItem;
 import com.danrus.rpf.duck.load.RpfBakingResult;
@@ -89,7 +91,11 @@ public class ModelBakeryMixin implements RpfModelBakery {
                                     *///?}
                                     missingModels.item,
                                     clientItem.registrySwapper()));
-                            return new SignedItemModel(RpfClientItem.class.cast(clientItem).rpf$getPackName(), model);
+                            SignedItemModel result = new SignedItemModel(RpfClientItem.class.cast(clientItem).rpf$getPackName(), model);
+                            PostBakeEvent event = new PostBakeEvent(clientItem, result);
+                            Rpf.getEventBus().post(event);
+                            if (event.isCancelled()) return null;
+                            return event.getResult();
                         } catch (Exception exception) {
                             LOGGER.warn("Unable to bake item model: '{}'", resourceLocation, exception);
                             return null;
