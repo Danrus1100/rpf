@@ -1,6 +1,7 @@
 package com.danrus.rpf;
 
 import com.danrus.rpf.api.DelegateItemModel;
+import com.danrus.rpf.api.codec.RpfModelsCodecsExtends;
 import com.danrus.rpf.duck.item.RpfCompositeModel;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
@@ -10,46 +11,36 @@ import net.minecraft.client.renderer.item.ItemModels;
 import net.minecraft.client.renderer.item.RangeSelectItemModel;
 import net.minecraft.client.renderer.item.SelectItemModel;
 import net.minecraft.client.renderer.item.properties.numeric.RangeSelectItemModelProperties;
+import net.minecraft.resources.ResourceLocation;
 
 public class RpfCodecs {
     private RpfCodecs() {}
+    public static final ResourceLocation COMPOSITE_ID = ResourceLocation.withDefaultNamespace("composite");
+    public static final ResourceLocation RANGE_ID = ResourceLocation.withDefaultNamespace("range_dispatch");
+    public static final ResourceLocation SELECT_ID = ResourceLocation.withDefaultNamespace("select");
 
-    public static final MapCodec<SelectItemModel.Unbaked> MAP_CODEC_SELECT = RecordCodecBuilder.mapCodec(
-            (instance) -> instance.group(
-                    SelectItemModel.UnbakedSwitch.MAP_CODEC.forGetter(SelectItemModel.Unbaked::unbakedSwitch),
-                    ItemModels.CODEC.optionalFieldOf("fallback").forGetter(SelectItemModel.Unbaked::fallback),
-                    Codec.BOOL.optionalFieldOf("delegate", true).forGetter((model) -> {
-                        return DelegateItemModel.Unbaked.class.cast(model).rpf$getDelegation();
-                    })
-            ).apply(instance, ((unbakedSwitch, fallback, delegate) -> {
-                SelectItemModel.Unbaked model = new SelectItemModel.Unbaked(unbakedSwitch, fallback);
-                DelegateItemModel.Unbaked.class.cast(model).rpf$setDeligation(delegate);
-                return model;
-            })));
+    public static void registerDelegate(ResourceLocation location) {
+        RpfModelsCodecsExtends.getInstance().register(
+                location,
+                Codec.BOOL.optionalFieldOf("delegate", true),
+                (model, val) -> ((DelegateItemModel.Unbaked) model).rpf$setDeligation(val),
+                (model) -> ((DelegateItemModel.Unbaked) model).rpf$getDelegation()
+        );
+    }
 
-    public static final MapCodec<RangeSelectItemModel.Unbaked> MAP_CODEC_RANGE = RecordCodecBuilder.mapCodec(
-            (instance) -> instance.group(
-                        RangeSelectItemModelProperties.MAP_CODEC.forGetter(RangeSelectItemModel.Unbaked::property),
-                        Codec.FLOAT.optionalFieldOf("scale", 1.0F).forGetter(RangeSelectItemModel.Unbaked::scale),
-                        RangeSelectItemModel.Entry.CODEC.listOf().fieldOf("entries").forGetter(RangeSelectItemModel.Unbaked::entries),
-                        ItemModels.CODEC.optionalFieldOf("fallback").forGetter(RangeSelectItemModel.Unbaked::fallback),
-                        Codec.BOOL.optionalFieldOf("delegate", true).forGetter((model) -> {
-                            return DelegateItemModel.Unbaked.class.cast(model).rpf$getDelegation();
-                        })
-                    ).apply(instance, ((property, scale, entries, fallback, delegate) -> {
-                        RangeSelectItemModel.Unbaked model = new RangeSelectItemModel.Unbaked(property, scale, entries, fallback);
-                        DelegateItemModel.Unbaked.class.cast(model).rpf$setDeligation(delegate);
-                        return model;
-                    })));
+    public static void init() {
+        registerDelegate(SELECT_ID);
+        registerDelegate(RANGE_ID);
 
-    public static final MapCodec<CompositeModel.Unbaked> MAP_CODEC_COMPOSITE = RecordCodecBuilder.mapCodec(
-            (instance) -> instance.group(
-                    ItemModels.CODEC.listOf().fieldOf("models").forGetter(CompositeModel.Unbaked::models),
-                    Codec.STRING.optionalFieldOf("delegate_strategy", "one_do_delegate").forGetter((model) -> RpfCompositeModel.Unbaked.class.cast(model).rpf$getDelegateStrategy().name().toLowerCase())
-                    ).apply(instance, (models, delegateStrategy) -> {
-                        CompositeModel.Unbaked model = new CompositeModel.Unbaked(models);
-                        RpfCompositeModel.DelegateStrategy strategy = RpfCompositeModel.DelegateStrategy.valueOf(delegateStrategy.toUpperCase());
-                        RpfCompositeModel.Unbaked.class.cast(model).rpf$setDelegateStrategy(strategy);
-                        return model;
-            }));
+        RpfModelsCodecsExtends.getInstance().register(
+                COMPOSITE_ID,
+                Codec.STRING.optionalFieldOf("delegate_strategy", "one_do_delegate"),
+                (model, val) -> {
+                    var strategy = RpfCompositeModel.DelegateStrategy.valueOf(val.toUpperCase());
+                    ((RpfCompositeModel.Unbaked) model).rpf$setDelegateStrategy(strategy);
+                },
+                (model) -> ((RpfCompositeModel.Unbaked) model).rpf$getDelegateStrategy().name().toLowerCase()
+        );
+    }
+
 }

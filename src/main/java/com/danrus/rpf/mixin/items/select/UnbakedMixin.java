@@ -18,16 +18,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(SelectItemModel.Unbaked.class)
 public class UnbakedMixin implements DelegateItemModel.Unbaked {
-    @Inject(
-            method = "type",
-            at = @At("HEAD"),
-            cancellable = true
-    )
-    private static void rpf$type(CallbackInfoReturnable<MapCodec<SelectItemModel.Unbaked>> cir) {
-        cir.setReturnValue(RpfCodecs.MAP_CODEC_SELECT);
-    }
-
-
     @Unique
     private boolean rpf$doDelegate = true;
 

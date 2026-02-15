@@ -20,6 +20,7 @@ public class Rpf implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
+        RpfCodecs.init();
         ClientCommandRegistrationCallback.EVENT.register((dispatcher, commandBuildContext) -> {
             dispatcher.register(ClientCommandManager.literal("rpf_toggle_debug").executes(ctx -> {
                 debug = !debug;
