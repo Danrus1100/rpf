@@ -7,6 +7,7 @@ import com.danrus.rpf.core.SignedItemModel;
 import com.danrus.rpf.duck.load.RpfBakingResult;
 import com.danrus.rpf.duck.load.RpfModelBakery;
 import com.danrus.rpf.duck.load.RpfModelManager;
+import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
@@ -198,6 +199,18 @@ public abstract class ModelManagerMixin implements RpfModelManager {
         }
     }
 
+    @WrapMethod(
+            method = "getItemModel"
+    )
+    private ItemModel rpf$wrapGetItemModel(ResourceLocation modelLocation, Operation<ItemModel> original) {
+        for (Map<ResourceLocation, SignedItemModel> layer : this.rpf$bakedItemStackSignetModels) {
+            SignedItemModel model = layer.get(modelLocation);
+            if (model != null) {
+                return model.model();
+            }
+        }
+        return original.call(modelLocation);
+    }
 
     @Override
     public List<Map<ResourceLocation, SignedItemModel>> rpf$getSignedModels() {

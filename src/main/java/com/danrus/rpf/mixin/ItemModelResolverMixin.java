@@ -46,6 +46,7 @@ public class ItemModelResolverMixin<T, R> {
             cancellable = true
     )
     private void rpf$selectModel(ItemStackRenderState renderState, ItemStack stack, ItemDisplayContext displayContext, Level level, LivingEntity entity, int seed, CallbackInfo ci) {
+        if (!Rpf.toggle) return;
         ResourceLocation resourceLocation = stack.get(DataComponents.ITEM_MODEL);
         if (resourceLocation == null) return;
 
@@ -83,7 +84,7 @@ public class ItemModelResolverMixin<T, R> {
                     return;
                 }
 
-                if (!model.doDelegate(renderState, stack, (ItemModelResolver) (Object) this, displayContext, clientLevel, entity, seed, resourceLocation, collector) || i == packsCont - 1) {
+                if (!model.doDelegate(renderState, stack, (ItemModelResolver) (Object) this, displayContext, clientLevel, entity, seed, resourceLocation, collector) || i == candidates.size() - 1) {
                     ClientItem.Properties properties = rpfModelManager.rpf$getItemPropertiesMaps().get(i).get(resourceLocation);
                     if (properties == null) {
                         properties = ClientItem.Properties.DEFAULT;
