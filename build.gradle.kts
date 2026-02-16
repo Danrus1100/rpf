@@ -104,7 +104,7 @@ publishMods {
 
     dryRun = gitBranchName != mainBranch
 
-    type = ALPHA
+    type = STABLE
 
     file.set(tasks.named("remapJar").flatMap { (it as org.gradle.jvm.tasks.Jar).archiveFile })
 

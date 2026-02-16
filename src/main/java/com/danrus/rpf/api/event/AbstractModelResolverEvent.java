@@ -8,7 +8,7 @@ import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
-public class AbstractModelResolverEvent extends RpfEvent{
+public abstract class AbstractModelResolverEvent extends RpfEvent{
     private final ItemStackRenderState renderState;
     private final ItemStack stack;
     private final ItemModelResolver itemModelResolver;

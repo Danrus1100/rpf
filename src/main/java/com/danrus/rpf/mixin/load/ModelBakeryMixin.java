@@ -3,6 +3,7 @@ package com.danrus.rpf.mixin.load;
 import com.danrus.rpf.Rpf;
 import com.danrus.rpf.api.RpfItemModel;
 import com.danrus.rpf.api.event.type.PostBakeEvent;
+import com.danrus.rpf.api.event.type.PreBakeEvent;
 import com.danrus.rpf.core.SignedItemModel;
 import com.danrus.rpf.duck.RpfClientItem;
 import com.danrus.rpf.duck.load.RpfBakingResult;
@@ -82,7 +83,7 @@ public class ModelBakeryMixin implements RpfModelBakery {
                     layer,
                     (resourceLocation, clientItem) -> {
                         try {
-                            ItemModel model = clientItem.model().bake(new ItemModel.BakingContext(
+                            ItemModel.BakingContext context = new ItemModel.BakingContext(
                                     modelBakerImpl,
                                     this.entityModelSet,
                                     //? if >=1.21.10{
@@ -90,12 +91,16 @@ public class ModelBakeryMixin implements RpfModelBakery {
                                     playerSkinRenderCache,
                                     *///?}
                                     missingModels.item,
-                                    clientItem.registrySwapper()));
+                                    clientItem.registrySwapper());
+                            PreBakeEvent preEvent = new PreBakeEvent(clientItem, resourceLocation, context);
+                            Rpf.getEventBus().post(preEvent);
+                            if (preEvent.isCancelled()) return null;
+                            ItemModel model = clientItem.model().bake(preEvent.getBakingContext());
                             SignedItemModel result = new SignedItemModel(RpfClientItem.class.cast(clientItem).rpf$getPackName(), model);
-                            PostBakeEvent event = new PostBakeEvent(clientItem, result);
-                            Rpf.getEventBus().post(event);
-                            if (event.isCancelled()) return null;
-                            return event.getResult();
+                            PostBakeEvent postEvent = new PostBakeEvent(clientItem, result);
+                            Rpf.getEventBus().post(postEvent);
+                            if (postEvent.isCancelled()) return null;
+                            return postEvent.getResult();
                         } catch (Exception exception) {
                             LOGGER.warn("Unable to bake item model: '{}'", resourceLocation, exception);
                             return null;

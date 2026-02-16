@@ -1,6 +1,7 @@
 package com.danrus.rpf.mixin.load;
 
 import com.danrus.rpf.Rpf;
+import com.danrus.rpf.api.event.type.ModelDiscoveryEvent;
 import com.danrus.rpf.core.RpfClientItemInfoLoader;
 import com.danrus.rpf.compat.rprenames.impl.RenamesBridge;
 import com.danrus.rpf.core.SignedItemModel;
@@ -35,6 +36,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
+import java.util.function.Supplier;
 
 @Mixin(value = ModelManager.class, priority = 2000)
 public abstract class ModelManagerMixin implements RpfModelManager {
@@ -107,7 +109,7 @@ public abstract class ModelManagerMixin implements RpfModelManager {
             at = @At(value = "INVOKE", target = "Lnet/minecraft/client/resources/model/ModelManager;discoverModelDependencies(Ljava/util/Map;Lnet/minecraft/client/resources/model/BlockStateModelLoader$LoadedModels;Lnet/minecraft/client/resources/model/ClientItemInfoLoader$LoadedClientInfos;)Lnet/minecraft/client/resources/model/ModelManager$ResolvedModels;")
     )
     private static ModelManager.ResolvedModels rpf$wrapDiscovery(Map<ResourceLocation, UnbakedModel> inputModels, BlockStateModelLoader.LoadedModels loadedModels, ClientItemInfoLoader.LoadedClientInfos loadedClientInfos, Operation<ModelManager.ResolvedModels> original) {
-        return rpf$discoverModelDependencies(inputModels, loadedModels, Rpf.rpf$currentItemLayersFuture.join());
+        return rpf$discoverModelDependencies(inputModels, loadedModels, Rpf.rpf$currentItemLayersFuture.join(), () -> original.call(inputModels, loadedModels, loadedClientInfos));
     }
 
     @Unique
@@ -160,16 +162,30 @@ public abstract class ModelManagerMixin implements RpfModelManager {
     private static ModelManager.ResolvedModels rpf$discoverModelDependencies(
             Map<ResourceLocation, UnbakedModel> blockModels,
             BlockStateModelLoader.LoadedModels loadedModels,
-            List<RpfClientItemInfoLoader.LoadedClientInfos> itemLayers
+            List<RpfClientItemInfoLoader.LoadedClientInfos> itemLayers,
+            Supplier<ModelManager.ResolvedModels> originalDiscoverModelDependencies
     ) {
         try (Zone zone = Profiler.get().zone("dependencies")) {
             ModelDiscovery modelDiscovery = new ModelDiscovery(blockModels, MissingBlockModel.missingModel());
+            ModelDiscoveryEvent preEvent = new ModelDiscoveryEvent(ModelDiscoveryEvent.Stage.PRE, modelDiscovery, blockModels, loadedModels, itemLayers);
+            Rpf.getEventBus().post(preEvent);
+            if (preEvent.isCancelled()) {
+                LOGGER.info("[RPF] Model discovery was canceled during PRE stage, skipping discovery and using vanilla models only.");
+                return originalDiscoverModelDependencies.get();
+            }
             modelDiscovery.addSpecialModel(ItemModelGenerator.GENERATED_ITEM_MODEL_ID, new ItemModelGenerator());
 
             loadedModels.models().values().forEach(modelDiscovery::addRoot);
 
             for (RpfClientItemInfoLoader.LoadedClientInfos layer : itemLayers) {
                 layer.contents().values().forEach((clientItem) -> modelDiscovery.addRoot(clientItem.model()));
+            }
+
+            ModelDiscoveryEvent postEvent = new ModelDiscoveryEvent(ModelDiscoveryEvent.Stage.POST, modelDiscovery, blockModels, loadedModels, itemLayers);
+            Rpf.getEventBus().post(postEvent);
+            if (postEvent.isCancelled()) {
+                LOGGER.info("[RPF] Model discovery was canceled during POST stage, skipping discovery and using vanilla models only.");
+                return originalDiscoverModelDependencies.get();
             }
 
             return new ModelManager.ResolvedModels(modelDiscovery.missingModel(), modelDiscovery.resolve());

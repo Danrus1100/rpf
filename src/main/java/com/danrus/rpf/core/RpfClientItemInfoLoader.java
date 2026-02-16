@@ -1,5 +1,8 @@
 package com.danrus.rpf.core;
 
+import com.danrus.rpf.Rpf;
+import com.danrus.rpf.api.event.AbstractStagedEvent;
+import com.danrus.rpf.api.event.type.ResourceParsingEvent;
 import com.danrus.rpf.duck.RpfClientItem;
 import com.google.gson.JsonElement;
 import com.mojang.logging.LogUtils;
@@ -82,6 +85,9 @@ public class RpfClientItemInfoLoader {
             Resource resource,
             RegistryAccess.Frozen registryAccess
     ) {
+        ResourceParsingEvent preEvent = new ResourceParsingEvent(AbstractStagedEvent.Stage.PRE, id, resource, registryAccess, null);
+        Rpf.getEventBus().post(preEvent);
+
         try (Reader reader = resource.openAsReader()) {
             PlaceholderLookupProvider placeholders = new PlaceholderLookupProvider(registryAccess);
             DynamicOps<JsonElement> ops = placeholders.createSerializationContext(JsonOps.INSTANCE);
@@ -100,7 +106,10 @@ public class RpfClientItemInfoLoader {
                 RpfClientItem.class.cast(clientItem).rpf$setPackName(resource.sourcePackId());
             }
 
-            return clientItem;
+            ResourceParsingEvent postEvent = new ResourceParsingEvent(AbstractStagedEvent.Stage.POST, id, resource, registryAccess, clientItem);
+            Rpf.getEventBus().post(postEvent);
+
+            return postEvent.getClientItem();
 
         } catch (Exception e) {
             LOGGER.error("Failed to open item model {} from pack '{}'", id, resource.sourcePackId(), e);
