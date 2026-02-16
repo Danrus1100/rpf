@@ -72,8 +72,7 @@ public class ItemModelResolverMixin<T, R> {
             ci.cancel();
             return;
         }
-//        for (int i = 0; i < packsCont; i++) {
-        for (int i = candidates.size() - 1; i >= 0; i--) { // iterate in reverse to check higher priority packs first
+        for (int i = 0; i < candidates.size(); i++) {
             try {
                 SignedItemModel model = candidates.get(i);
                 collector.resetShift();
