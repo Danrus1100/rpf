@@ -4,6 +4,7 @@ import com.danrus.rpf.Rpf;
 import com.danrus.rpf.api.event.type.ModelDiscoveryEvent;
 import com.danrus.rpf.core.RpfClientItemInfoLoader;
 import com.danrus.rpf.compat.rprenames.impl.RenamesBridge;
+import com.danrus.rpf.core.RpfModelIdentity;
 import com.danrus.rpf.core.SignedItemModel;
 import com.danrus.rpf.duck.load.RpfBakingResult;
 import com.danrus.rpf.duck.load.RpfModelBakery;
@@ -26,6 +27,7 @@ import net.minecraft.util.profiling.Profiler;
 import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.util.profiling.Zone;
 import net.minecraft.world.level.block.state.BlockState;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongepowered.asm.mixin.*;
@@ -50,6 +52,9 @@ public abstract class ModelManagerMixin implements RpfModelManager {
 
     @Unique
     private List<Map<ResourceLocation, ClientItem.Properties>> rpf$itemProperties;
+
+    @Unique
+    private Map<RpfModelIdentity, ClientItem.Properties> rpf$itemPropertiesByIdentity;
 
     @Unique
     private static final ClientItemInfoLoader.LoadedClientInfos EMPTY_LOADED_INFOS =
@@ -206,7 +211,8 @@ public abstract class ModelManagerMixin implements RpfModelManager {
         try {
             RpfBakingResult result = ((RpfBakingResult) (Object) bakingResult);
             this.rpf$bakedItemStackSignetModels = new ArrayList<>(result.rpf$getItemSignedModels().reversed());// "reversed" to put vanilla RP down of list
-            this.rpf$itemProperties = new ArrayList<>(result.rpf$getItemProperties().reversed());
+            this.rpf$itemProperties = new ArrayList<>(result.rpf$getItemPropertiesById().reversed());
+            this.rpf$itemPropertiesByIdentity = result.rpf$getItemPropertiesByIdentity();
             Rpf.getItemLogger().onReload();
         } catch (ClassCastException e) {
             throw new IllegalStateException("ModelBakery.BakingResult bakingResult is not instance of RpfBakingResult!");
@@ -236,6 +242,16 @@ public abstract class ModelManagerMixin implements RpfModelManager {
     @Override
     public List<Map<ResourceLocation, ClientItem.Properties>> rpf$getItemPropertiesMaps() {
         return this.rpf$itemProperties;
+    }
+
+    @Override
+    @NotNull
+    public ClientItem.Properties rpf$getProperties(RpfModelIdentity identity) {
+        ClientItem.Properties properties = rpf$itemPropertiesByIdentity.get(identity);
+        if (properties == null) {
+            properties = ClientItem.Properties.DEFAULT;
+        }
+        return properties;
     }
 
     @Override

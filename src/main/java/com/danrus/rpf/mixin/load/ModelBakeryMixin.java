@@ -1,9 +1,9 @@
 package com.danrus.rpf.mixin.load;
 
 import com.danrus.rpf.Rpf;
-import com.danrus.rpf.api.RpfItemModel;
 import com.danrus.rpf.api.event.type.PostBakeEvent;
 import com.danrus.rpf.api.event.type.PreBakeEvent;
+import com.danrus.rpf.core.RpfModelIdentity;
 import com.danrus.rpf.core.SignedItemModel;
 import com.danrus.rpf.duck.RpfClientItem;
 import com.danrus.rpf.duck.load.RpfBakingResult;
@@ -111,12 +111,15 @@ public class ModelBakeryMixin implements RpfModelBakery {
             layerFutures.add(layerFuture);
         }
         List<Map<ResourceLocation, ClientItem.Properties>> propertiesLayers = new ArrayList<>(this.rpf$clientItems.size());
+        Map<RpfModelIdentity, ClientItem.Properties> byIdentity = new HashMap<>();
         for (Map<ResourceLocation, ClientItem> layer : this.rpf$clientItems) {
             Map<ResourceLocation, ClientItem.Properties> propertiesMap = new HashMap<>();
             layer.forEach((resourceLocation, clientItem) -> {
                 ClientItem.Properties properties = clientItem.properties();
                 if (!properties.equals(ClientItem.Properties.DEFAULT)) {
                     propertiesMap.put(resourceLocation, properties);
+                    RpfModelIdentity identity = new RpfModelIdentity(resourceLocation, RpfClientItem.class.cast(clientItem).rpf$getPackName());
+                    byIdentity.put(identity, properties);
                 }
             });
             propertiesLayers.add(propertiesMap);
@@ -132,7 +135,10 @@ public class ModelBakeryMixin implements RpfModelBakery {
             }
 
             ModelBakery.BakingResult result = new ModelBakery.BakingResult(missingModels, blockModels, flatItemModels, Map.of());
-            ((RpfBakingResult) (Object) result).rpf$setItemProperties(propertiesLayers).rpf$setSignedItemModels(bakedLayers);
+            ((RpfBakingResult) (Object) result)
+                    .rpf$addItemPropertiesByIdentity(byIdentity)
+                    .rpf$setItemPropertiesById(propertiesLayers)
+                    .rpf$setSignedItemModels(bakedLayers);
 
             return result;
         }));

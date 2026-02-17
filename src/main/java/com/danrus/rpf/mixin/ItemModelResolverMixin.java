@@ -85,13 +85,14 @@ public class ItemModelResolverMixin<T, R> {
                 }
 
                 if (!model.doDelegate(renderState, stack, (ItemModelResolver) (Object) this, displayContext, clientLevel, entity, seed, resourceLocation, collector) || i == candidates.size() - 1) {
-                    ClientItem.Properties properties = rpfModelManager.rpf$getItemPropertiesMaps().get(i).get(resourceLocation);
+                    RpfModelIdentity identity = new RpfModelIdentity(resourceLocation, model.name());
+                    ClientItem.Properties properties = rpfModelManager.rpf$getProperties(identity);
                     if (properties == null) {
                         properties = ClientItem.Properties.DEFAULT;
                     }
                     renderState.setOversizedInGui(properties.oversizedInGui());
                     this.componentsToProperties.put(stack.getComponents(), properties);
-                    renderState.appendModelIdentityElement(new RpfModelIdentity(resourceLocation, i, true)); // for correct GUI rendering
+                    renderState.appendModelIdentityElement(identity); // for correct GUI rendering
                     model.update(renderState, stack, (ItemModelResolver) (Object) this, displayContext, clientLevel, entity, seed);
                     if (Rpf.debug) {
                         Rpf.getItemLogger().info(collector);
@@ -114,7 +115,7 @@ public class ItemModelResolverMixin<T, R> {
         RpfEvent event = new MissingModelUpdateEvent(resourceLocation, renderState, stack, (ItemModelResolver) (Object) this, displayContext, level, owner, seed, collector);
         Rpf.getEventBus().post(event);
         if (event.isCancelled()) return;
-        renderState.appendModelIdentityElement(new RpfModelIdentity(resourceLocation, -1, false)); // no model found
+        renderState.appendModelIdentityElement(new RpfModelIdentity(resourceLocation, "Unknown")); // no model found
         modelManager.rpf$getMissingModel().update(renderState, stack, (ItemModelResolver) (Object) this, displayContext, level, owner, seed);
         collector.touchModelNotFound(resourceLocation);
         Rpf.getItemLogger().error(collector);

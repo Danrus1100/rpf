@@ -1,5 +1,6 @@
 package com.danrus.rpf.mixin.load;
 
+import com.danrus.rpf.core.RpfModelIdentity;
 import com.danrus.rpf.core.SignedItemModel;
 import com.danrus.rpf.duck.load.RpfBakingResult;
 import net.minecraft.client.renderer.item.ClientItem;
@@ -21,6 +22,9 @@ public class BakingResultMixin implements RpfBakingResult {
     @Unique
     private List<Map<ResourceLocation, ClientItem.Properties>> propertiesList;
 
+    @Unique
+    private Map<RpfModelIdentity, ClientItem.Properties> propertiesByIdentity;
+
     @Override
     public ModelBakery.BakingResult rpf$setSignedItemModels(List<Map<ResourceLocation, SignedItemModel>> models) {
         this.modelsList = models;
@@ -33,13 +37,24 @@ public class BakingResultMixin implements RpfBakingResult {
     }
 
     @Override
-    public RpfBakingResult rpf$setItemProperties(List<Map<ResourceLocation, ClientItem.Properties>> properties) {
+    public RpfBakingResult rpf$setItemPropertiesById(List<Map<ResourceLocation, ClientItem.Properties>> properties) {
         this.propertiesList = properties;
         return this;
     }
 
     @Override
-    public List<Map<ResourceLocation, ClientItem.Properties>> rpf$getItemProperties() {
+    public List<Map<ResourceLocation, ClientItem.Properties>> rpf$getItemPropertiesById() {
         return propertiesList;
+    }
+
+    @Override
+    public RpfBakingResult rpf$addItemPropertiesByIdentity(Map<RpfModelIdentity, ClientItem.Properties> properties) {
+        this.propertiesByIdentity = properties;
+        return this;
+    }
+
+    @Override
+    public Map<RpfModelIdentity, ClientItem.Properties> rpf$getItemPropertiesByIdentity() {
+        return propertiesByIdentity;
     }
 }
