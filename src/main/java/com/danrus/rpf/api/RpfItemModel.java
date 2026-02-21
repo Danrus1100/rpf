@@ -20,7 +20,7 @@ public interface RpfItemModel {
     void rpf$markAsFallback();
     boolean rpf$isFallback();
 
-    default boolean rpf$doDelegate(
+    default void rpf$doDelegate(
             ItemStackRenderState renderState,
             ItemStack stack,
             ItemModelResolver itemModelResolver,
@@ -34,9 +34,7 @@ public interface RpfItemModel {
             ModelTestsResultCollector collector
     ) {
         if (rpf$isFallback()) {
-            collector.touchDelegate(this.getClass().getSimpleName(), packName, itemModelId);
-            return true;
+            collector.delegate(this.getClass().getSimpleName(), packName);
         }
-        return false;
     }
 }

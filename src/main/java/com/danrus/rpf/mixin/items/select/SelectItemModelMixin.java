@@ -47,7 +47,7 @@ public abstract class SelectItemModelMixin<T> implements DelegateItemModel, RpfI
             ModelTestsResultCollector collector
     ) {
         if (!this.rpf$delegate) {
-            collector.touchAllow(this.getClass().getSimpleName() + " force cancel delegate", packName, itemModelId);
+            collector.hit(this.getClass().getSimpleName() + " force cancel delegate", packName);
             return false;
         }
 //        if (this.rpf$isFallback()) return true;
@@ -61,10 +61,10 @@ public abstract class SelectItemModelMixin<T> implements DelegateItemModel, RpfI
         if (itemModel instanceof RpfItemModel rpfItemModel) {
             if (prev != null && this.rpf$isFallback()) rpfItemModel.rpf$markAsFallback();
             String propertyValue = object != null ? object.toString() : "null";
-            collector.touchNext(this.getClass().getSimpleName() + " proprety: " + propertyValue, packName, itemModelId, rpfItemModel.rpf$isFallback());
+            collector.next(this.getClass().getSimpleName() + " proprety: " + propertyValue, packName, rpfItemModel.rpf$isFallback());
             return rpfItemModel.rpf$doDelegate(renderState, stack, itemModelResolver, displayContext, level, owner, (ItemModel) (Object) this, seed, itemModelId, packName, collector);
         } else {
-            collector.touchDelegate(this.getClass().getSimpleName() + " proprety: " + object.toString(), packName, itemModelId);
+            collector.delegate(this.getClass().getSimpleName() + " proprety: " + object.toString(), packName);
             return itemModel == null || this.rpf$getDelegation();
         }
     }

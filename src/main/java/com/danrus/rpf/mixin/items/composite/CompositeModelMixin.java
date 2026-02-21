@@ -45,12 +45,12 @@ public abstract class CompositeModelMixin implements RpfItemModel, RpfCompositeM
             models.forEach(model ->  ((RpfItemModel) model).rpf$markAsFallback());
         }
         boolean delegate = rpf$getDelegationInitialState();
-        collector.touchInfo(this.getClass().getSimpleName() + " models: " + models.size(), packName, itemModelId);
+        collector.info(this.getClass().getSimpleName() + " models: " + models.size(), packName);
         collector.pushShift();
         for (ItemModel model : models) {
-            collector.touchInfo("Testing model: " + model.getClass().getSimpleName(), packName, itemModelId);
+            collector.info("Testing model: " + model.getClass().getSimpleName(), packName);
             if (((RpfItemModel)model).rpf$doDelegate(renderState, stack, itemModelResolver, displayContext, level, owner, prev, seed, itemModelId, packName, collector)) {
-                collector.touchInfo("Model " + model.getClass().getSimpleName() + " cancel delegate", packName, itemModelId);
+                collector.info("Model " + model.getClass().getSimpleName() + " cancel delegate", packName);
                 delegate = rpf$getDelegationStateWhenDelegate();
             }
         }
@@ -61,9 +61,9 @@ public abstract class CompositeModelMixin implements RpfItemModel, RpfCompositeM
         });
 
         if (delegate) {
-            collector.touchDelegate(this.getClass().getSimpleName() + " models: " + models.size() + ": " + modesString, packName, itemModelId);
+            collector.delegate(this.getClass().getSimpleName() + " models: " + models.size() + ": " + modesString, packName);
         } else {
-            collector.touchAllow(this.getClass().getSimpleName() + " models: " + models.size() + ": " + modesString, packName, itemModelId);
+            collector.hit(this.getClass().getSimpleName() + " models: " + models.size() + ": " + modesString, packName);
         }
         collector.popShift();
         return delegate;
