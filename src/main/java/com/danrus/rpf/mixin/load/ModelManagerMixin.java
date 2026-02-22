@@ -106,7 +106,7 @@ public abstract class ModelManagerMixin implements RpfModelManager {
     )
     private CompletableFuture<ClientItemInfoLoader.LoadedClientInfos> rpf$wrapClientItemInfoLoader(ResourceManager resourceManager, Executor executor, Operation<CompletableFuture<ClientItemInfoLoader.LoadedClientInfos>> original) {
         LOGGER.info("[RPF] Start to schedule items!");
-        Rpf.rpf$currentItemLayersFuture = RpfClientItemInfoLoader.scheduleLoad(resourceManager, executor);
+        Rpf.getResourceLoadManager().setCurrentFuture(RpfClientItemInfoLoader.scheduleLoad(resourceManager, executor));
         return CompletableFuture.completedFuture(EMPTY_LOADED_INFOS);
     }
 
@@ -115,7 +115,7 @@ public abstract class ModelManagerMixin implements RpfModelManager {
             at = @At(value = "INVOKE", target = "Lnet/minecraft/client/resources/model/ModelManager;discoverModelDependencies(Ljava/util/Map;Lnet/minecraft/client/resources/model/BlockStateModelLoader$LoadedModels;Lnet/minecraft/client/resources/model/ClientItemInfoLoader$LoadedClientInfos;)Lnet/minecraft/client/resources/model/ModelManager$ResolvedModels;")
     )
     private static ModelManager.ResolvedModels rpf$wrapDiscovery(Map<ResourceLocation, UnbakedModel> inputModels, BlockStateModelLoader.LoadedModels loadedModels, ClientItemInfoLoader.LoadedClientInfos loadedClientInfos, Operation<ModelManager.ResolvedModels> original) {
-        return rpf$discoverModelDependencies(inputModels, loadedModels, Rpf.rpf$currentItemLayersFuture.join(), () -> original.call(inputModels, loadedModels, loadedClientInfos));
+        return rpf$discoverModelDependencies(inputModels, loadedModels, Rpf.getResourceLoadManager().getCurrentFuture().join(), () -> original.call(inputModels, loadedModels, loadedClientInfos));
     }
 
     @Unique
@@ -145,7 +145,7 @@ public abstract class ModelManagerMixin implements RpfModelManager {
             //(EntityModelSet entityModelSet, MaterialSet materials, net.minecraft.client.renderer.PlayerSkinRenderCache playerSkinRenderCache, Map unbakedBlockStateModels, Map clientInfos, Map resolvedModels, ResolvedModel missingModel, Operation<ModelBakery> original)
     {
         List<Map<ResourceLocation, ClientItem>> rawLayers = new ArrayList<>();
-        for (RpfClientItemInfoLoader.LoadedClientInfos layer : Rpf.rpf$currentItemLayersFuture.join()) {
+        for (RpfClientItemInfoLoader.LoadedClientInfos layer : Rpf.getResourceLoadManager().getCurrentFuture().join()) {
             rawLayers.add(layer.contents());
         }
         if (RenamesBridge.active) {
