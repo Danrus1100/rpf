@@ -13,6 +13,8 @@ import com.danrus.rpf.api.TestsResultCollector;
 import com.danrus.rpf.logging.DummyTestsResultsCollector;
 import com.danrus.rpf.logging.LoggingTestsResultCollector;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.item.ClientItem;
@@ -27,14 +29,16 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class RpfV1ModelResolver implements RpfItemModelResolver {
+    
+    private static final Logger LOGGER = LoggerFactory.getLogger(RpfV1ModelResolver.class);
 
-    private final Map<DataComponentMap, ClientItem.Properties> componentsToProperties = new HashMap<>();
+    // WeakHashMap allows garbage collection of entries when ItemStacks are no longer referenced
+    // Collections.synchronizedMap ensures thread safety during concurrent access
+    private final Map<DataComponentMap, ClientItem.Properties> componentsToProperties = 
+        Collections.synchronizedMap(new WeakHashMap<>());
     private static final TestsResultCollector DUMMY_COLLECTOR = new DummyTestsResultsCollector();
 
     @Override
@@ -88,7 +92,17 @@ public class RpfV1ModelResolver implements RpfItemModelResolver {
                     return;
                 }
             } catch (Exception e) {
-//                e.printStackTrace(); //TODO: remove
+                // Log exception with context for debugging
+                LOGGER.error(
+                    "Exception while resolving model '{}' from pack '{}': {}",
+                    resourceLocation,
+                    i < candidates.size() ? candidates.get(i).name() : "unknown",
+                    e.getMessage(),
+                    e
+                );
+                
+                // Continue to next candidate (fallback behavior)
+                // If this was the last candidate, will fall through to updateMissingModel
             }
 
         }
