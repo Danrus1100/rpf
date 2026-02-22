@@ -38,6 +38,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
 import java.util.function.Supplier;
 
@@ -56,6 +57,9 @@ public abstract class ModelManagerMixin implements RpfModelManager {
 
     @Unique
     private Map<RpfModelIdentity, ClientItem.Properties> rpf$itemPropertiesByIdentity;
+
+    @Unique
+    private final Map<ResourceLocation, SignedItemModel> rpf$vanillaModelCache = new ConcurrentHashMap<>();
 
     @Unique
     private static final ClientItemInfoLoader.LoadedClientInfos EMPTY_LOADED_INFOS =
@@ -214,6 +218,10 @@ public abstract class ModelManagerMixin implements RpfModelManager {
             this.rpf$bakedItemStackSignetModels = new ArrayList<>(result.rpf$getItemSignedModels().reversed());// "reversed" to put vanilla RP down of list
             this.rpf$itemProperties = new ArrayList<>(result.rpf$getItemPropertiesById().reversed());
             this.rpf$itemPropertiesByIdentity = result.rpf$getItemPropertiesByIdentity();
+            
+            // Clear vanilla model cache on resource reload
+            this.rpf$vanillaModelCache.clear();
+            
             RpfResolversManager.getInstance().applyPendingResolver();
             Rpf.getItemLogger().onReload();
         } catch (ClassCastException e) {
@@ -248,9 +256,19 @@ public abstract class ModelManagerMixin implements RpfModelManager {
 
     @Override
     public SignedItemModel rpf$getVanillaModel(ResourceLocation location) {
+        // Check cache first for O(1) lookup
+        SignedItemModel cached = rpf$vanillaModelCache.get(location);
+        if (cached != null) {
+            return cached;
+        }
+
+        // Cache miss - search through packs
         for (Map<ResourceLocation, SignedItemModel> map : rpf$getSignedModels()) {
-            if ("vanilla".equals(map.get(location).name()) ) {
-                return map.get(location);
+            SignedItemModel model = map.get(location);
+            if (model != null && "vanilla".equals(model.name())) {
+                // Cache the result before returning
+                rpf$vanillaModelCache.put(location, model);
+                return model;
             }
         }
         return null;
