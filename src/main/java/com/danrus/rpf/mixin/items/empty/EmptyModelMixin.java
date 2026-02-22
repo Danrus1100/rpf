@@ -1,7 +1,7 @@
 package com.danrus.rpf.mixin.items.empty;
 
 import com.danrus.rpf.api.RpfItemModel;
-import com.danrus.rpf.logging.ModelTestsResultCollector;
+import com.danrus.rpf.api.TestsResultCollector;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.item.EmptyModel;
 import net.minecraft.client.renderer.item.ItemModel;
@@ -17,7 +17,7 @@ import org.spongepowered.asm.mixin.Mixin;
 @Mixin(EmptyModel.class)
 public abstract class EmptyModelMixin implements RpfItemModel {
     @Override
-    public boolean rpf$doDelegate(ItemStackRenderState renderState, ItemStack stack, ItemModelResolver itemModelResolver, ItemDisplayContext displayContext, @Nullable ClientLevel level, @Nullable LivingEntity owner, @Nullable ItemModel prev, int seed, ResourceLocation itemModelId, String packName, ModelTestsResultCollector collector) {
+    public boolean rpf$doDelegate(ItemStackRenderState renderState, ItemStack stack, ItemModelResolver itemModelResolver, ItemDisplayContext displayContext, @Nullable ClientLevel level, @Nullable LivingEntity owner, @Nullable ItemModel prev, int seed, ResourceLocation itemModelId, String packName, TestsResultCollector collector) {
         return false;
     }
 }

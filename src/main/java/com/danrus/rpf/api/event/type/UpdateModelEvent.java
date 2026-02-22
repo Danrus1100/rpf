@@ -1,8 +1,7 @@
 package com.danrus.rpf.api.event.type;
 
 import com.danrus.rpf.api.event.AbstractModelResolverEvent;
-import com.danrus.rpf.api.event.RpfEvent;
-import com.danrus.rpf.core.SignedItemModel;
+import com.danrus.rpf.core.item.SignedItemModel;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.item.ItemModelResolver;
 import net.minecraft.client.renderer.item.ItemStackRenderState;

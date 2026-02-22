@@ -40,6 +40,11 @@ stonecutter{
 
         string {
             direction = eval(current.version, ">=1.21.11")
+            replace("ResourceLocationArgument", "IdentifierArgument")
+        }
+
+        string {
+            direction = eval(current.version, ">=1.21.11")
             replace("import net.minecraft.Util;", "import net.minecraft.util.Util;")
         }
 
@@ -100,11 +105,12 @@ publishMods {
     val modrinthToken = findProperty("modrinth-token")
     val curseforgeToken = findProperty("curseforge-token")
     val discordWebhookDR = findProperty("discord-webhook")
+    val discordWebhookDRRU = findProperty("discord-webhook-dr-ru")
     val discordWebhookDry = findProperty("discord-webhook-dry")
 
     dryRun = gitBranchName != mainBranch
 
-    type = STABLE
+    type = BETA
 
     file.set(tasks.named("remapJar").flatMap { (it as org.gradle.jvm.tasks.Jar).archiveFile })
 
@@ -122,12 +128,12 @@ publishMods {
         targets.forEach(minecraftVersions::add)
     }
 
-    curseforge {
-        projectId = prop("publish.curseforge")
-        accessToken = curseforgeToken.toString()
-        projectSlug = prop("pub.slug")
-        targets.forEach(minecraftVersions::add)
-    }
+//    curseforge {
+//        projectId = prop("publish.curseforge")
+//        accessToken = curseforgeToken.toString()
+//        projectSlug = prop("pub.slug")
+//        targets.forEach(minecraftVersions::add)
+//    }
 
     if (targets.contains("1.21.8") && loaders.contains("fabric")) {
         discord ("DR freak mods anonuncement") {
@@ -138,6 +144,15 @@ publishMods {
             avatarUrl = "https://github.com/Danrus1100/rpf/blob/main/src/main/resources/assets/rpf/icon.png?raw=true"
 
             content = changelog.map{ "# " + prop("mod.version") + " version here! \n\n" + rootProject.file("CHANGELOG.md").readText() +"\n\n<@&1426901890582581248>" }
+        }
+        discord ("DR freak mods anonuncement (RU)") {
+            webhookUrl = discordWebhookDRRU.toString()
+            dryRunWebhookUrl = discordWebhookDry.toString()
+
+            username  = prop("mod.name")
+            avatarUrl = "https://github.com/Danrus1100/rpf/blob/main/src/main/resources/assets/rpf/icon.png?raw=true"
+
+            content = changelog.map{ "# Версия" + prop("mod.version") + " вышла! \n\n" + rootProject.file("CHANGELOG_RU.md").readText() +"\n\n<@&1426901890582581248>" }
         }
     }
 }

@@ -2,7 +2,7 @@ package com.danrus.rpf.mixin.items.select;
 
 import com.danrus.rpf.api.DelegateItemModel;
 import com.danrus.rpf.api.RpfItemModel;
-import com.danrus.rpf.logging.ModelTestsResultCollector;
+import com.danrus.rpf.api.TestsResultCollector;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.item.ItemModel;
 import net.minecraft.client.renderer.item.ItemModelResolver;
@@ -44,10 +44,10 @@ public abstract class SelectItemModelMixin<T> implements DelegateItemModel, RpfI
             int seed,
             ResourceLocation itemModelId,
             String packName,
-            ModelTestsResultCollector collector
+            TestsResultCollector collector
     ) {
         if (!this.rpf$delegate) {
-            collector.hit(this.getClass().getSimpleName() + " force cancel delegate", packName);
+            collector.hit(this.getClass(), " force cancel delegate", packName);
             return false;
         }
 //        if (this.rpf$isFallback()) return true;
@@ -61,10 +61,10 @@ public abstract class SelectItemModelMixin<T> implements DelegateItemModel, RpfI
         if (itemModel instanceof RpfItemModel rpfItemModel) {
             if (prev != null && this.rpf$isFallback()) rpfItemModel.rpf$markAsFallback();
             String propertyValue = object != null ? object.toString() : "null";
-            collector.next(this.getClass().getSimpleName() + " proprety: " + propertyValue, packName, rpfItemModel.rpf$isFallback());
+            collector.next(this.getClass(), " proprety: " + propertyValue, packName, rpfItemModel.rpf$isFallback());
             return rpfItemModel.rpf$doDelegate(renderState, stack, itemModelResolver, displayContext, level, owner, (ItemModel) (Object) this, seed, itemModelId, packName, collector);
         } else {
-            collector.delegate(this.getClass().getSimpleName() + " proprety: " + object.toString(), packName);
+            collector.delegate(this.getClass(), " proprety: " + object.toString(), packName);
             return itemModel == null || this.rpf$getDelegation();
         }
     }

@@ -1,10 +1,9 @@
 package com.danrus.rpf.mixin.load;
 
-import com.danrus.rpf.core.RpfModelIdentity;
-import com.danrus.rpf.core.SignedItemModel;
+import com.danrus.rpf.core.item.RpfModelIdentity;
+import com.danrus.rpf.core.item.SignedItemModel;
 import com.danrus.rpf.duck.load.RpfBakingResult;
 import net.minecraft.client.renderer.item.ClientItem;
-import net.minecraft.client.renderer.item.ItemModel;
 import net.minecraft.client.resources.model.ModelBakery;
 import net.minecraft.resources.ResourceLocation;
 import org.spongepowered.asm.mixin.Mixin;

@@ -2,10 +2,11 @@ package com.danrus.rpf.mixin.load;
 
 import com.danrus.rpf.Rpf;
 import com.danrus.rpf.api.event.type.ModelDiscoveryEvent;
-import com.danrus.rpf.core.RpfClientItemInfoLoader;
+import com.danrus.rpf.core.item.RpfResolversManager;
+import com.danrus.rpf.core.load.RpfClientItemInfoLoader;
 import com.danrus.rpf.compat.rprenames.impl.RenamesBridge;
-import com.danrus.rpf.core.RpfModelIdentity;
-import com.danrus.rpf.core.SignedItemModel;
+import com.danrus.rpf.core.item.RpfModelIdentity;
+import com.danrus.rpf.core.item.SignedItemModel;
 import com.danrus.rpf.duck.load.RpfBakingResult;
 import com.danrus.rpf.duck.load.RpfModelBakery;
 import com.danrus.rpf.duck.load.RpfModelManager;
@@ -213,6 +214,7 @@ public abstract class ModelManagerMixin implements RpfModelManager {
             this.rpf$bakedItemStackSignetModels = new ArrayList<>(result.rpf$getItemSignedModels().reversed());// "reversed" to put vanilla RP down of list
             this.rpf$itemProperties = new ArrayList<>(result.rpf$getItemPropertiesById().reversed());
             this.rpf$itemPropertiesByIdentity = result.rpf$getItemPropertiesByIdentity();
+            RpfResolversManager.getInstance().applyPendingResolver();
             Rpf.getItemLogger().onReload();
         } catch (ClassCastException e) {
             throw new IllegalStateException("ModelBakery.BakingResult bakingResult is not instance of RpfBakingResult!");
@@ -242,6 +244,16 @@ public abstract class ModelManagerMixin implements RpfModelManager {
     @Override
     public List<Map<ResourceLocation, ClientItem.Properties>> rpf$getItemPropertiesMaps() {
         return this.rpf$itemProperties;
+    }
+
+    @Override
+    public SignedItemModel rpf$getVanillaModel(ResourceLocation location) {
+        for (Map<ResourceLocation, SignedItemModel> map : rpf$getSignedModels()) {
+            if ("vanilla".equals(map.get(location).name()) ) {
+                return map.get(location);
+            }
+        }
+        return null;
     }
 
     @Override

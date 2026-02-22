@@ -1,10 +1,10 @@
-package com.danrus.rpf.core;
+package com.danrus.rpf.core.item;
 
 import com.danrus.rpf.Rpf;
 import com.danrus.rpf.api.RpfItemModel;
 import com.danrus.rpf.api.event.RpfEvent;
 import com.danrus.rpf.api.event.type.UpdateModelEvent;
-import com.danrus.rpf.logging.ModelTestsResultCollector;
+import com.danrus.rpf.api.TestsResultCollector;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.item.ItemModel;
 import net.minecraft.client.renderer.item.ItemModelResolver;
@@ -28,7 +28,7 @@ public record SignedItemModel(
             @Nullable LivingEntity owner,
             int seed,
             ResourceLocation itemModelId,
-            ModelTestsResultCollector collector
+            TestsResultCollector collector
     ) {
         if (model == null) return false;
         try {

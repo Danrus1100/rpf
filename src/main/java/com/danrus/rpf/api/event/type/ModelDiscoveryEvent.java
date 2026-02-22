@@ -1,8 +1,7 @@
 package com.danrus.rpf.api.event.type;
 
 import com.danrus.rpf.api.event.AbstractStagedEvent;
-import com.danrus.rpf.api.event.RpfEvent;
-import com.danrus.rpf.core.RpfClientItemInfoLoader;
+import com.danrus.rpf.core.load.RpfClientItemInfoLoader;
 import net.minecraft.client.resources.model.BlockStateModelLoader;
 import net.minecraft.client.resources.model.ModelDiscovery;
 import net.minecraft.client.resources.model.UnbakedModel;

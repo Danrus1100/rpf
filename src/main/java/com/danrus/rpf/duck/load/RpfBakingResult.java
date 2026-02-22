@@ -1,7 +1,7 @@
 package com.danrus.rpf.duck.load;
 
-import com.danrus.rpf.core.RpfModelIdentity;
-import com.danrus.rpf.core.SignedItemModel;
+import com.danrus.rpf.core.item.RpfModelIdentity;
+import com.danrus.rpf.core.item.SignedItemModel;
 import net.minecraft.client.renderer.item.ClientItem;
 import net.minecraft.client.resources.model.ModelBakery;
 import net.minecraft.resources.ResourceLocation;

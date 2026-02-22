@@ -1,5 +1,6 @@
 package com.danrus.rpf.logging;
 
+import com.danrus.rpf.api.TestsResultCollector;
 import net.minecraft.resources.ResourceLocation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,7 +16,7 @@ public class ItemModelsSelectLogger {
         return alreadyLogged.contains(location);
     }
 
-    public void info(ModelTestsResultCollector collector) {
+    public void info(TestsResultCollector collector) {
         ResourceLocation location = collector.getModelLocation();
         if (alreadyLogged.contains(location)) return;
         alreadyLogged.add(location);
@@ -23,7 +24,7 @@ public class ItemModelsSelectLogger {
         collector.getStringsToLog().forEach(s -> LOGGER.info(" - {}", s));
     }
 
-    public void error(ModelTestsResultCollector collector) {
+    public void error(TestsResultCollector collector) {
         ResourceLocation location = collector.getModelLocation();
         LOGGER.info("Error for {}", location.toString());
         collector.getStringsToLog().forEach(s -> LOGGER.error(" - {}", s));

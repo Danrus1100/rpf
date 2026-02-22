@@ -1,7 +1,7 @@
 package com.danrus.rpf.api.event.type;
 
 import com.danrus.rpf.api.event.RpfEvent;
-import com.danrus.rpf.core.SignedItemModel;
+import com.danrus.rpf.core.item.SignedItemModel;
 import net.minecraft.client.renderer.item.ClientItem;
 
 public class PostBakeEvent extends RpfEvent {

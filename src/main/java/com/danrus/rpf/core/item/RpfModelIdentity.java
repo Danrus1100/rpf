@@ -1,4 +1,4 @@
-package com.danrus.rpf.core;
+package com.danrus.rpf.core.item;
 
 import net.minecraft.resources.ResourceLocation;
 

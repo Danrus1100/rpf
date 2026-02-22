@@ -2,7 +2,7 @@ package com.danrus.rpf.mixin.items.composite;
 
 import com.danrus.rpf.api.RpfItemModel;
 import com.danrus.rpf.duck.item.RpfCompositeModel;
-import com.danrus.rpf.logging.ModelTestsResultCollector;
+import com.danrus.rpf.api.TestsResultCollector;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.item.CompositeModel;
 import net.minecraft.client.renderer.item.ItemModel;
@@ -40,12 +40,12 @@ public abstract class CompositeModelMixin implements RpfItemModel, RpfCompositeM
     }
 
     @Override
-    public boolean rpf$doDelegate(ItemStackRenderState renderState, ItemStack stack, ItemModelResolver itemModelResolver, ItemDisplayContext displayContext, @Nullable ClientLevel level, @Nullable LivingEntity owner, @Nullable ItemModel prev, int seed, ResourceLocation itemModelId, String packName, ModelTestsResultCollector collector) {
+    public boolean rpf$doDelegate(ItemStackRenderState renderState, ItemStack stack, ItemModelResolver itemModelResolver, ItemDisplayContext displayContext, @Nullable ClientLevel level, @Nullable LivingEntity owner, @Nullable ItemModel prev, int seed, ResourceLocation itemModelId, String packName, TestsResultCollector collector) {
         if (rpf$isFallback()) {
             models.forEach(model ->  ((RpfItemModel) model).rpf$markAsFallback());
         }
         boolean delegate = rpf$getDelegationInitialState();
-        collector.info(this.getClass().getSimpleName() + " models: " + models.size(), packName);
+        collector.info(this.getClass(), " models: " + models.size(), packName);
         collector.pushShift();
         for (ItemModel model : models) {
             collector.info("Testing model: " + model.getClass().getSimpleName(), packName);
@@ -61,9 +61,9 @@ public abstract class CompositeModelMixin implements RpfItemModel, RpfCompositeM
         });
 
         if (delegate) {
-            collector.delegate(this.getClass().getSimpleName() + " models: " + models.size() + ": " + modesString, packName);
+            collector.delegate(this.getClass(), " models: " + models.size() + ": " + modesString, packName);
         } else {
-            collector.hit(this.getClass().getSimpleName() + " models: " + models.size() + ": " + modesString, packName);
+            collector.hit(this.getClass(), " models: " + models.size() + ": " + modesString, packName);
         }
         collector.popShift();
         return delegate;

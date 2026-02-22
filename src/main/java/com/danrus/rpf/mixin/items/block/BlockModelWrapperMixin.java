@@ -2,7 +2,7 @@ package com.danrus.rpf.mixin.items.block;
 
 import com.danrus.rpf.api.RpfItemModel;
 import com.danrus.rpf.duck.item.RpfBlockModelWrapper;
-import com.danrus.rpf.logging.ModelTestsResultCollector;
+import com.danrus.rpf.api.TestsResultCollector;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.item.BlockModelWrapper;
 import net.minecraft.client.renderer.item.ItemModel;
@@ -36,7 +36,7 @@ public abstract class BlockModelWrapperMixin implements RpfItemModel, RpfBlockMo
             int seed,
             ResourceLocation itemModelId,
             String packName,
-            ModelTestsResultCollector collector
+            TestsResultCollector collector
     ){
         boolean delegate = this.rpf$isFallback()
                 
@@ -44,9 +44,9 @@ public abstract class BlockModelWrapperMixin implements RpfItemModel, RpfBlockMo
                 && this.rpf$modelLink.getNamespace().equals(itemModelId.getNamespace())
                 && this.rpf$modelLink.getPath().contains(itemModelId.getPath());
         if (delegate) {
-            collector.delegate(this.getClass().getSimpleName() + ": " + rpf$getModelLink().toString(), packName);
+            collector.delegate(this.getClass(), ": " + rpf$getModelLink().toString(), packName);
         } else {
-            collector.hit(this.getClass().getSimpleName() + ": " + rpf$getModelLink().toString(), packName);
+            collector.hit(this.getClass(), ": " + rpf$getModelLink().toString(), packName);
         }
 
         return delegate;

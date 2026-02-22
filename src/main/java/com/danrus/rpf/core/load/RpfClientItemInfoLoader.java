@@ -1,4 +1,4 @@
-package com.danrus.rpf.core;
+package com.danrus.rpf.core.load;
 
 import com.danrus.rpf.Rpf;
 import com.danrus.rpf.api.event.AbstractStagedEvent;

@@ -1,8 +1,5 @@
 package com.danrus.rpf.api;
 
-import com.danrus.rpf.api.codec.RpfModelsCodecsExtends;
-import com.danrus.rpf.logging.ModelTestsResultCollector;
-import com.mojang.serialization.MapCodec;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.item.ItemModel;
 import net.minecraft.client.renderer.item.ItemModelResolver;
@@ -20,7 +17,7 @@ public interface RpfItemModel {
     void rpf$markAsFallback();
     boolean rpf$isFallback();
 
-    default void rpf$doDelegate(
+    default boolean rpf$doDelegate(
             ItemStackRenderState renderState,
             ItemStack stack,
             ItemModelResolver itemModelResolver,
@@ -31,10 +28,12 @@ public interface RpfItemModel {
             int seed,
             ResourceLocation itemModelId,
             String packName,
-            ModelTestsResultCollector collector
+            TestsResultCollector collector
     ) {
         if (rpf$isFallback()) {
-            collector.delegate(this.getClass().getSimpleName(), packName);
+            collector.delegate(this.getClass(), "", packName);
+            return true;
         }
+        return false;
     }
 }

@@ -1,7 +1,7 @@
 package com.danrus.rpf.api.event.type;
 
 import com.danrus.rpf.api.event.AbstractModelResolverEvent;
-import com.danrus.rpf.logging.ModelTestsResultCollector;
+import com.danrus.rpf.api.TestsResultCollector;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.item.ItemModelResolver;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
@@ -12,15 +12,15 @@ import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
 public class MissingModelUpdateEvent extends AbstractModelResolverEvent {
-    private final ModelTestsResultCollector collector;
+    private final TestsResultCollector collector;
     private final ResourceLocation modelId; // For consistency with PreModelResolveEvent, even though it's not used here.
-    public MissingModelUpdateEvent(ResourceLocation location, ItemStackRenderState renderState, ItemStack stack, ItemModelResolver itemModelResolver, ItemDisplayContext displayContext, @Nullable ClientLevel level, @Nullable LivingEntity owner, int seed, ModelTestsResultCollector collector) {
+    public MissingModelUpdateEvent(ResourceLocation location, ItemStackRenderState renderState, ItemStack stack, ItemModelResolver itemModelResolver, ItemDisplayContext displayContext, @Nullable ClientLevel level, @Nullable LivingEntity owner, int seed, TestsResultCollector collector) {
         super(renderState, stack, itemModelResolver, displayContext, level, owner, seed);
         this.collector = collector;
         this.modelId = location;
     }
 
-    public ModelTestsResultCollector getCollector() {
+    public TestsResultCollector getCollector() {
         return collector;
     }
 
