@@ -2,12 +2,15 @@ package com.danrus.rpf.api.codec;
 
 import com.mojang.serialization.MapCodec;
 import net.minecraft.resources.ResourceLocation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
 public class RpfModelsCodecsExtends {
+    private static final Logger LOGGER = LoggerFactory.getLogger(RpfModelsCodecsExtends.class);
     private static final RpfModelsCodecsExtends INSTANCE = new RpfModelsCodecsExtends();
     private RpfModelsCodecsExtends() {}
     public static RpfModelsCodecsExtends getInstance() {return INSTANCE;}
@@ -21,15 +24,18 @@ public class RpfModelsCodecsExtends {
     public <T, V> void register(ResourceLocation location, MapCodec<V> fieldCodec, BiConsumer<T, V> setter, Function<T, V> getter) {
         extensions.computeIfAbsent(location, l -> new ArrayList<>())
                 .add(new ItemModelCodecExtend<>(fieldCodec, setter, getter));
+        LOGGER.debug("Registered codec extension for location: {}", location);
     }
 
     @SuppressWarnings("unchecked")
     public <T> MapCodec<T> wrap(ResourceLocation location, MapCodec<T> baseCodec) {
         List<ItemModelCodecExtend<?, ?>> list = extensions.get(location);
         if (list == null || list.isEmpty()) {
+            LOGGER.debug("No extensions found for location: {}", location);
             return baseCodec;
         }
 
+        LOGGER.debug("Wrapping codec for location: {} with {} extension(s)", location, list.size());
         RpfCodecBuilder<T> builder = RpfCodecBuilder.of(baseCodec);
         for (ItemModelCodecExtend<?, ?> ext : list) {
             MapCodec<Object> fCodec = (MapCodec<Object>) ext.fieldCodec;

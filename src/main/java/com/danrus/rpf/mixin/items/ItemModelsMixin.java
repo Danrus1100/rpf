@@ -12,6 +12,14 @@ import org.spongepowered.asm.mixin.injection.At;
 
 @Mixin(ItemModels.class)
 public class ItemModelsMixin {
+    static {
+        try {
+            Class.forName("com.danrus.rpf.RpfCodecs");
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException("Failed to load RpfCodecs", e);
+        }
+    }
+
     @SuppressWarnings("unchecked")
     @WrapOperation(
             method = "bootstrap",

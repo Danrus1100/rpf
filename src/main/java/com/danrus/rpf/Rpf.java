@@ -34,7 +34,6 @@ public class Rpf implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         RpfConfig.init(CONFIG_PATH);
-        RpfCodecs.init();
 
         RpfResolversManager.getInstance().register(RpfResolversManager.DEFAULT_RESOLVER, new RpfV1ModelResolver());
         RpfResolversManager.getInstance().register(RpfResolversManager.VANILLA_RESOLVER, new VanillaModelResolver());

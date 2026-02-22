@@ -19,6 +19,10 @@ public class RpfCodecs {
     public static final ResourceLocation RANGE_ID = ResourceLocation.withDefaultNamespace("range_dispatch");
     public static final ResourceLocation SELECT_ID = ResourceLocation.withDefaultNamespace("select");
 
+    static {
+        init();
+    }
+
     public static void registerDelegate(ResourceLocation location) {
         RpfModelsCodecsExtends.getInstance().register(
                 location,
@@ -28,6 +32,7 @@ public class RpfCodecs {
         );
     }
 
+    // if you want to add your own extends for codec, the best idea to mixin your codec here
     public static void init() {
         registerDelegate(SELECT_ID);
         registerDelegate(RANGE_ID);

@@ -7,6 +7,10 @@
   "authors": [
     "${author}"
   ],
+  "contact": {
+    "issues": "https://github.com/Danrus1100/rpf/issues",
+    "sources": "https://github.com/Danrus1100/rpf"
+  },
   "license": "MIT",
   "icon": "assets/rpf/icon.png",
   "accessWidener": "rpf.accesswidener",

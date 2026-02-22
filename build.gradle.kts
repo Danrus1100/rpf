@@ -110,7 +110,7 @@ publishMods {
 
     dryRun = gitBranchName != mainBranch
 
-    type = BETA
+    type = STABLE
 
     file.set(tasks.named("remapJar").flatMap { (it as org.gradle.jvm.tasks.Jar).archiveFile })
 
@@ -128,12 +128,12 @@ publishMods {
         targets.forEach(minecraftVersions::add)
     }
 
-//    curseforge {
-//        projectId = prop("publish.curseforge")
-//        accessToken = curseforgeToken.toString()
-//        projectSlug = prop("pub.slug")
-//        targets.forEach(minecraftVersions::add)
-//    }
+    curseforge {
+        projectId = prop("publish.curseforge")
+        accessToken = curseforgeToken.toString()
+        projectSlug = prop("pub.slug")
+        targets.forEach(minecraftVersions::add)
+    }
 
     if (targets.contains("1.21.8") && loaders.contains("fabric")) {
         discord ("DR freak mods anonuncement") {
@@ -152,7 +152,7 @@ publishMods {
             username  = prop("mod.name")
             avatarUrl = "https://github.com/Danrus1100/rpf/blob/main/src/main/resources/assets/rpf/icon.png?raw=true"
 
-            content = changelog.map{ "# Версия" + prop("mod.version") + " вышла! \n\n" + rootProject.file("CHANGELOG_RU.md").readText() +"\n\n<@&1426901890582581248>" }
+            content = changelog.map{ "# Версия " + prop("mod.version") + " вышла! \n\n" + rootProject.file("CHANGELOG_RU.md").readText() +"\n\n<@&1426901890582581248>" }
         }
     }
 }

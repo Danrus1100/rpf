@@ -20,8 +20,10 @@ public class RpfCodecBuilder<T> {
      * adds a field to the codec, using the provided getter and setter to read and write the value from the model
      */
     public <V> RpfCodecBuilder<T> withField(MapCodec<V> fieldCodec, BiConsumer<T, V> setter, Function<T, V> getter) {
+        final MapCodec<T> captured = this.currentCodec;
+
         this.currentCodec = RecordCodecBuilder.mapCodec(inst -> inst.group(
-                currentCodec.forGetter(Function.identity()),
+                captured.forGetter(t -> t),
                 fieldCodec.forGetter(getter)
         ).apply(inst, (model, value) -> {
             setter.accept(model, value);
