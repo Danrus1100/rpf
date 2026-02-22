@@ -3,7 +3,7 @@ package com.danrus.rpf;
 import com.danrus.rpf.api.event.RpfEventBus;
 import com.danrus.rpf.compat.rprenames.impl.RpRenamesCompat;
 import com.danrus.rpf.core.item.RpfResolversManager;
-import com.danrus.rpf.core.load.RpfClientItemInfoLoader;
+import com.danrus.rpf.core.resource.ResourceLoadManager;
 import com.danrus.rpf.impl.RpfExperimentalResolver;
 import com.danrus.rpf.impl.RpfV1ModelResolver;
 import com.danrus.rpf.impl.VanillaModelResolver;
@@ -19,13 +19,12 @@ import net.minecraft.resources.ResourceLocation;
 import java.nio.file.Path;
 import java.util.Comparator;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.*;
 
 public class Rpf implements ClientModInitializer {
 
     public static String MOD_ID = "rpf";
-    public static CompletableFuture<List<RpfClientItemInfoLoader.LoadedClientInfos>> rpf$currentItemLayersFuture;
+    private static final ResourceLoadManager RESOURCE_LOAD_MANAGER = new ResourceLoadManager();
     private static final ItemModelsSelectLogger ITEM_LOGGER = new ItemModelsSelectLogger();
     private static final RpfEventBus EVENT_BUS = new RpfEventBus();
     public static final Path CONFIG_PATH = FabricLoader.getInstance().getConfigDir();
@@ -95,5 +94,15 @@ public class Rpf implements ClientModInitializer {
 
     public static ItemModelsSelectLogger getItemLogger() {
         return ITEM_LOGGER;
+    }
+    
+    /**
+     * Gets the resource load manager for thread-safe access to loading futures.
+     * 
+     * @return The resource load manager instance
+     * @since 1.4.0
+     */
+    public static ResourceLoadManager getResourceLoadManager() {
+        return RESOURCE_LOAD_MANAGER;
     }
 }
