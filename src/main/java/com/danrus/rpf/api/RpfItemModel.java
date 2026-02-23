@@ -1,5 +1,6 @@
 package com.danrus.rpf.api;
 
+import com.danrus.rpf.core.item.ModelUpdateContext;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.item.ItemModel;
 import net.minecraft.client.renderer.item.ItemModelResolver;
@@ -18,20 +19,14 @@ public interface RpfItemModel {
     boolean rpf$isFallback();
 
     default boolean rpf$doDelegate(
-            ItemStackRenderState renderState,
+            ModelUpdateContext context,
             ItemStack stack,
-            ItemModelResolver itemModelResolver,
-            ItemDisplayContext displayContext,
-            @Nullable ClientLevel level,
             @Nullable LivingEntity owner,
             @Nullable ItemModel prev,
-            int seed,
-            ResourceLocation itemModelId,
-            String packName,
             TestsResultCollector collector
     ) {
         if (rpf$isFallback()) {
-            collector.delegate(this.getClass(), "", packName);
+            collector.delegate(this.getClass(), "");
             return true;
         }
         return false;

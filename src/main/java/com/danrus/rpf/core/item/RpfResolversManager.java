@@ -35,24 +35,16 @@ public class RpfResolversManager {
     }
 
     public void resolve(
-            ItemStackRenderState renderState,
+            ModelUpdateContext context,
             ItemStack stack,
-            ItemDisplayContext displayContext,
-            Level level,
             LivingEntity entity,
-            int seed,
-            Operation<Void> vanilla,
-            ItemModelResolver mcResolver
+            Operation<Void> vanilla
     ) {
         resolvers.get(currentResolver).resolveAndAppendLayer(
-                renderState,
+                context,
                 stack,
-                displayContext,
-                level,
                 entity,
-                seed,
-                vanilla,
-                mcResolver
+                vanilla
         );
     }
 

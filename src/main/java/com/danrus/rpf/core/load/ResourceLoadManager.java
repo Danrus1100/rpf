@@ -1,6 +1,4 @@
-package com.danrus.rpf.core.resource;
-
-import com.danrus.rpf.core.load.RpfClientItemInfoLoader;
+package com.danrus.rpf.core.load;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;

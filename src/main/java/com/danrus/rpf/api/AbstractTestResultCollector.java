@@ -6,14 +6,14 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-public class AbstractTestResultCollector implements TestsResultCollector {
-
-    protected final List<TestResultUnit> units = new LinkedList<>();
+public abstract class AbstractTestResultCollector implements TestsResultCollector {
     public final ResourceLocation modelLocation;
     protected int currentShift = 0;
+    protected String packName;
 
-    public AbstractTestResultCollector(ResourceLocation modelLocation) {
+    public AbstractTestResultCollector(ResourceLocation modelLocation, String initialPackName) {
         this.modelLocation = modelLocation;
+        packName = initialPackName;
     }
 
     public void pushShift() {
@@ -28,27 +28,12 @@ public class AbstractTestResultCollector implements TestsResultCollector {
         currentShift = 0;
     }
 
-    public void touch(Class<?> clazz, String itemModelType, String packName, TestsResultCollector.TestResultType resultType) {
-        units.add(new TestResultUnit(clazz, itemModelType, packName, resultType, currentShift));
+    @Override
+    public void pushPack(String packName) {
+        this.packName = packName;
     }
 
     public ResourceLocation getModelLocation() {
         return modelLocation;
     }
-
-    public List<String> getStringsToLog() {
-        List<String> strings = new ArrayList<>(units.size());
-        for (TestResultUnit unit : units) {
-            strings.add(unit.toPrint());
-        }
-        return strings;
-    }
-
-    protected record TestResultUnit(Class<?> clazz, String itemModelType, String packName, TestResultType result, int shift) {
-
-        public String toPrint() {
-                String shiftString = "  ".repeat(shift);
-                return shiftString + "Pack " + packName + ": action " + (clazz == null ? "" : clazz.getSimpleName()) + String.join(" ", itemModelType, result.toString());
-            }
-        }
 }

@@ -4,19 +4,15 @@ import com.danrus.rpf.api.AbstractTestResultCollector;
 import com.danrus.rpf.api.RpfItemModel;
 import com.danrus.rpf.api.RpfItemModelResolver;
 import com.danrus.rpf.api.TestsResultCollector;
-import com.danrus.rpf.core.item.RpfModelIdentity;
+import com.danrus.rpf.core.item.ModelUpdateContext;
 import com.danrus.rpf.core.item.SignedItemModel;
 import com.danrus.rpf.duck.load.RpfModelManager;
-import com.danrus.rpf.logging.DummyTestsResultsCollector;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
-import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.item.*;
-import net.minecraft.core.component.DataComponents;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
@@ -26,18 +22,14 @@ public class RpfExperimentalResolver implements RpfItemModelResolver {
 
 
     @Override
-    public void resolveAndAppendLayer(ItemStackRenderState renderState, ItemStack stack, ItemDisplayContext displayContext, Level level, LivingEntity entity, int seed, Operation<Void> vanilla, ItemModelResolver mcResolver) {
-        ResourceLocation resourceLocation = stack.get(DataComponents.ITEM_MODEL);
-        if (resourceLocation == null) return;
-
-        ClientLevel clientLevel = level instanceof ClientLevel cl ? cl : null;
+    public void resolveAndAppendLayer(ModelUpdateContext context, ItemStack stack, LivingEntity entity, Operation<Void> vanilla) {
 
         RpfModelManager rpfModelManager = RpfItemModelResolver.getModelManager();
         List<Map<ResourceLocation, SignedItemModel>> packs = rpfModelManager.rpf$getSignedModels();
 
         List<SignedItemModel> candidates = new ArrayList<>();
         for (Map<ResourceLocation, SignedItemModel> currentPack : packs) {
-            SignedItemModel model = currentPack.get(resourceLocation);
+            SignedItemModel model = currentPack.get(context.location());
             if (model != null) {
                 candidates.add(model);
             }
@@ -49,12 +41,12 @@ public class RpfExperimentalResolver implements RpfItemModelResolver {
             try {
                 SignedItemModel model = candidates.get(i);
                 if (!(model.model() instanceof RpfItemModel)) {
-                    model.model().update(renderState, stack, mcResolver, displayContext, clientLevel, entity, seed);
+                    model.update(context, stack, entity);
                     return;
                 }
-                ExperimentalModelTestCollector collector = new ExperimentalModelTestCollector(resourceLocation);
+                ExperimentalModelTestCollector collector = new ExperimentalModelTestCollector(context.location(), model.name());
                 collector.resetShift();
-                model.doDelegate(renderState, stack, mcResolver, displayContext, clientLevel, entity, seed, resourceLocation, collector);
+                model.doDelegate(context, stack, entity, collector);
                 collector.addAdditionalScore(packCounter);
                 packCounter -= 1;
                 results.put(model, collector.calculateResult());
@@ -73,19 +65,11 @@ public class RpfExperimentalResolver implements RpfItemModelResolver {
         }
 
         if (modelToUpdate == null) {
-            RpfV1ModelResolver.updateMissingModel(resourceLocation, rpfModelManager, renderState, DUMMY_COLLECTOR, stack, displayContext, clientLevel, entity, seed, mcResolver);
+            RpfItemModelResolver.updateMissingModel(context, DUMMY_COLLECTOR, stack, entity);
             return;
         }
 
-        RpfModelIdentity identity = new RpfModelIdentity(resourceLocation, modelToUpdate.name());
-        ClientItem.Properties properties = rpfModelManager.rpf$getProperties(identity);
-        if (properties == null) {
-            properties = ClientItem.Properties.DEFAULT;
-        }
-        renderState.setOversizedInGui(properties.oversizedInGui());
-//        this.componentsToProperties.put(stack.getComponents(), properties);
-        renderState.appendModelIdentityElement(identity); // for correct GUI rendering
-        modelToUpdate.update(renderState, stack, mcResolver, displayContext, clientLevel, entity, seed);
+        RpfItemModelResolver.appendModelLayer(context, stack, entity, modelToUpdate);
     }
 
     @Override
@@ -118,14 +102,10 @@ public class RpfExperimentalResolver implements RpfItemModelResolver {
 
         protected final List<ExperimentalResultUnit> eUnits = new LinkedList<>();
 
-        public ExperimentalModelTestCollector(ResourceLocation modelLocation) {
-            super(modelLocation);
+        public ExperimentalModelTestCollector(ResourceLocation modelLocation, String packName) {
+            super(modelLocation, packName);
         }
 
-        @Override
-        public void touch(Class<?> clazz, String desc, String packName, TestResultType resultType) {
-            eUnits.add(new ExperimentalResultUnit(clazz, desc, packName, resultType, currentShift));
-        }
 
         public void addAdditionalScore(int value) {
             eUnits.add(new ExperimentalResultUnit(null, "", "", TestResultType.INFO, 0, value));
@@ -138,6 +118,11 @@ public class RpfExperimentalResolver implements RpfItemModelResolver {
                 result += unit.score;
             }
             return result;
+        }
+
+        @Override
+        public void touch(@Nullable Class<?> clazz, String description, TestResultType resultType) {
+            eUnits.add(new ExperimentalResultUnit(clazz, description, this.packName, resultType, currentShift));
         }
 
         @Override

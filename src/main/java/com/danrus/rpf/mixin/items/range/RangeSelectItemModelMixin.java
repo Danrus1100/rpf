@@ -3,6 +3,7 @@ package com.danrus.rpf.mixin.items.range;
 import com.danrus.rpf.api.DelegateItemModel;
 import com.danrus.rpf.api.RpfItemModel;
 import com.danrus.rpf.api.TestsResultCollector;
+import com.danrus.rpf.core.item.ModelUpdateContext;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.item.ItemModel;
 import net.minecraft.client.renderer.item.ItemModelResolver;
@@ -63,27 +64,15 @@ public abstract class RangeSelectItemModelMixin implements RpfItemModel, Delegat
     }
 
     @Override
-    public boolean rpf$doDelegate(
-            ItemStackRenderState renderState,
-            ItemStack stack,
-            ItemModelResolver itemModelResolver,
-            ItemDisplayContext displayContext,
-            @Nullable ClientLevel level,
-            @Nullable LivingEntity owner,
-            @Nullable ItemModel prev,
-            int seed,
-            ResourceLocation itemModelId,
-            String packName,
-            TestsResultCollector collector
-    ) {
+    public boolean rpf$doDelegate(ModelUpdateContext context, ItemStack stack, @Nullable LivingEntity owner, @Nullable ItemModel prev, TestsResultCollector collector) {
         if (!this.rpf$delegate) {
-            collector.hit(this.getClass(), " force cancel delegate", packName);
+            collector.hit(this.getClass(), " force cancel delegate");
             return false;
         }
         if (prev != null && this.rpf$isFallback()) {
             Arrays.stream(models).forEach(model -> ((RpfItemModel) model).rpf$markAsFallback());
         }
-        float f = property.get(stack, level, owner, seed) * scale;
+        float f = property.get(stack, context.level(), owner, context.seed()) * scale;
         boolean isFallback = false;
         ItemModel itemModel;
         if (Float.isNaN(f)) {
@@ -96,7 +85,7 @@ public abstract class RangeSelectItemModelMixin implements RpfItemModel, Delegat
         if (!(itemModel instanceof RpfItemModel)) {
             return this.rpf$getDelegation();
         }
-        collector.next(this.getClass(),": property " + property.toString() + ", value " + f, packName, isFallback);
-        return (((RpfItemModel) itemModel).rpf$doDelegate(renderState, stack, itemModelResolver, displayContext, level, owner, (ItemModel) (Object) this, seed, itemModelId, packName, collector));
+        collector.next(this.getClass(),": property " + property.toString() + ", value " + f, isFallback);
+        return (((RpfItemModel) itemModel).rpf$doDelegate(context, stack, owner, (ItemModel) (Object) this, collector));
     }
 }

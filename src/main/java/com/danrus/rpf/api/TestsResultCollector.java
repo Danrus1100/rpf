@@ -9,39 +9,41 @@ import java.util.List;
 public interface TestsResultCollector {
 
     default void touchModelNotFound() {
-        touch(null, "Not Found", "Unknown", TestsResultCollector.TestResultType.ERROR);
+        touch(null, "Not Found", TestsResultCollector.TestResultType.ERROR);
     }
 
-    default void hit(Class<?> clazz, String description, String packName) {
-        touch(clazz, description, packName, TestsResultCollector.TestResultType.ALLOW_UPDATE);
+    default void hit(Class<?> clazz, String description) {
+        touch(clazz, description, TestsResultCollector.TestResultType.ALLOW_UPDATE);
     }
 
-    default void delegate(Class<?> clazz, String description, String packName) {
-        touch(clazz, description, packName, TestsResultCollector.TestResultType.DELEGATE);
+    default void delegate(Class<?> clazz, String description) {
+        touch(clazz, description, TestsResultCollector.TestResultType.DELEGATE);
     }
 
-    default void next(Class<?> clazz, String description, String packName, boolean fallback) {
-        if ( fallback ) { touch(clazz, description, packName, TestsResultCollector.TestResultType.NEXT_TEST_FALLBACK); }
-        else { touch(clazz, description, packName, TestsResultCollector.TestResultType.NEXT_TEST); }
+    default void next(Class<?> clazz, String description, boolean fallback) {
+        if ( fallback ) { touch(clazz, description, TestsResultCollector.TestResultType.NEXT_TEST_FALLBACK); }
+        else { touch(clazz, description, TestsResultCollector.TestResultType.NEXT_TEST); }
     }
 
-    default void next(Class<?> clazz, String description, String packName) {
-        touch(clazz, description, packName, TestsResultCollector.TestResultType.NEXT_TEST);
+    default void next(Class<?> clazz, String description) {
+        touch(clazz, description, TestsResultCollector.TestResultType.NEXT_TEST);
     }
 
-    default void info(Class<?> clazz, String description, String packName) {
-        touch(clazz, description, packName, TestsResultCollector.TestResultType.INFO);
+    default void info(Class<?> clazz, String description) {
+        touch(clazz, description, TestsResultCollector.TestResultType.INFO);
     }
 
-    default void info(String description, String packName) {
-        touch(null, description, packName, TestsResultCollector.TestResultType.INFO);
+    default void info(String description) {
+        touch(null, description, TestsResultCollector.TestResultType.INFO);
     }
 
     void pushShift();
     void popShift();
     void resetShift();
 
-    void touch(@Nullable Class<?> clazz, String description, String packName, TestsResultCollector.TestResultType resultType);
+    void pushPack(String packName);
+
+    void touch(@Nullable Class<?> clazz, String description, TestsResultCollector.TestResultType resultType);
 
     ResourceLocation getModelLocation();
 

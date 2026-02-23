@@ -1,6 +1,7 @@
 package com.danrus.rpf.mixin.items.composite;
 
 import com.danrus.rpf.api.RpfItemModel;
+import com.danrus.rpf.core.item.ModelUpdateContext;
 import com.danrus.rpf.duck.item.RpfCompositeModel;
 import com.danrus.rpf.api.TestsResultCollector;
 import net.minecraft.client.multiplayer.ClientLevel;
@@ -40,17 +41,17 @@ public abstract class CompositeModelMixin implements RpfItemModel, RpfCompositeM
     }
 
     @Override
-    public boolean rpf$doDelegate(ItemStackRenderState renderState, ItemStack stack, ItemModelResolver itemModelResolver, ItemDisplayContext displayContext, @Nullable ClientLevel level, @Nullable LivingEntity owner, @Nullable ItemModel prev, int seed, ResourceLocation itemModelId, String packName, TestsResultCollector collector) {
+    public boolean rpf$doDelegate(ModelUpdateContext context, ItemStack stack, @Nullable LivingEntity owner, @Nullable ItemModel prev, TestsResultCollector collector) {
         if (rpf$isFallback()) {
             models.forEach(model ->  ((RpfItemModel) model).rpf$markAsFallback());
         }
         boolean delegate = rpf$getDelegationInitialState();
-        collector.info(this.getClass(), " models: " + models.size(), packName);
+        collector.info(this.getClass(), " models: " + models.size());
         collector.pushShift();
         for (ItemModel model : models) {
-            collector.info("Testing model: " + model.getClass().getSimpleName(), packName);
-            if (((RpfItemModel)model).rpf$doDelegate(renderState, stack, itemModelResolver, displayContext, level, owner, prev, seed, itemModelId, packName, collector)) {
-                collector.info("Model " + model.getClass().getSimpleName() + " cancel delegate", packName);
+            collector.info("Testing model: " + model.getClass().getSimpleName());
+            if (((RpfItemModel)model).rpf$doDelegate(context, stack, owner, (ItemModel) (Object) this, collector)) {
+                collector.info("Model " + model.getClass().getSimpleName() + " cancel delegate");
                 delegate = rpf$getDelegationStateWhenDelegate();
             }
         }
@@ -61,9 +62,9 @@ public abstract class CompositeModelMixin implements RpfItemModel, RpfCompositeM
         });
 
         if (delegate) {
-            collector.delegate(this.getClass(), " models: " + models.size() + ": " + modesString, packName);
+            collector.delegate(this.getClass(), " models: " + models.size() + ": " + modesString);
         } else {
-            collector.hit(this.getClass(), " models: " + models.size() + ": " + modesString, packName);
+            collector.hit(this.getClass(), " models: " + models.size() + ": " + modesString);
         }
         collector.popShift();
         return delegate;

@@ -2,6 +2,7 @@ package com.danrus.rpf.mixin.items.conditional;
 
 import com.danrus.rpf.api.RpfItemModel;
 import com.danrus.rpf.api.TestsResultCollector;
+import com.danrus.rpf.core.item.ModelUpdateContext;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.item.ConditionalItemModel;
 import net.minecraft.client.renderer.item.ItemModel;
@@ -33,16 +34,16 @@ public abstract class ConditionalItemModelMixin implements RpfItemModel {
     private ItemModel onFalse;
 
     @Override
-    public boolean rpf$doDelegate(ItemStackRenderState renderState, ItemStack stack, ItemModelResolver itemModelResolver, ItemDisplayContext displayContext, @Nullable ClientLevel level, @Nullable LivingEntity owner, @Nullable ItemModel prev, int seed, ResourceLocation itemModelId, String packName, TestsResultCollector collector) {
+    public boolean rpf$doDelegate(ModelUpdateContext context, ItemStack stack, @Nullable LivingEntity owner, @Nullable ItemModel prev, TestsResultCollector collector) {
         boolean isTrue = property.get(
                 stack,
-                level,
+                context.level(),
                 owner == null ? null : owner
                 //? if >=1.21.10
                 //.asLivingEntity()
                 ,
-                seed,
-                displayContext
+                context.seed(),
+                context.displayContext()
         );
         ItemModel model = isTrue ? onTrue : onFalse;
         if (prev != null && this.rpf$isFallback()) {
@@ -53,8 +54,8 @@ public abstract class ConditionalItemModelMixin implements RpfItemModel {
             ((RpfItemModel) onFalse).rpf$markAsFallback();
         }
         if (model instanceof RpfItemModel rpfItemModel) {
-            collector.next(this.getClass(), " (" + isTrue + ")", packName);
-            return rpfItemModel.rpf$doDelegate(renderState, stack, itemModelResolver, displayContext, level, owner, (ItemModel) (Object) this, seed, itemModelId, packName, collector);
+            collector.next(this.getClass(), " (" + isTrue + ")");
+            return rpfItemModel.rpf$doDelegate(context, stack, owner, (ItemModel) (Object) this, collector);
         }
         return this.rpf$isFallback();
     }

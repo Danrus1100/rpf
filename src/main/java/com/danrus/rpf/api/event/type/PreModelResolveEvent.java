@@ -1,6 +1,7 @@
 package com.danrus.rpf.api.event.type;
 
 import com.danrus.rpf.api.event.AbstractModelResolverEvent;
+import com.danrus.rpf.core.item.ModelUpdateContext;
 import com.danrus.rpf.core.item.SignedItemModel;
 import com.danrus.rpf.api.TestsResultCollector;
 import net.minecraft.client.multiplayer.ClientLevel;
@@ -15,19 +16,13 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 public class PreModelResolveEvent extends AbstractModelResolverEvent {
-    private final ResourceLocation modelId;
     private final List<SignedItemModel> candidates;
     private final TestsResultCollector collector;
 
-    public PreModelResolveEvent(ResourceLocation modelId, List<SignedItemModel> candidates, TestsResultCollector collector, ItemStackRenderState renderState, ItemStack stack, ItemModelResolver itemModelResolver, ItemDisplayContext displayContext, @Nullable ClientLevel level, @Nullable LivingEntity owner, int seed) {
-        super(renderState, stack, itemModelResolver, displayContext, level, owner, seed);
-        this.modelId = modelId;
+    public PreModelResolveEvent(ModelUpdateContext context, ItemStack stack, List<SignedItemModel> candidates, TestsResultCollector collector, @Nullable LivingEntity owner) {
+        super(context, stack, owner);
         this.candidates = candidates;
         this.collector = collector;
-    }
-
-    public ResourceLocation getModelId() {
-        return modelId;
     }
 
     public List<SignedItemModel> getCandidates() {

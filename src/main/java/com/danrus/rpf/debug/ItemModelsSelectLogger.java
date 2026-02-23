@@ -1,4 +1,4 @@
-package com.danrus.rpf.logging;
+package com.danrus.rpf.debug;
 
 import com.danrus.rpf.api.TestsResultCollector;
 import net.minecraft.resources.ResourceLocation;

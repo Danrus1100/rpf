@@ -1,6 +1,7 @@
 package com.danrus.rpf.api.event.type;
 
 import com.danrus.rpf.api.event.AbstractModelResolverEvent;
+import com.danrus.rpf.core.item.ModelUpdateContext;
 import com.danrus.rpf.core.item.SignedItemModel;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.item.ItemModelResolver;
@@ -13,8 +14,8 @@ import org.jetbrains.annotations.Nullable;
 public class UpdateModelEvent extends AbstractModelResolverEvent {
     private final SignedItemModel model;
 
-    public UpdateModelEvent(SignedItemModel model, ItemStackRenderState renderState, ItemStack stack, ItemModelResolver itemModelResolver, ItemDisplayContext displayContext, @Nullable ClientLevel level, @Nullable LivingEntity owner, int seed) {
-        super(renderState, stack, itemModelResolver, displayContext, level, owner, seed);
+    public UpdateModelEvent(SignedItemModel model, ModelUpdateContext context, ItemStack stack, @Nullable LivingEntity owner) {
+        super(context, stack, owner);
         this.model = model;
     }
 

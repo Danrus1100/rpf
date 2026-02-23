@@ -3,6 +3,7 @@ package com.danrus.rpf.mixin.items.select;
 import com.danrus.rpf.api.DelegateItemModel;
 import com.danrus.rpf.api.RpfItemModel;
 import com.danrus.rpf.api.TestsResultCollector;
+import com.danrus.rpf.core.item.ModelUpdateContext;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.item.ItemModel;
 import net.minecraft.client.renderer.item.ItemModelResolver;
@@ -33,38 +34,26 @@ public abstract class SelectItemModelMixin<T> implements DelegateItemModel, RpfI
 
     @SuppressWarnings("unchecked")
     @Override
-    public boolean rpf$doDelegate(
-            ItemStackRenderState renderState,
-            ItemStack stack,
-            ItemModelResolver itemModelResolver,
-            ItemDisplayContext displayContext,
-            @Nullable ClientLevel level,
-            @Nullable LivingEntity owner,
-            @Nullable ItemModel prev,
-            int seed,
-            ResourceLocation itemModelId,
-            String packName,
-            TestsResultCollector collector
-    ) {
+    public boolean rpf$doDelegate(ModelUpdateContext context, ItemStack stack, @Nullable LivingEntity owner, @Nullable ItemModel prev, TestsResultCollector collector) {
         if (!this.rpf$delegate) {
-            collector.hit(this.getClass(), " force cancel delegate", packName);
+            collector.hit(this.getClass(), " force cancel delegate");
             return false;
         }
 //        if (this.rpf$isFallback()) return true;
         SelectItemModel<T> self = (SelectItemModel<T>) (Object) this;
-        T object = self.property.get(stack, level, owner == null ? null : owner
+        T object = self.property.get(stack, context.level(), owner == null ? null : owner
                 //? if >=1.21.10
                 //.asLivingEntity()
-                , seed, displayContext);
-        ItemModel itemModel = self.models.get(object, level);
+                , context.seed(), context.displayContext());
+        ItemModel itemModel = self.models.get(object, context.level());
 
         if (itemModel instanceof RpfItemModel rpfItemModel) {
             if (prev != null && this.rpf$isFallback()) rpfItemModel.rpf$markAsFallback();
             String propertyValue = object != null ? object.toString() : "null";
-            collector.next(this.getClass(), " proprety: " + propertyValue, packName, rpfItemModel.rpf$isFallback());
-            return rpfItemModel.rpf$doDelegate(renderState, stack, itemModelResolver, displayContext, level, owner, (ItemModel) (Object) this, seed, itemModelId, packName, collector);
+            collector.next(this.getClass(), " proprety: " + propertyValue, rpfItemModel.rpf$isFallback());
+            return rpfItemModel.rpf$doDelegate(context, stack, owner, (ItemModel) (Object) this, collector);
         } else {
-            collector.delegate(this.getClass(), " proprety: " + object.toString(), packName);
+            collector.delegate(this.getClass(), " proprety: " + object.toString());
             return itemModel == null || this.rpf$getDelegation();
         }
     }

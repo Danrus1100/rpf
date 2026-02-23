@@ -1,2 +1,1 @@
-- fixed RpfCodecs API
-- fixed additional json models parameters
+- improved optimisation and stability

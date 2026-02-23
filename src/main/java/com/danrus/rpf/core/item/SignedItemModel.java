@@ -20,29 +20,18 @@ public record SignedItemModel(
         ItemModel model
 ) {
     public boolean doDelegate(
-            ItemStackRenderState renderState,
+            ModelUpdateContext context,
             ItemStack stack,
-            ItemModelResolver itemModelResolver,
-            ItemDisplayContext displayContext,
-            @Nullable ClientLevel level,
             @Nullable LivingEntity owner,
-            int seed,
-            ResourceLocation itemModelId,
             TestsResultCollector collector
     ) {
         if (model == null) return false;
         try {
             return ((RpfItemModel)model).rpf$doDelegate(
-                renderState,
+                context,
                 stack,
-                itemModelResolver,
-                displayContext,
-                level,
                 owner,
                 null,
-                seed,
-                itemModelId,
-                name,
                 collector
             );
         } catch (Exception ignored) {
@@ -50,12 +39,12 @@ public record SignedItemModel(
         }
     }
 
-    public void update(ItemStackRenderState renderState, ItemStack stack, ItemModelResolver itemModelResolver, ItemDisplayContext displayContext, @Nullable ClientLevel level, @Nullable LivingEntity owner, int seed) {
+    public void update(ModelUpdateContext context, ItemStack stack, @Nullable LivingEntity owner) {
         if (model != null) {
-            RpfEvent event = new UpdateModelEvent(this, renderState, stack, itemModelResolver, displayContext, level, owner, seed);
+            RpfEvent event = new UpdateModelEvent(this, context, stack, owner);
             Rpf.getEventBus().post(event);
             if (event.isCancelled()) return;
-            model.update(renderState, stack, itemModelResolver, displayContext, level, owner, seed);
+            model.update(context.renderState(), stack, context.mcResolver(), context.displayContext(), context.level(), owner, context.seed());
         }
     }
 

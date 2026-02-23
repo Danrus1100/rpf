@@ -1,7 +1,8 @@
-package com.danrus.rpf.logging;
+package com.danrus.rpf.impl;
 
 import com.danrus.rpf.api.TestsResultCollector;
 import net.minecraft.resources.ResourceLocation;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -16,7 +17,10 @@ public class DummyTestsResultsCollector implements TestsResultCollector {
     public void resetShift() {}
 
     @Override
-    public void touch(Class<?> clazz, String itemModelType, String packName, TestResultType resultType) {}
+    public void pushPack(String packName) {}
+
+    @Override
+    public void touch(@Nullable Class<?> clazz, String description, TestResultType resultType) {}
 
     @Override
     public ResourceLocation getModelLocation() {
