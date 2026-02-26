@@ -5,6 +5,7 @@ import com.danrus.rpf.api.RpfItemModel;
 import com.danrus.rpf.api.event.RpfEvent;
 import com.danrus.rpf.api.event.type.UpdateModelEvent;
 import com.danrus.rpf.api.TestsResultCollector;
+import com.danrus.rpf.debug.RpfDebugSystem;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.item.ItemModel;
 import net.minecraft.client.renderer.item.ItemModelResolver;
@@ -34,8 +35,9 @@ public record SignedItemModel(
                 null,
                 collector
             );
-        } catch (Exception ignored) {
-            return false;
+        } catch (Exception e) {
+            RpfDebugSystem.getInstance().errorItem(collector);
+            return true;
         }
     }
 

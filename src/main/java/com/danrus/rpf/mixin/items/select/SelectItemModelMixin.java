@@ -1,17 +1,14 @@
 package com.danrus.rpf.mixin.items.select;
 
+import com.danrus.rpf.Rpf;
 import com.danrus.rpf.api.DelegateItemModel;
 import com.danrus.rpf.api.RpfItemModel;
 import com.danrus.rpf.api.TestsResultCollector;
+import com.danrus.rpf.api.event.type.SelectModelPropertyGetWhenDoDelegateEvent;
 import com.danrus.rpf.core.item.ModelUpdateContext;
-import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.item.ItemModel;
-import net.minecraft.client.renderer.item.ItemModelResolver;
-import net.minecraft.client.renderer.item.ItemStackRenderState;
 import net.minecraft.client.renderer.item.SelectItemModel;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.*;
@@ -41,10 +38,17 @@ public abstract class SelectItemModelMixin<T> implements DelegateItemModel, RpfI
         }
 //        if (this.rpf$isFallback()) return true;
         SelectItemModel<T> self = (SelectItemModel<T>) (Object) this;
-        T object = self.property.get(stack, context.level(), owner == null ? null : owner
+
+        SelectModelPropertyGetWhenDoDelegateEvent<T> event = new SelectModelPropertyGetWhenDoDelegateEvent<T>(
+                context, stack, owner, self.property, self, () -> self.property.get(stack, context.level(), owner
                 //? if >=1.21.10
                 //.asLivingEntity()
-                , context.seed(), context.displayContext());
+                , context.seed(), context.displayContext())
+        );
+
+        Rpf.getEventBus().post(event);
+        if (event.isCancelled()) return true;
+        T object = event.getObject();
         ItemModel itemModel = self.models.get(object, context.level());
 
         if (itemModel instanceof RpfItemModel rpfItemModel) {

@@ -8,7 +8,6 @@ import com.danrus.rpf.core.load.ResourceLoadManager;
 import com.danrus.rpf.impl.RpfExperimentalResolver;
 import com.danrus.rpf.impl.RpfV1ModelResolver;
 import com.danrus.rpf.impl.VanillaModelResolver;
-import com.danrus.rpf.debug.ItemModelsSelectLogger;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.resources.ResourceLocation;
@@ -19,10 +18,8 @@ public class Rpf implements ClientModInitializer {
 
     public static String MOD_ID = "rpf";
     private static final ResourceLoadManager RESOURCE_LOAD_MANAGER = new ResourceLoadManager();
-    private static final ItemModelsSelectLogger ITEM_LOGGER = new ItemModelsSelectLogger();
     private static final RpfEventBus EVENT_BUS = new RpfEventBus();
     public static final Path CONFIG_PATH = FabricLoader.getInstance().getConfigDir();
-    public static boolean debug;
 
     @Override
     public void onInitializeClient() {
@@ -46,10 +43,6 @@ public class Rpf implements ClientModInitializer {
         return EVENT_BUS;
     }
 
-    public static ItemModelsSelectLogger getItemLogger() {
-        return ITEM_LOGGER;
-    }
-    
     /**
      * Gets the resource load manager for thread-safe access to loading futures.
      * 

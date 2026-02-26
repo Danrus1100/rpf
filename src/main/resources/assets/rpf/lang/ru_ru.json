@@ -1,5 +1,9 @@
 {
   "rpf.debug": "режим отладки RPF теперь %1$s.",
+  "rpf.debug.clear": "база данных отладки RPF очищена!",
+  "rpf.debug.export": "%s экспортирован! ",
+  "rpf.debug.export.open": "Открыть файл",
+  "rpf.debug.export.error": "Ошибка во время экспорта отладочной информации для %s!",
   "rpf.toggle.off": "выборка RPF отключена. Что-то пошло не так? Сообщите мне об этом в разделе %s!",
   "rpf.toggle.on": "выборка RPF включена",
   "rpf.resolver.current": "Текущая статегия выборки: %s.",

@@ -1,7 +1,8 @@
 plugins {
-    id("fabric-loom") version "1.13-SNAPSHOT"
+    id("net.fabricmc.fabric-loom-remap") version "1.15-SNAPSHOT"
     id("me.modmuss50.mod-publish-plugin") version "0.8.4"
     id("java")
+    id("maven-publish")
 }
 
 fun opt(name: String, consumer: (prop: String) -> Unit) {
@@ -29,6 +30,26 @@ repositories {
 
 loom {
     accessWidenerPath = rootProject.file("src/main/resources/rpf.accesswidener")
+
+    runs {
+        create("gameTest") {
+            server()
+            name("Game Test")
+            vmArg("-Dfabric-api.gametest")
+            vmArg("-Dfabric-api.gametest.report-file=build/gametestresults.xml")
+            runDir("build/gametest")
+        }
+    }
+}
+
+fabricApi {
+    configureTests {
+        createSourceSet = true
+        modId = prop("mod.id") + "-test"
+        enableGameTests = false
+        enableClientGameTests = true
+        eula = true
+    }
 }
 
 stonecutter{
@@ -73,33 +94,42 @@ dependencies {
     opt("deps.rprenames") {
         modImplementation(rootProject.files("lib/${it}.jar"))
     }
+
+    testImplementation("net.fabricmc:fabric-loader-junit:${findProperty("deps.fabric")}")
 }
 
-tasks.processResources {
-    inputs.property("id", findProperty("mod.id"))
-    inputs.property("name", findProperty("mod.name"))
-    inputs.property("version", findProperty("mod.version"))
-    inputs.property("mcdep", findProperty("mod.mcdep"))
-    inputs.property("minecraft_version", findProperty("deps.mc"))
-    inputs.property("description", findProperty("mod.description"))
-    inputs.property("author", findProperty("mod.author"))
+tasks {
+    test {
+        useJUnitPlatform()
+    }
+    processResources {
+        inputs.property("id", findProperty("mod.id"))
+        inputs.property("name", findProperty("mod.name"))
+        inputs.property("version", findProperty("mod.version"))
+        inputs.property("mcdep", findProperty("mod.mcdep"))
+        inputs.property("minecraft_version", findProperty("deps.mc"))
+        inputs.property("description", findProperty("mod.description"))
+        inputs.property("author", findProperty("mod.author"))
 
-    val map = mapOf(
-        "id" to findProperty("mod.id"),
-        "name" to findProperty("mod.name"),
-        "version" to findProperty("mod.version"),
-        "mcdep" to findProperty("mod.mcdep"),
-        "minecraft_version" to findProperty("deps.mc"),
-        "description" to findProperty("mod.description"),
-        "author" to findProperty("mod.author")
-    )
+        val map = mapOf(
+            "id" to findProperty("mod.id"),
+            "name" to findProperty("mod.name"),
+            "version" to findProperty("mod.version"),
+            "mcdep" to findProperty("mod.mcdep"),
+            "minecraft_version" to findProperty("deps.mc"),
+            "description" to findProperty("mod.description"),
+            "author" to findProperty("mod.author")
+        )
 
-    filesMatching("fabric.mod.json") { expand(map) }
+        filesMatching("fabric.mod.json") { expand(map) }
+    }
 }
 
 base {
     archivesName.set(findProperty("mod.id") as String)
 }
+
+val artifactVersion = "${prop("mod.version")}-${minecraft}"
 
 publishMods {
     val modrinthToken = findProperty("modrinth-token")
@@ -119,7 +149,7 @@ publishMods {
     val loaders = prop("pub.target.platforms").split(' ')
     loaders.forEach(modLoaders::add)
     displayName = "PRF ${prop("mod.version")} for ${minecraft}"
-    version = "${prop("mod.version")}-${minecraft}"
+    version = artifactVersion
 
     val targets = prop("pub.target.versions").split(' ')
     modrinth {
@@ -163,6 +193,31 @@ stonecutter {
 //    }
     val isRpRenames = propExists("deps.rprenames")
     constants["rprenames"] = isRpRenames
+}
+
+publishing {
+
+    publications {
+        create<MavenPublication>("maven") {
+            from(components["java"])
+
+            groupId = "com.danrus"
+            artifactId = "rpf"
+            version = artifactVersion
+        }
+    }
+
+    repositories {
+        maven {
+            name = "Shlakoblock"
+            url = uri("https://maven.shlakoblock.com/releases")
+
+            credentials {
+                username = project.findProperty("shlakoblock-maven-username")?.toString()
+                password = project.findProperty("shlakoblock-maven-password")?.toString()
+            }
+        }
+    }
 }
 
 version = findProperty("mod.version") as String + "-" +findProperty("deps.mc") as String

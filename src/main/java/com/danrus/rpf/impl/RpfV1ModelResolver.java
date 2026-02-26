@@ -7,6 +7,7 @@ import com.danrus.rpf.api.event.RpfEvent;
 import com.danrus.rpf.api.event.type.PreModelResolveEvent;
 import com.danrus.rpf.core.item.ModelUpdateContext;
 import com.danrus.rpf.core.item.SignedItemModel;
+import com.danrus.rpf.debug.RpfDebugSystem;
 import com.danrus.rpf.duck.load.RpfModelManager;
 import com.danrus.rpf.api.TestsResultCollector;
 import com.danrus.rpf.debug.LoggingTestsResultCollector;
@@ -28,7 +29,6 @@ public class RpfV1ModelResolver implements RpfItemModelResolver {
 
     private final Map<DataComponentMap, ClientItem.Properties> componentsToProperties = 
         Collections.synchronizedMap(new WeakHashMap<>());
-    private static final TestsResultCollector DUMMY_COLLECTOR = new DummyTestsResultsCollector();
 
     @Override
     public void resolveAndAppendLayer(ModelUpdateContext context, ItemStack stack, LivingEntity entity, Operation<Void> vanilla) {
@@ -44,7 +44,7 @@ public class RpfV1ModelResolver implements RpfItemModelResolver {
             }
         }
 
-        TestsResultCollector collector = Rpf.debug ? new LoggingTestsResultCollector(context.location(), candidates.getFirst().name()) : DUMMY_COLLECTOR;
+        TestsResultCollector collector = RpfDebugSystem.getInstance().optimiseCollector(() -> new LoggingTestsResultCollector(context.location(), candidates.getFirst().name()));
 
         RpfEvent preEvent = new PreModelResolveEvent(context, stack, candidates, collector, entity);
         Rpf.getEventBus().post(preEvent);
@@ -64,9 +64,7 @@ public class RpfV1ModelResolver implements RpfItemModelResolver {
 
                 if (!model.doDelegate(context, stack, entity, collector) || i == candidates.size() - 1) {
                     RpfItemModelResolver.appendModelLayer(context, stack, entity, componentsToProperties, model);
-                    if (Rpf.debug) {
-                        Rpf.getItemLogger().info(collector);
-                    }
+                    RpfDebugSystem.getInstance().logItem(collector);
                     return;
                 }
             } catch (Exception e) {

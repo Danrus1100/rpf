@@ -7,6 +7,7 @@ import com.danrus.rpf.core.load.RpfClientItemInfoLoader;
 import com.danrus.rpf.compat.rprenames.impl.RenamesBridge;
 import com.danrus.rpf.core.item.RpfModelIdentity;
 import com.danrus.rpf.core.item.SignedItemModel;
+import com.danrus.rpf.debug.RpfDebugSystem;
 import com.danrus.rpf.duck.load.RpfBakingResult;
 import com.danrus.rpf.duck.load.RpfModelBakery;
 import com.danrus.rpf.duck.load.RpfModelManager;
@@ -223,7 +224,7 @@ public abstract class ModelManagerMixin implements RpfModelManager {
             this.rpf$vanillaModelCache.clear();
             
             RpfResolversManager.getInstance().applyPendingResolver();
-            Rpf.getItemLogger().onReload();
+            RpfDebugSystem.getInstance().clear();
         } catch (ClassCastException e) {
             throw new IllegalStateException("ModelBakery.BakingResult bakingResult is not instance of RpfBakingResult!");
         } catch (Exception e2) {

@@ -1,5 +1,9 @@
 {
   "rpf.debug": "RPF debug mode is now %1$s.",
+  "rpf.debug.clear": "RPF debug database cleared!",
+  "rpf.debug.export": "%s exported! ",
+  "rpf.debug.export.open": "Open log",
+  "rpf.debug.export.error": "Failed to export item log of %s!",
   "rpf.toggle.off": "RPF resolving turned off. Something went wrong? let me know about it on %s!",
   "rpf.toggle.on": "RPF resolving turned on",
   "rpf.resolver.current": "Current resolver is %s.",

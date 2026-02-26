@@ -6,6 +6,7 @@ import com.danrus.rpf.api.event.type.MissingModelUpdateEvent;
 import com.danrus.rpf.core.item.ModelUpdateContext;
 import com.danrus.rpf.core.item.RpfModelIdentity;
 import com.danrus.rpf.core.item.SignedItemModel;
+import com.danrus.rpf.debug.RpfDebugSystem;
 import com.danrus.rpf.duck.load.RpfModelManager;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import net.minecraft.client.Minecraft;
@@ -57,6 +58,6 @@ public interface RpfItemModelResolver {
         context.renderState().appendModelIdentityElement(new RpfModelIdentity(context.location(), "Unknown")); // no model found
         getModelManager().rpf$getMissingModel().update(context.renderState(), stack, context.mcResolver(), context.displayContext(), context.level(), owner, context.seed());
         collector.touchModelNotFound();
-        Rpf.getItemLogger().error(collector);
+        RpfDebugSystem.getInstance().errorItem(collector);
     }
 }

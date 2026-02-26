@@ -20,6 +20,7 @@ public class RpfConfig {
     private static final Logger log = LoggerFactory.getLogger(RpfConfig.class);
 
     private ResourceLocation resolver;
+    private boolean isDebug;
 
     public static final String CONFIG_FILE_NAME = "rpf.json";
     private static RpfConfig INSTANCE = null;
@@ -104,6 +105,14 @@ public class RpfConfig {
         try (Writer writer = Files.newBufferedWriter(path)) {
             GSON.toJson(config, writer);
         }
+    }
+
+    public void setDebug(boolean debugOutput) {
+        this.isDebug = debugOutput;
+    }
+
+    public boolean isDebug() {
+        return isDebug;
     }
 
     public static class ResourceLocationAdapter implements JsonSerializer<ResourceLocation>, JsonDeserializer<ResourceLocation> {
