@@ -1,7 +1,7 @@
 package com.danrus.rpf.debug;
 
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
@@ -13,7 +13,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
-public record ItemDump(Type type, ResourceLocation item, List<String> strings) {
+public record ItemDump(Type type, Identifier item, List<String> strings) {
 
     private static final Path EXPORT_PATH = FabricLoader.getInstance().getGameDir().resolve("debug/rpf");
     private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss");
@@ -40,7 +40,7 @@ public record ItemDump(Type type, ResourceLocation item, List<String> strings) {
     }
 
     @Nullable
-    public static Path saveCombined(ResourceLocation item, List<ItemDump> dumps) {
+    public static Path saveCombined(Identifier item, List<ItemDump> dumps) {
         if (dumps.isEmpty()) return null;
 
         try {

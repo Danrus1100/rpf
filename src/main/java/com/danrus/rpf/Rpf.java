@@ -11,7 +11,7 @@ import com.danrus.rpf.impl.RpfV1ModelResolver;
 import com.danrus.rpf.impl.VanillaModelResolver;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.nio.file.Path;
 
@@ -36,7 +36,7 @@ public class Rpf implements ClientModInitializer {
     private static void registerResolvers() {
         RpfResolversManager.getInstance().register(RpfResolversManager.DEFAULT_RESOLVER, new RpfV1ModelResolver());
         RpfResolversManager.getInstance().register(RpfResolversManager.VANILLA_RESOLVER, new VanillaModelResolver());
-        RpfResolversManager.getInstance().register(ResourceLocation.fromNamespaceAndPath("rpf", "experimental"), new RpfExperimentalResolver());
+        RpfResolversManager.getInstance().register(Identifier.fromNamespaceAndPath("rpf", "experimental"), new RpfExperimentalResolver());
         RpfResolversManager.getInstance().setPendingResolver(CONFIG.getResolver());
     }
 

@@ -8,7 +8,7 @@ import com.danrus.rpf.api.event.type.SelectModelPropertyGetWhenDoDelegateEvent;
 import com.danrus.rpf.core.item.ModelUpdateContext;
 import net.minecraft.client.renderer.item.ItemModel;
 import net.minecraft.client.renderer.item.SelectItemModel;
-import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ItemOwner;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.*;
@@ -31,7 +31,7 @@ public abstract class SelectItemModelMixin<T> implements DelegateItemModel, RpfI
 
     @SuppressWarnings("unchecked")
     @Override
-    public boolean rpf$doDelegate(ModelUpdateContext context, ItemStack stack, @Nullable LivingEntity owner, @Nullable ItemModel prev, TestsResultCollector collector) {
+    public boolean rpf$doDelegate(ModelUpdateContext context, ItemStack stack, @Nullable ItemOwner owner, @Nullable ItemModel prev, TestsResultCollector collector) {
         if (!this.rpf$delegate) {
             collector.hit(this.getClass(), " force cancel delegate");
             return false;
@@ -42,7 +42,7 @@ public abstract class SelectItemModelMixin<T> implements DelegateItemModel, RpfI
         SelectModelPropertyGetWhenDoDelegateEvent<T> event = new SelectModelPropertyGetWhenDoDelegateEvent<T>(
                 context, stack, owner, self.property, self, () -> self.property.get(stack, context.level(), owner
                 //? if >=1.21.10
-                //.asLivingEntity()
+                == null ? null : owner.asLivingEntity()
                 , context.seed(), context.displayContext())
         );
 

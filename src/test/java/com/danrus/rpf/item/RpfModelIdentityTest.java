@@ -1,7 +1,7 @@
 package com.danrus.rpf.item;
 
 import com.danrus.rpf.core.item.RpfModelIdentity;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -12,7 +12,7 @@ class RpfModelIdentityTest {
     @Test
     @DisplayName("Equal identities have same hashCode")
     void equalIdentities_sameHashCode() {
-        ResourceLocation location = ResourceLocation.fromNamespaceAndPath("test", "model");
+        Identifier location = Identifier.fromNamespaceAndPath("test", "model");
         String packName = "pack";
         
         RpfModelIdentity id1 = new RpfModelIdentity(location, packName);
@@ -25,8 +25,8 @@ class RpfModelIdentityTest {
     @Test
     @DisplayName("Different locations produce non-equal identities")
     void differentLocations_notEqual() {
-        ResourceLocation location1 = ResourceLocation.fromNamespaceAndPath("test", "model1");
-        ResourceLocation location2 = ResourceLocation.fromNamespaceAndPath("test", "model2");
+        Identifier location1 = Identifier.fromNamespaceAndPath("test", "model1");
+        Identifier location2 = Identifier.fromNamespaceAndPath("test", "model2");
         
         RpfModelIdentity id1 = new RpfModelIdentity(location1, "pack");
         RpfModelIdentity id2 = new RpfModelIdentity(location2, "pack");
@@ -37,7 +37,7 @@ class RpfModelIdentityTest {
     @Test
     @DisplayName("Different pack names produce non-equal identities")
     void differentPackNames_notEqual() {
-        ResourceLocation location = ResourceLocation.fromNamespaceAndPath("test", "model");
+        Identifier location = Identifier.fromNamespaceAndPath("test", "model");
         
         RpfModelIdentity id1 = new RpfModelIdentity(location, "pack1");
         RpfModelIdentity id2 = new RpfModelIdentity(location, "pack2");
@@ -48,7 +48,7 @@ class RpfModelIdentityTest {
     @Test
     @DisplayName("Record components are accessible")
     void recordComponents_accessible() {
-        ResourceLocation location = ResourceLocation.fromNamespaceAndPath("namespace", "path");
+        Identifier location = Identifier.fromNamespaceAndPath("namespace", "path");
         String packName = "testPack";
         
         RpfModelIdentity identity = new RpfModelIdentity(location, packName);
@@ -60,7 +60,7 @@ class RpfModelIdentityTest {
     @Test
     @DisplayName("toString contains both components")
     void toString_containsComponents() {
-        ResourceLocation location = ResourceLocation.fromNamespaceAndPath("namespace", "path");
+        Identifier location = Identifier.fromNamespaceAndPath("namespace", "path");
         RpfModelIdentity identity = new RpfModelIdentity(location, "testPack");
         
         String str = identity.toString();
@@ -73,7 +73,7 @@ class RpfModelIdentityTest {
     @DisplayName("Identity is not equal to null")
     void identity_notEqualToNull() {
         RpfModelIdentity identity = new RpfModelIdentity(
-            ResourceLocation.fromNamespaceAndPath("test", "model"), "pack"
+            Identifier.fromNamespaceAndPath("test", "model"), "pack"
         );
         
         assertNotEquals(null, identity);
@@ -83,7 +83,7 @@ class RpfModelIdentityTest {
     @DisplayName("Identity is not equal to different type")
     void identity_notEqualToDifferentType() {
         RpfModelIdentity identity = new RpfModelIdentity(
-            ResourceLocation.fromNamespaceAndPath("test", "model"), "pack"
+            Identifier.fromNamespaceAndPath("test", "model"), "pack"
         );
         
         assertNotEquals("string", identity);
@@ -94,7 +94,7 @@ class RpfModelIdentityTest {
     @DisplayName("Identity equals itself")
     void identity_equalsItself() {
         RpfModelIdentity identity = new RpfModelIdentity(
-            ResourceLocation.fromNamespaceAndPath("test", "model"), "pack"
+            Identifier.fromNamespaceAndPath("test", "model"), "pack"
         );
         
         assertEquals(identity, identity);

@@ -5,8 +5,8 @@ import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.item.ItemModel;
 import net.minecraft.client.renderer.item.ItemModelResolver;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.entity.ItemOwner;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
@@ -21,7 +21,7 @@ public interface RpfItemModel {
     default boolean rpf$doDelegate(
             ModelUpdateContext context,
             ItemStack stack,
-            @Nullable LivingEntity owner,
+            @Nullable ItemOwner owner,
             @Nullable ItemModel prev,
             TestsResultCollector collector
     ) {

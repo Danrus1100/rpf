@@ -9,8 +9,8 @@ import com.danrus.rpf.core.item.SignedItemModel;
 import com.danrus.rpf.duck.load.RpfModelManager;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import net.minecraft.client.renderer.item.*;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.entity.ItemOwner;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
@@ -22,13 +22,13 @@ public class RpfExperimentalResolver implements RpfItemModelResolver {
 
 
     @Override
-    public void resolveAndAppendLayer(ModelUpdateContext context, ItemStack stack, LivingEntity entity, Operation<Void> vanilla) {
+    public void resolveAndAppendLayer(ModelUpdateContext context, ItemStack stack, ItemOwner entity, Operation<Void> vanilla) {
 
         RpfModelManager rpfModelManager = RpfItemModelResolver.getModelManager();
-        List<Map<ResourceLocation, SignedItemModel>> packs = rpfModelManager.rpf$getSignedModels();
+        List<Map<Identifier, SignedItemModel>> packs = rpfModelManager.rpf$getSignedModels();
 
         List<SignedItemModel> candidates = new ArrayList<>();
-        for (Map<ResourceLocation, SignedItemModel> currentPack : packs) {
+        for (Map<Identifier, SignedItemModel> currentPack : packs) {
             SignedItemModel model = currentPack.get(context.location());
             if (model != null) {
                 candidates.add(model);
@@ -102,7 +102,7 @@ public class RpfExperimentalResolver implements RpfItemModelResolver {
 
         protected final List<ExperimentalResultUnit> eUnits = new LinkedList<>();
 
-        public ExperimentalModelTestCollector(ResourceLocation modelLocation, String packName) {
+        public ExperimentalModelTestCollector(Identifier modelLocation, String packName) {
             super(modelLocation, packName);
         }
 

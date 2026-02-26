@@ -1,2 +1,1 @@
- - Fixed an issue related to the `select` model.
- - Overhauled the debug system. If you need to report an issue, please check how to use the new system [here](https://danrus1100.github.io/rtp-rpf-docs/rpf/getting-started.html#how-to-report-a-bug).
+ - Fixed `select` item model, when entity doesn't hold item (1.21.10+)

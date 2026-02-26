@@ -14,7 +14,7 @@ import net.minecraft.client.renderer.item.properties.select.ComponentContents;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.profiling.ProfilerFiller;
 
@@ -22,18 +22,18 @@ import java.util.*;
 
 public class RpfParser extends ItemModelParser {
 
-    private List<Map<ResourceLocation, ClientItem>> listItemAssets = new ArrayList<>();
+    private List<Map<Identifier, ClientItem>> listItemAssets = new ArrayList<>();
 
     public RpfParser(RenamesManager<? super ItemModelRename> renamesManager) {
         super(renamesManager);
     }
 
-    public void updateClientItem(List<Map<ResourceLocation, ClientItem>> itemAssets) {
+    public void updateClientItem(List<Map<Identifier, ClientItem>> itemAssets) {
         this.listItemAssets = itemAssets;
     }
 
     public void parse(ResourceManager resourceManager, ProfilerFiller profiler) {
-        for (Map<ResourceLocation, ClientItem> itemAssets : listItemAssets) {
+        for (Map<Identifier, ClientItem> itemAssets : listItemAssets) {
             this.updateItemAssets(itemAssets);
             super.parse(resourceManager, profiler);
         }

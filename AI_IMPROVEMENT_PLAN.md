@@ -17,10 +17,10 @@
 - ✅ Multi-pack resolution with V1, Experimental, and Vanilla resolvers
 - ✅ Event system for extensibility
 - ✅ Multi-version support (1.21.8, 1.21.10, 1.21.11+)
-- ⚠️ Memory leak in V1 resolver (grows unbounded)
-- ⚠️ Race condition in static CompletableFuture
-- ⚠️ Thread-unsafe event bus
-- ⚠️ Silent exception swallowing
+- ✅ Memory leak in V1 resolver (grows unbounded)
+- ✅ Race condition in static CompletableFuture
+- ✅️ Thread-unsafe event bus
+- ✅️ Silent exception swallowing
 - ❌ Limited documentation
 - ❌ No tests
 

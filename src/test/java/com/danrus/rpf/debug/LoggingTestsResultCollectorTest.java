@@ -1,7 +1,7 @@
 package com.danrus.rpf.debug;
 
 import com.danrus.rpf.api.TestsResultCollector;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class LoggingTestsResultCollectorTest {
 
     private LoggingTestsResultCollector collector;
-    private static final ResourceLocation TEST_LOCATION = ResourceLocation.fromNamespaceAndPath("test", "model");
+    private static final Identifier TEST_LOCATION = Identifier.fromNamespaceAndPath("test", "model");
 
     @BeforeEach
     void setUp() {

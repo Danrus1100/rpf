@@ -17,8 +17,8 @@ import org.slf4j.LoggerFactory;
 import net.minecraft.client.renderer.item.ClientItem;
 import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.core.component.DataComponents;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.entity.ItemOwner;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.*;
@@ -31,13 +31,13 @@ public class RpfV1ModelResolver implements RpfItemModelResolver {
         Collections.synchronizedMap(new WeakHashMap<>());
 
     @Override
-    public void resolveAndAppendLayer(ModelUpdateContext context, ItemStack stack, LivingEntity entity, Operation<Void> vanilla) {
+    public void resolveAndAppendLayer(ModelUpdateContext context, ItemStack stack, ItemOwner entity, Operation<Void> vanilla) {
 
         RpfModelManager rpfModelManager = RpfItemModelResolver.getModelManager();
-        List<Map<ResourceLocation, SignedItemModel>> packs = rpfModelManager.rpf$getSignedModels();
+        List<Map<Identifier, SignedItemModel>> packs = rpfModelManager.rpf$getSignedModels();
 
         List<SignedItemModel> candidates = new ArrayList<>();
-        for (Map<ResourceLocation, SignedItemModel> currentPack : packs) {
+        for (Map<Identifier, SignedItemModel> currentPack : packs) {
             SignedItemModel model = currentPack.get(context.location());
             if (model != null) {
                 candidates.add(model);
@@ -88,7 +88,7 @@ public class RpfV1ModelResolver implements RpfItemModelResolver {
 
     @Override
     public boolean shouldPlaySwapAnimation(ItemStack stack, Operation<Boolean> vanilla) {
-        ResourceLocation resourceLocation = stack.get(DataComponents.ITEM_MODEL);
+        Identifier resourceLocation = stack.get(DataComponents.ITEM_MODEL);
         ClientItem.Properties properties = this.componentsToProperties.get(stack.getComponents()); // FIXME: not the best way to get properties
         if (resourceLocation == null || properties == null) {
             return true;

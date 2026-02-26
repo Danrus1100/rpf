@@ -9,10 +9,10 @@ import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.item.ItemModelResolver;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
 import net.minecraft.core.component.DataComponents;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.profiling.Profiler;
 import net.minecraft.util.profiling.Zone;
-import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ItemOwner;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -23,10 +23,10 @@ public class ItemModelResolverMixin<T, R> {
     @WrapMethod(
             method = "appendItemLayers"
     )
-    private void rpf$selectModel(ItemStackRenderState renderState, ItemStack stack, ItemDisplayContext displayContext, Level level, LivingEntity entity, int seed, Operation<Void> original) {
+    private void rpf$selectModel(ItemStackRenderState renderState, ItemStack stack, ItemDisplayContext displayContext, Level level, ItemOwner entity, int seed, Operation<Void> original) {
         try (Zone zone = Profiler.get().zone("[RPF] resolving")) {
 
-            ResourceLocation resourceLocation = stack.get(DataComponents.ITEM_MODEL);
+            Identifier resourceLocation = stack.get(DataComponents.ITEM_MODEL);
             if (resourceLocation == null) return;
 
             ClientLevel clientLevel = level instanceof ClientLevel cl ? cl : null;

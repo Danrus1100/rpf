@@ -2,7 +2,7 @@ package com.danrus.rpf.debug;
 
 import com.danrus.rpf.api.TestsResultCollector;
 import com.danrus.rpf.impl.DummyTestsResultsCollector;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -54,7 +54,7 @@ class RpfDebugSystemTest {
         
         TestsResultCollector result = debugSystem.optimiseCollector(
             () -> new LoggingTestsResultCollector(
-                ResourceLocation.fromNamespaceAndPath("test", "model"), "pack"
+                Identifier.fromNamespaceAndPath("test", "model"), "pack"
             )
         );
         
@@ -70,7 +70,7 @@ class RpfDebugSystemTest {
         
         TestsResultCollector result = debugSystem.optimiseCollector(
             () -> new LoggingTestsResultCollector(
-                ResourceLocation.fromNamespaceAndPath("test", "model"), "pack"
+                Identifier.fromNamespaceAndPath("test", "model"), "pack"
             )
         );
         
@@ -85,7 +85,7 @@ class RpfDebugSystemTest {
         }
         
         LoggingTestsResultCollector collector = new LoggingTestsResultCollector(
-            ResourceLocation.fromNamespaceAndPath("test", "model1"), "pack"
+            Identifier.fromNamespaceAndPath("test", "model1"), "pack"
         );
         collector.touch(Object.class, "test", TestsResultCollector.TestResultType.INFO);
         
@@ -104,7 +104,7 @@ class RpfDebugSystemTest {
     void getDatabaseKeys_whenEmpty_returnsEmptyList() {
         debugSystem.clear();
         
-        List<ResourceLocation> keys = debugSystem.getDatabaseKeys();
+        List<Identifier> keys = debugSystem.getDatabaseKeys();
         
         assertTrue(keys.isEmpty());
     }
@@ -116,9 +116,9 @@ class RpfDebugSystemTest {
             debugSystem.toggleDebug();
         }
         
-        ResourceLocation loc1 = ResourceLocation.fromNamespaceAndPath("test", "a_model");
-        ResourceLocation loc2 = ResourceLocation.fromNamespaceAndPath("test", "b_model");
-        ResourceLocation loc3 = ResourceLocation.fromNamespaceAndPath("test", "a_model");
+        Identifier loc1 = Identifier.fromNamespaceAndPath("test", "a_model");
+        Identifier loc2 = Identifier.fromNamespaceAndPath("test", "b_model");
+        Identifier loc3 = Identifier.fromNamespaceAndPath("test", "a_model");
         
         LoggingTestsResultCollector collector1 = new LoggingTestsResultCollector(loc1, "pack");
         LoggingTestsResultCollector collector2 = new LoggingTestsResultCollector(loc2, "pack");
@@ -128,7 +128,7 @@ class RpfDebugSystemTest {
         debugSystem.errorItem(collector2);
         debugSystem.logItem(collector3);
         
-        List<ResourceLocation> keys = debugSystem.getDatabaseKeys();
+        List<Identifier> keys = debugSystem.getDatabaseKeys();
         
         assertEquals(2, keys.size());
         assertEquals(loc1, keys.get(0));
@@ -143,7 +143,7 @@ class RpfDebugSystemTest {
         }
         
         LoggingTestsResultCollector collector = new LoggingTestsResultCollector(
-            ResourceLocation.fromNamespaceAndPath("test", "model"), "pack"
+            Identifier.fromNamespaceAndPath("test", "model"), "pack"
         );
         
         debugSystem.logItem(collector);
@@ -159,7 +159,7 @@ class RpfDebugSystemTest {
         }
         
         LoggingTestsResultCollector collector = new LoggingTestsResultCollector(
-            ResourceLocation.fromNamespaceAndPath("test", "model"), "pack"
+            Identifier.fromNamespaceAndPath("test", "model"), "pack"
         );
         
         debugSystem.errorItem(collector);
@@ -174,7 +174,7 @@ class RpfDebugSystemTest {
             debugSystem.toggleDebug();
         }
         
-        ResourceLocation location = ResourceLocation.fromNamespaceAndPath("test", "model");
+        Identifier location = Identifier.fromNamespaceAndPath("test", "model");
         
         LoggingTestsResultCollector collector1 = new LoggingTestsResultCollector(location, "pack1");
         LoggingTestsResultCollector collector2 = new LoggingTestsResultCollector(location, "pack2");
@@ -182,7 +182,7 @@ class RpfDebugSystemTest {
         debugSystem.logItem(collector1);
         debugSystem.logItem(collector2);
         
-        List<ResourceLocation> keys = debugSystem.getDatabaseKeys();
+        List<Identifier> keys = debugSystem.getDatabaseKeys();
         
         assertEquals(1, keys.size());
     }
@@ -190,7 +190,7 @@ class RpfDebugSystemTest {
     @Test
     @DisplayName("exportDump returns null for non-existent location")
     void exportDump_nonExistent_returnsNull() {
-        ResourceLocation nonExistent = ResourceLocation.fromNamespaceAndPath("test", "nonexistent");
+        Identifier nonExistent = Identifier.fromNamespaceAndPath("test", "nonexistent");
         
         assertNull(debugSystem.exportDump(nonExistent));
     }

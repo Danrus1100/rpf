@@ -15,8 +15,8 @@ import net.minecraft.client.renderer.item.ClientItem;
 import net.minecraft.client.renderer.item.ItemModelResolver;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
 import net.minecraft.core.component.DataComponentMap;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.entity.ItemOwner;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -28,7 +28,7 @@ public interface RpfItemModelResolver {
     void resolveAndAppendLayer(
             ModelUpdateContext context,
             ItemStack stack,
-            LivingEntity entity,
+            ItemOwner entity,
             Operation<Void> vanilla
     );
 
@@ -38,11 +38,11 @@ public interface RpfItemModelResolver {
         return (RpfModelManager) Minecraft.getInstance().getModelManager();
     }
 
-    public static void appendModelLayer(ModelUpdateContext context, ItemStack stack, LivingEntity entity, SignedItemModel model) {
+    public static void appendModelLayer(ModelUpdateContext context, ItemStack stack, ItemOwner entity, SignedItemModel model) {
         appendModelLayer(context, stack, entity, null, model);
     }
 
-    public static void appendModelLayer(ModelUpdateContext context, ItemStack stack, LivingEntity entity, @Nullable Map<DataComponentMap, ClientItem.Properties> componentsToProperties, SignedItemModel model) {
+    public static void appendModelLayer(ModelUpdateContext context, ItemStack stack, ItemOwner entity, @Nullable Map<DataComponentMap, ClientItem.Properties> componentsToProperties, SignedItemModel model) {
         RpfModelIdentity identity = new RpfModelIdentity(context.location(), model.name());
         ClientItem.Properties properties = getModelManager().rpf$getProperties(identity);
         context.renderState().setOversizedInGui(properties != null && properties.oversizedInGui());
@@ -51,7 +51,7 @@ public interface RpfItemModelResolver {
         model.update(context, stack, entity);
     }
 
-    public static void updateMissingModel(ModelUpdateContext context, TestsResultCollector collector, ItemStack stack, @Nullable LivingEntity owner){
+    public static void updateMissingModel(ModelUpdateContext context, TestsResultCollector collector, ItemStack stack, @Nullable ItemOwner owner){
         RpfEvent event = new MissingModelUpdateEvent(context, stack, owner, collector);
         Rpf.getEventBus().post(event);
         if (event.isCancelled()) return;

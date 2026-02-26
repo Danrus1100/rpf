@@ -1,7 +1,7 @@
 package com.danrus.rpf.debug;
 
 import com.danrus.rpf.api.AbstractTestResultCollector;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -12,7 +12,7 @@ public class LoggingTestsResultCollector extends AbstractTestResultCollector {
 
     protected final List<TestResultUnit> units = new LinkedList<>();
 
-    public LoggingTestsResultCollector(ResourceLocation modelLocation, String packName) {
+    public LoggingTestsResultCollector(Identifier modelLocation, String packName) {
         super(modelLocation, packName);
     }
 

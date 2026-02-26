@@ -4,7 +4,7 @@ import com.danrus.rpf.core.item.ModelUpdateContext;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.item.ItemModelResolver;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
-import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ItemOwner;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
@@ -13,9 +13,9 @@ public abstract class AbstractModelResolverEvent extends RpfEvent{
     private final ModelUpdateContext context;
     private final ItemStack stack;
     @Nullable
-    private final LivingEntity owner;
+    private final ItemOwner owner;
 
-    public AbstractModelResolverEvent(ModelUpdateContext context, ItemStack stack, @Nullable LivingEntity owner) {
+    public AbstractModelResolverEvent(ModelUpdateContext context, ItemStack stack, @Nullable ItemOwner owner) {
         this.context = context;
         this.stack = stack;
         this.owner = owner;
@@ -29,7 +29,7 @@ public abstract class AbstractModelResolverEvent extends RpfEvent{
         return stack;
     }
     @Nullable
-    public LivingEntity getOwner() {
+    public ItemOwner getOwner() {
         return owner;
     }
 }

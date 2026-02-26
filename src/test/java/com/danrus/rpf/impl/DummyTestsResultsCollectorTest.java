@@ -1,7 +1,7 @@
 package com.danrus.rpf.impl;
 
 import com.danrus.rpf.api.TestsResultCollector;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -41,7 +41,7 @@ class DummyTestsResultsCollectorTest {
     @Test
     @DisplayName("getModelLocation returns dummy location")
     void getModelLocation_returnsDummy() {
-        ResourceLocation location = collector.getModelLocation();
+        Identifier location = collector.getModelLocation();
         
         assertEquals("rpf", location.getNamespace());
         assertEquals("dummy", location.getPath());

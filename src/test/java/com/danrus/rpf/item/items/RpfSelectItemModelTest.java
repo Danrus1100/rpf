@@ -14,7 +14,7 @@ import net.minecraft.client.renderer.item.properties.select.ComponentContents;
 import net.minecraft.client.renderer.item.properties.select.SelectItemModelProperties;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.Bootstrap;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
@@ -140,14 +140,14 @@ public class RpfSelectItemModelTest {
     
     private LoggingTestsResultCollector createCollector() {
         return new LoggingTestsResultCollector(
-            ResourceLocation.fromNamespaceAndPath("rpf", "test"),
+            Identifier.fromNamespaceAndPath("rpf", "test"),
             "test_pack"
         );
     }
 
     private ModelUpdateContext createContext() {
         return new ModelUpdateContext(
-                ResourceLocation.fromNamespaceAndPath("rpf", "test"),
+                Identifier.fromNamespaceAndPath("rpf", "test"),
                 Mockito.mock(ItemStackRenderState.class),
                 ItemDisplayContext.THIRD_PERSON_RIGHT_HAND,
                 null,

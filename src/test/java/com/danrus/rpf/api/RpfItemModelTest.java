@@ -1,7 +1,7 @@
 package com.danrus.rpf.api;
 
 import com.danrus.rpf.debug.LoggingTestsResultCollector;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -17,7 +17,7 @@ class RpfItemModelTest {
     void setUp() {
         model = new TestRpfItemModel();
         collector = new LoggingTestsResultCollector(
-            ResourceLocation.fromNamespaceAndPath("test", "model"), "test_pack"
+            Identifier.fromNamespaceAndPath("test", "model"), "test_pack"
         );
     }
 
