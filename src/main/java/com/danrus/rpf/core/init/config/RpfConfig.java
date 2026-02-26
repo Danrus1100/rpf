@@ -1,5 +1,6 @@
-package com.danrus.rpf;
+package com.danrus.rpf.core.init.config;
 
+import com.danrus.rpf.Rpf;
 import com.danrus.rpf.core.item.RpfResolversManager;
 import com.google.gson.*;
 import net.minecraft.resources.ResourceLocation;
@@ -7,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
+import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -19,14 +21,16 @@ public class RpfConfig {
             .create();
     private static final Logger log = LoggerFactory.getLogger(RpfConfig.class);
 
+    @RpfConfigField
     private ResourceLocation resolver;
+    @RpfConfigField
     private boolean isDebug;
 
     public static final String CONFIG_FILE_NAME = "rpf.json";
-    private static RpfConfig INSTANCE = null;
 
-    private RpfConfig() {
+    public RpfConfig() {
         this.resolver = RpfResolversManager.DEFAULT_RESOLVER;
+        this.isDebug = false;
     }
 
     public ResourceLocation getResolver() {
@@ -37,54 +41,58 @@ public class RpfConfig {
         this.resolver = resolver;
     }
 
-    public static RpfConfig getInstance() {
-        if (INSTANCE == null) {
-            throw new IllegalStateException("Config not initialized yet!");
-        }
-        return INSTANCE;
-    }
-
-    public static void init(Path configPath) {
-        if (INSTANCE != null) {
-            return;
-        }
-
+    public static RpfConfig create(Path configPath) {
         Path configFile = configPath.resolve(CONFIG_FILE_NAME);
 
         try {
             if (Files.exists(configFile)) {
-                INSTANCE = load(configFile);
+                return load(configFile);
             } else {
-                INSTANCE = new RpfConfig();
-                save(INSTANCE, configFile);
+                RpfConfig config = new RpfConfig();
+                save(config, configFile);
+                return config;
             }
         } catch (Exception e) {
             log.error("Failed to load config, using defaults", e);
-            INSTANCE = new RpfConfig(); // fallback
-            try {
-                save(INSTANCE, configFile);
-            } catch (IOException ex) {
-                log.error("Failed to save fallback config", ex);
-            }
+            return new RpfConfig();
         }
     }
 
-    public static void reload(Path configPath) {
+
+    public void reload(Path configPath) {
         Path configFile = configPath.resolve(CONFIG_FILE_NAME);
         if (Files.exists(configFile)) {
             try {
-                INSTANCE = load(configFile);
-            } catch (IOException | JsonParseException e) {
+                RpfConfig loaded = load(configFile);
+                copyAnnotatedFields(loaded, this);
+                log.info("[RPF] Config reloaded successfully.");
+            } catch (Exception e) {
                 log.error("Failed to reload config", e);
             }
         }
     }
 
-    public static void save(Path configDir) {
-        if (INSTANCE == null) return;
+    private void copyAnnotatedFields(RpfConfig from, RpfConfig to) throws IllegalAccessException {
+        for (Field field : RpfConfig.class.getDeclaredFields()) {
+            if (field.isAnnotationPresent(RpfConfigField.class)) {
+                field.setAccessible(true);
+
+                Object value = field.get(from);
+                field.set(to, value);
+
+                log.debug("[RPF] Updated config field: {} = {}", field.getName(), value);
+            }
+        }
+    }
+
+    public void save() {
+        save(Rpf.CONFIG_PATH);
+    }
+
+    public void save(Path configDir) {
         Path configFile = configDir.resolve(CONFIG_FILE_NAME);
         try {
-            save(INSTANCE, configFile);
+            save(this, configFile);
         } catch (IOException e) {
             log.error("Failed to save config", e);
         }
@@ -123,6 +131,7 @@ public class RpfConfig {
 
         @Override
         public ResourceLocation deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+            // Используем tryParse или parse в зависимости от версии MC
             return ResourceLocation.parse(json.getAsString());
         }
     }

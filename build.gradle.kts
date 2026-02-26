@@ -96,6 +96,9 @@ dependencies {
     }
 
     testImplementation("net.fabricmc:fabric-loader-junit:${findProperty("deps.fabric")}")
+    testImplementation("org.mockito:mockito-core:5.21.0")
+    testImplementation("org.mockito:mockito-junit-jupiter:5.21.0")
+    add("gametestImplementation", "net.fabricmc:fabric-loader-junit:${findProperty("deps.fabric")}")
 }
 
 tasks {

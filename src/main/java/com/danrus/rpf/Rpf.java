@@ -3,6 +3,7 @@ package com.danrus.rpf;
 import com.danrus.rpf.api.event.RpfEventBus;
 import com.danrus.rpf.compat.rprenames.impl.RpRenamesCompat;
 import com.danrus.rpf.core.init.RpfCommands;
+import com.danrus.rpf.core.init.config.RpfConfig;
 import com.danrus.rpf.core.item.RpfResolversManager;
 import com.danrus.rpf.core.load.ResourceLoadManager;
 import com.danrus.rpf.impl.RpfExperimentalResolver;
@@ -20,10 +21,10 @@ public class Rpf implements ClientModInitializer {
     private static final ResourceLoadManager RESOURCE_LOAD_MANAGER = new ResourceLoadManager();
     private static final RpfEventBus EVENT_BUS = new RpfEventBus();
     public static final Path CONFIG_PATH = FabricLoader.getInstance().getConfigDir();
+    private static final RpfConfig CONFIG = RpfConfig.create(CONFIG_PATH);
 
     @Override
     public void onInitializeClient() {
-        RpfConfig.init(CONFIG_PATH);
         registerResolvers();
         RpfCommands.init();
 
@@ -36,7 +37,7 @@ public class Rpf implements ClientModInitializer {
         RpfResolversManager.getInstance().register(RpfResolversManager.DEFAULT_RESOLVER, new RpfV1ModelResolver());
         RpfResolversManager.getInstance().register(RpfResolversManager.VANILLA_RESOLVER, new VanillaModelResolver());
         RpfResolversManager.getInstance().register(ResourceLocation.fromNamespaceAndPath("rpf", "experimental"), new RpfExperimentalResolver());
-        RpfResolversManager.getInstance().setPendingResolver(RpfConfig.getInstance().getResolver());
+        RpfResolversManager.getInstance().setPendingResolver(CONFIG.getResolver());
     }
 
     public static RpfEventBus getEventBus() {
@@ -51,5 +52,9 @@ public class Rpf implements ClientModInitializer {
      */
     public static ResourceLoadManager getResourceLoadManager() {
         return RESOURCE_LOAD_MANAGER;
+    }
+
+    public static RpfConfig getConfig() {
+        return CONFIG;
     }
 }

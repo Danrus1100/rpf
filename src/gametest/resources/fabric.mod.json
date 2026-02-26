@@ -5,6 +5,11 @@
   "name": "RPF Auto Tests",
   "environment": "client",
   "entrypoints": {
-    "fabric-client-gametest": ["com.danrus.rpt.test.RpfTests"]
+    "fabric-client-gametest": [
+      "com.danrus.rpf.test.RpfTests",
+      "com.danrus.rpf.test.RpfResolversManagerTest",
+      "com.danrus.rpf.test.RpfDebugSystemGameTest",
+      "com.danrus.rpf.test.RpfItemModelTest"
+    ]
   }
 }

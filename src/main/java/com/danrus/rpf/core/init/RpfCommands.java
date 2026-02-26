@@ -1,7 +1,7 @@
 package com.danrus.rpf.core.init;
 
 import com.danrus.rpf.Rpf;
-import com.danrus.rpf.RpfConfig;
+import com.danrus.rpf.core.init.config.RpfConfig;
 import com.danrus.rpf.core.item.RpfResolversManager;
 import com.danrus.rpf.debug.RpfDebugSystem;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
@@ -99,8 +99,8 @@ public class RpfCommands {
         ResourceLocation id = ctx.getArgument("id", ResourceLocation.class);
         RpfResolversManager.getInstance().setPendingResolver(id);
         Minecraft.getInstance().reloadResourcePacks();
-        RpfConfig.getInstance().setResolver(id);
-        RpfConfig.save(Rpf.CONFIG_PATH);
+        Rpf.getConfig().setResolver(id);
+        Rpf.getConfig().save();
         ctx.getSource().sendFeedback(Component.translatable("rpf.resolver.changed", id));
         return 1;
     }

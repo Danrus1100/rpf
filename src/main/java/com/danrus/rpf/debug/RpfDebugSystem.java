@@ -1,6 +1,7 @@
     package com.danrus.rpf.debug;
 
-    import com.danrus.rpf.RpfConfig;
+    import com.danrus.rpf.Rpf;
+    import com.danrus.rpf.core.init.config.RpfConfig;
     import com.danrus.rpf.api.TestsResultCollector;
     import com.danrus.rpf.impl.DummyTestsResultsCollector;
     import net.fabricmc.loader.api.FabricLoader;
@@ -57,8 +58,8 @@
 
         public void toggleDebug() {
             debugOutput = !debugOutput;
-            RpfConfig.getInstance().setDebug(debugOutput);
-            RpfConfig.save(FabricLoader.getInstance().getConfigDir());
+            Rpf.getConfig().setDebug(debugOutput);
+            Rpf.getConfig().save();
         }
 
         public boolean isDebug() { return debugOutput; }
