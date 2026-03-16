@@ -7,8 +7,8 @@ import com.danrus.rpf.api.TestsResultCollector;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.item.ItemModelResolver;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
-import net.minecraft.resources.Identifier;
-import net.minecraft.world.entity.ItemOwner;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
@@ -19,7 +19,7 @@ public class PreModelResolveEvent extends AbstractModelResolverEvent {
     private final List<SignedItemModel> candidates;
     private final TestsResultCollector collector;
 
-    public PreModelResolveEvent(ModelUpdateContext context, ItemStack stack, List<SignedItemModel> candidates, TestsResultCollector collector, @Nullable ItemOwner owner) {
+    public PreModelResolveEvent(ModelUpdateContext context, ItemStack stack, List<SignedItemModel> candidates, TestsResultCollector collector, @Nullable LivingEntity owner) {
         super(context, stack, owner);
         this.candidates = candidates;
         this.collector = collector;

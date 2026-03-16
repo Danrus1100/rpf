@@ -1,7 +1,7 @@
 package com.danrus.rpf.api;
 
 import net.minecraft.client.renderer.item.ItemModel;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -45,7 +45,7 @@ public interface TestsResultCollector {
 
     void touch(@Nullable Class<?> clazz, String description, TestsResultCollector.TestResultType resultType);
 
-    Identifier getModelLocation();
+    ResourceLocation getModelLocation();
 
     List<String> getStringsToLog();
 

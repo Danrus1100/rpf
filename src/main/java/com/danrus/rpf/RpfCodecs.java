@@ -11,19 +11,19 @@ import net.minecraft.client.renderer.item.ItemModels;
 import net.minecraft.client.renderer.item.RangeSelectItemModel;
 import net.minecraft.client.renderer.item.SelectItemModel;
 import net.minecraft.client.renderer.item.properties.numeric.RangeSelectItemModelProperties;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 
 public class RpfCodecs {
     private RpfCodecs() {}
-    public static final Identifier COMPOSITE_ID = Identifier.withDefaultNamespace("composite");
-    public static final Identifier RANGE_ID = Identifier.withDefaultNamespace("range_dispatch");
-    public static final Identifier SELECT_ID = Identifier.withDefaultNamespace("select");
+    public static final ResourceLocation COMPOSITE_ID = ResourceLocation.withDefaultNamespace("composite");
+    public static final ResourceLocation RANGE_ID = ResourceLocation.withDefaultNamespace("range_dispatch");
+    public static final ResourceLocation SELECT_ID = ResourceLocation.withDefaultNamespace("select");
 
     static {
         init();
     }
 
-    public static void registerDelegate(Identifier location) {
+    public static void registerDelegate(ResourceLocation location) {
         RpfModelsCodecsExtends.getInstance().register(
                 location,
                 Codec.BOOL.optionalFieldOf("delegate", true),

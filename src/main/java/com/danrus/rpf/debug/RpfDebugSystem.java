@@ -5,7 +5,7 @@
     import com.danrus.rpf.api.TestsResultCollector;
     import com.danrus.rpf.impl.DummyTestsResultsCollector;
     import net.fabricmc.loader.api.FabricLoader;
-    import net.minecraft.resources.Identifier;
+    import net.minecraft.resources.ResourceLocation;
     import org.jetbrains.annotations.Nullable;
 
     import java.nio.file.Path;
@@ -20,18 +20,18 @@
         public static RpfDebugSystem getInstance() { return INSTANCE; }
 
         private final TestsResultCollector DUMMY_COLLECTOR = new DummyTestsResultsCollector();
-        private final Map<Identifier, ItemDump> alreadyLogged = new HashMap<>();
-        private final Map<Identifier, ItemDump> alreadyErrored = new HashMap<>();
+        private final Map<ResourceLocation, ItemDump> alreadyLogged = new HashMap<>();
+        private final Map<ResourceLocation, ItemDump> alreadyErrored = new HashMap<>();
         private boolean debugOutput;
 
         private void processItem(TestsResultCollector collector,
-                                 Map<Identifier, ItemDump> targetMap,
+                                 Map<ResourceLocation, ItemDump> targetMap,
                                  ItemDump.Type type,
                                  Consumer<String> logger) {
 
             if (!debugOutput) return;
 
-            Identifier loc = collector.getModelLocation();
+            ResourceLocation loc = collector.getModelLocation();
             targetMap.computeIfAbsent(loc, key -> {
                 List<String> log = collector.getStringsToLog();
                 List<String> fullLog = new ArrayList<>();
@@ -70,7 +70,7 @@
         }
 
         @Nullable
-        public Path exportDump(Identifier location) {
+        public Path exportDump(ResourceLocation location) {
             List<ItemDump> dumpsToExport = new ArrayList<>();
 
             ItemDump info = alreadyLogged.get(location);
@@ -84,7 +84,7 @@
             return ItemDump.saveCombined(location, dumpsToExport);
         }
 
-        public List<Identifier> getDatabaseKeys() {
+        public List<ResourceLocation> getDatabaseKeys() {
             return Stream.concat(
                             alreadyLogged.keySet().stream(),
                             alreadyErrored.keySet().stream()

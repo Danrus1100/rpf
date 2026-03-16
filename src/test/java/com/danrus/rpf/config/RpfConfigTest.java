@@ -3,8 +3,8 @@ package com.danrus.rpf.config;
 import com.danrus.rpf.core.init.config.RpfConfig;
 import com.danrus.rpf.core.item.RpfResolversManager;
 import com.google.gson.JsonPrimitive;
-import net.minecraft.IdentifierException;
-import net.minecraft.resources.Identifier;
+import net.minecraft.ResourceLocationException;
+import net.minecraft.resources.ResourceLocation;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -20,10 +20,10 @@ class RpfConfigTest {
     Path tempDir;
 
     @Test
-    @DisplayName("IdentifierAdapter serializes correctly")
+    @DisplayName("ResourceLocationAdapter serializes correctly")
     void resourceLocationAdapter_serialize_correctFormat() {
-        RpfConfig.IdentifierAdapter adapter = new RpfConfig.IdentifierAdapter();
-        Identifier location = Identifier.fromNamespaceAndPath("test", "path");
+        RpfConfig.ResourceLocationAdapter adapter = new RpfConfig.ResourceLocationAdapter();
+        ResourceLocation location = ResourceLocation.fromNamespaceAndPath("test", "path");
         
         JsonPrimitive result = (JsonPrimitive) adapter.serialize(location, null, null);
         
@@ -31,31 +31,31 @@ class RpfConfigTest {
     }
 
     @Test
-    @DisplayName("IdentifierAdapter deserializes correctly")
+    @DisplayName("ResourceLocationAdapter deserializes correctly")
     void resourceLocationAdapter_deserialize_correctResult() {
-        RpfConfig.IdentifierAdapter adapter = new RpfConfig.IdentifierAdapter();
+        RpfConfig.ResourceLocationAdapter adapter = new RpfConfig.ResourceLocationAdapter();
         JsonPrimitive json = new JsonPrimitive("test:path");
         
-        Identifier result = adapter.deserialize(json, null, null);
+        ResourceLocation result = adapter.deserialize(json, null, null);
         
         assertEquals("test", result.getNamespace());
         assertEquals("path", result.getPath());
     }
 
     @Test
-    @DisplayName("IdentifierAdapter throws on invalid format")
+    @DisplayName("ResourceLocationAdapter throws on invalid format")
     void resourceLocationAdapter_deserialize_invalidFormat_throws() {
-        RpfConfig.IdentifierAdapter adapter = new RpfConfig.IdentifierAdapter();
+        RpfConfig.ResourceLocationAdapter adapter = new RpfConfig.ResourceLocationAdapter();
         JsonPrimitive json = new JsonPrimitive("invalid string with spaces");
         
-        assertThrows(IdentifierException.class, () -> adapter.deserialize(json, null, null));
+        assertThrows(ResourceLocationException.class, () -> adapter.deserialize(json, null, null));
     }
 
     @Test
-    @DisplayName("IdentifierAdapter handles vanilla locations")
+    @DisplayName("ResourceLocationAdapter handles vanilla locations")
     void resourceLocationAdapter_vanillaLocation_correctFormat() {
-        RpfConfig.IdentifierAdapter adapter = new RpfConfig.IdentifierAdapter();
-        Identifier location = Identifier.withDefaultNamespace("stone");
+        RpfConfig.ResourceLocationAdapter adapter = new RpfConfig.ResourceLocationAdapter();
+        ResourceLocation location = ResourceLocation.withDefaultNamespace("stone");
         
         JsonPrimitive result = (JsonPrimitive) adapter.serialize(location, null, null);
         
@@ -63,12 +63,12 @@ class RpfConfigTest {
     }
 
     @Test
-    @DisplayName("IdentifierAdapter deserializes vanilla locations")
+    @DisplayName("ResourceLocationAdapter deserializes vanilla locations")
     void resourceLocationAdapter_deserializeVanilla_correctResult() {
-        RpfConfig.IdentifierAdapter adapter = new RpfConfig.IdentifierAdapter();
+        RpfConfig.ResourceLocationAdapter adapter = new RpfConfig.ResourceLocationAdapter();
         JsonPrimitive json = new JsonPrimitive("minecraft:stone");
         
-        Identifier result = adapter.deserialize(json, null, null);
+        ResourceLocation result = adapter.deserialize(json, null, null);
         
         assertEquals("minecraft", result.getNamespace());
         assertEquals("stone", result.getPath());
@@ -88,7 +88,7 @@ class RpfConfigTest {
     void config_setResolver_works() throws Exception {
         RpfConfig config = RpfConfig.create(tempDir);
         
-        Identifier newResolver = Identifier.fromNamespaceAndPath("test", "custom");
+        ResourceLocation newResolver = ResourceLocation.fromNamespaceAndPath("test", "custom");
         config.setResolver(newResolver);
         
         assertEquals(newResolver, config.getResolver());

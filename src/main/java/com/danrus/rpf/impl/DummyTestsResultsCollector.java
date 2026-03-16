@@ -1,7 +1,7 @@
 package com.danrus.rpf.impl;
 
 import com.danrus.rpf.api.TestsResultCollector;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -23,8 +23,8 @@ public class DummyTestsResultsCollector implements TestsResultCollector {
     public void touch(@Nullable Class<?> clazz, String description, TestResultType resultType) {}
 
     @Override
-    public Identifier getModelLocation() {
-        return Identifier.fromNamespaceAndPath("rpf", "dummy");
+    public ResourceLocation getModelLocation() {
+        return ResourceLocation.fromNamespaceAndPath("rpf", "dummy");
     }
 
     @Override

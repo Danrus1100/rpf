@@ -1,11 +1,12 @@
 package com.danrus.rpf.core.item;
 
 import com.danrus.rpf.api.RpfItemModelResolver;
+import com.danrus.rpf.debug.RpfLogger;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import net.minecraft.client.renderer.item.ItemModelResolver;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
-import net.minecraft.resources.Identifier;
-import net.minecraft.world.entity.ItemOwner;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -21,38 +22,47 @@ import java.util.Map;
 public class RpfResolversManager {
     private static final RpfResolversManager INSTANCE = new RpfResolversManager();
 
-    public static final Identifier DEFAULT_RESOLVER = Identifier.fromNamespaceAndPath("rpf", "v1");
-    public static final Identifier VANILLA_RESOLVER = Identifier.withDefaultNamespace("vanilla");
+    public static final ResourceLocation DEFAULT_RESOLVER = ResourceLocation.fromNamespaceAndPath("rpf", "v1");
+    public static final ResourceLocation VANILLA_RESOLVER = ResourceLocation.withDefaultNamespace("vanilla");
     private static final Logger log = LoggerFactory.getLogger(RpfResolversManager.class);
 
-    private final Map<Identifier, RpfItemModelResolver> resolvers = new HashMap<>();
-    private Identifier currentResolver = DEFAULT_RESOLVER;
+    private final Map<ResourceLocation, RpfItemModelResolver> resolvers = new HashMap<>();
+    private ResourceLocation currentResolver = DEFAULT_RESOLVER;
     @Nullable
-    private Identifier pendingResolver;
+    private ResourceLocation pendingResolver;
 
-    public void register(Identifier id, RpfItemModelResolver resolver) {
+    public void register(ResourceLocation id, RpfItemModelResolver resolver) {
         resolvers.put(id, resolver);
     }
 
     public void resolve(
             ModelUpdateContext context,
             ItemStack stack,
-            ItemOwner entity,
+            LivingEntity entity,
             Operation<Void> vanilla
     ) {
-        resolvers.get(currentResolver).resolveAndAppendLayer(
-                context,
-                stack,
-                entity,
-                vanilla
-        );
+        try {
+            resolvers.get(currentResolver).resolveAndAppendLayer(
+                    context,
+                    stack,
+                    entity,
+                    vanilla
+            );
+        } catch (Exception e) {
+            RpfLogger.get().error("Unknown resolver: " + currentResolver);
+        }
     }
 
     public boolean shouldPlayAnimationOnSwap(ItemStack stack, Operation<Boolean> vanilla) {
-       return resolvers.get(currentResolver).shouldPlaySwapAnimation(stack, vanilla);
+        try {
+            return resolvers.get(currentResolver).shouldPlaySwapAnimation(stack, vanilla);
+        } catch (Exception e) {
+            RpfLogger.get().error("Unknown resolver: " + currentResolver);
+            return true;
+        }
     }
 
-    public void setPendingResolver(Identifier pendingResolver) {
+    public void setPendingResolver(ResourceLocation pendingResolver) {
         this.pendingResolver = pendingResolver;
     }
 
@@ -62,14 +72,14 @@ public class RpfResolversManager {
         pendingResolver = null;
     }
 
-    public List<Identifier> getAvailable() {
+    public List<ResourceLocation> getAvailable() {
         return new ArrayList<>(resolvers.keySet());
     }
 
     private RpfResolversManager() {}
     public static RpfResolversManager getInstance() { return INSTANCE; }
 
-    public Identifier getCurrent() {
+    public ResourceLocation getCurrent() {
         return currentResolver;
     }
 }

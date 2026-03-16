@@ -9,14 +9,14 @@ import com.danrus.rpf.duck.RpfClientItem;
 import com.danrus.rpf.duck.load.RpfBakingResult;
 import com.danrus.rpf.duck.load.RpfModelBakery;
 import com.llamalad7.mixinextras.sugar.Local;
-import net.minecraft.util.Util;
+import net.minecraft.Util;
 import net.minecraft.client.model.geom.EntityModelSet;
 import net.minecraft.client.renderer.block.model.BlockStateModel;
 import net.minecraft.client.renderer.item.ClientItem;
 import net.minecraft.client.renderer.item.ItemModel;
 import net.minecraft.client.resources.model.ModelBakery;
 import net.minecraft.client.resources.model.SpriteGetter;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.thread.ParallelMapTransform;
 import net.minecraft.world.level.block.state.BlockState;
 import org.slf4j.Logger;
@@ -40,7 +40,7 @@ public class ModelBakeryMixin implements RpfModelBakery {
     private static final Logger LOGGER = LoggerFactory.getLogger("RpfModelBakery");
 
     @Unique
-    private List<Map<Identifier, ClientItem>> rpf$clientItems;
+    private List<Map<ResourceLocation, ClientItem>> rpf$clientItems;
 
     @Shadow
     @Final
@@ -48,7 +48,7 @@ public class ModelBakeryMixin implements RpfModelBakery {
 
     //? if >=1.21.10{
 
-    @Shadow
+    /*@Shadow
     @Final
     private net.minecraft.client.renderer.PlayerSkinRenderCache playerSkinRenderCache;
 
@@ -56,13 +56,13 @@ public class ModelBakeryMixin implements RpfModelBakery {
     @Final
     private net.minecraft.client.resources.model.MaterialSet materials;
 
-    //? }
+    *///? }
 
 
 
 
     @Override
-    public ModelBakery rpf$setClientItems(List<Map<Identifier, ClientItem>> items) {
+    public ModelBakery rpf$setClientItems(List<Map<ResourceLocation, ClientItem>> items) {
         this.rpf$clientItems = items;
         return (ModelBakery) (Object) this;
     }
@@ -76,10 +76,10 @@ public class ModelBakeryMixin implements RpfModelBakery {
                                 @Local ModelBakery.MissingModels missingModels,
                                 @Local ModelBakery.ModelBakerImpl modelBakerImpl,
                                 @Local CompletableFuture<Map<BlockState, BlockStateModel>> completableFuture) {
-        List<CompletableFuture<Map<Identifier, SignedItemModel>>> layerFutures = new ArrayList<>(this.rpf$clientItems.size());
+        List<CompletableFuture<Map<ResourceLocation, SignedItemModel>>> layerFutures = new ArrayList<>(this.rpf$clientItems.size());
 
-        for (Map<Identifier, ClientItem> layer : this.rpf$clientItems) {
-            CompletableFuture<Map<Identifier, SignedItemModel>> layerFuture = ParallelMapTransform.schedule(
+        for (Map<ResourceLocation, ClientItem> layer : this.rpf$clientItems) {
+            CompletableFuture<Map<ResourceLocation, SignedItemModel>> layerFuture = ParallelMapTransform.schedule(
                     layer,
                     (resourceLocation, clientItem) -> {
                         try {
@@ -87,9 +87,9 @@ public class ModelBakeryMixin implements RpfModelBakery {
                                     modelBakerImpl,
                                     this.entityModelSet,
                                     //? if >=1.21.10{
-                                    materials,
+                                    /*materials,
                                     playerSkinRenderCache,
-                                    //?}
+                                    *///?}
                                     missingModels.item,
                                     clientItem.registrySwapper());
                             PreBakeEvent preEvent = new PreBakeEvent(clientItem, resourceLocation, context);
@@ -110,10 +110,10 @@ public class ModelBakeryMixin implements RpfModelBakery {
             );
             layerFutures.add(layerFuture);
         }
-        List<Map<Identifier, ClientItem.Properties>> propertiesLayers = new ArrayList<>(this.rpf$clientItems.size());
+        List<Map<ResourceLocation, ClientItem.Properties>> propertiesLayers = new ArrayList<>(this.rpf$clientItems.size());
         Map<RpfModelIdentity, ClientItem.Properties> byIdentity = new HashMap<>();
-        for (Map<Identifier, ClientItem> layer : this.rpf$clientItems) {
-            Map<Identifier, ClientItem.Properties> propertiesMap = new HashMap<>();
+        for (Map<ResourceLocation, ClientItem> layer : this.rpf$clientItems) {
+            Map<ResourceLocation, ClientItem.Properties> propertiesMap = new HashMap<>();
             layer.forEach((resourceLocation, clientItem) -> {
                 ClientItem.Properties properties = clientItem.properties();
                 if (!properties.equals(ClientItem.Properties.DEFAULT)) {
@@ -127,9 +127,9 @@ public class ModelBakeryMixin implements RpfModelBakery {
 
         cir.setReturnValue(completableFuture.thenCombine(Util.sequence(layerFutures), (blockModels, bakedLayers) -> {
 
-            Map<Identifier, ItemModel> flatItemModels = new HashMap<>();
-            for (Map<Identifier, SignedItemModel> layer : bakedLayers) {
-                for (Map.Entry<Identifier, SignedItemModel> m : layer.entrySet()) {
+            Map<ResourceLocation, ItemModel> flatItemModels = new HashMap<>();
+            for (Map<ResourceLocation, SignedItemModel> layer : bakedLayers) {
+                for (Map.Entry<ResourceLocation, SignedItemModel> m : layer.entrySet()) {
                     flatItemModels.put(m.getKey(), m.getValue().model());
                 }
             }

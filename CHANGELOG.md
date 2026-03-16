@@ -1,1 +1,2 @@
- - Fixed `select` item model, when entity doesn't hold item (1.21.10+)
+ - Revert Debug system changes
+ - Updated compatibility with `Rp Renames`

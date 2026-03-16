@@ -26,6 +26,7 @@ repositories {
     mavenCentral()
     maven("https://maven.fabricmc.net/")
     maven("https://maven.parchmentmc.org")
+    maven("https://api.modrinth.com/maven")
 }
 
 loom {
@@ -92,8 +93,17 @@ dependencies {
     modImplementation("net.fabricmc:fabric-loader:${findProperty("deps.fabric")}")
     modImplementation("net.fabricmc.fabric-api:fabric-api:${findProperty("deps.fapi")}")
     opt("deps.rprenames") {
-        modImplementation(rootProject.files("lib/${it}.jar"))
+//        modImplementation(rootProject.files("lib/${it}.jar"))
     }
+
+    // modCompileOnly
+    // modImplementation
+
+    modImplementation("maven.modrinth:my_totem_doll:${findProperty("deps.mtd")}")
+    modImplementation("maven.modrinth:rp-renames:Q7MQm2v2")
+//    if (sc.eval(sc.current.version, "=1.21.8") == true) {
+//        modRuntimeOnly("maven.modrinth:rp-renames:Q7MQm2v2")
+//    }
 
     testImplementation("net.fabricmc:fabric-loader-junit:${findProperty("deps.fabric")}")
     testImplementation("org.mockito:mockito-core:5.21.0")

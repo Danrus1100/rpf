@@ -1,17 +1,17 @@
 package com.danrus.rpf.api;
 
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
 public abstract class AbstractTestResultCollector implements TestsResultCollector {
-    public final Identifier modelLocation;
+    public final ResourceLocation modelLocation;
     protected int currentShift = 0;
     protected String packName;
 
-    public AbstractTestResultCollector(Identifier modelLocation, String initialPackName) {
+    public AbstractTestResultCollector(ResourceLocation modelLocation, String initialPackName) {
         this.modelLocation = modelLocation;
         packName = initialPackName;
     }
@@ -33,7 +33,7 @@ public abstract class AbstractTestResultCollector implements TestsResultCollecto
         this.packName = packName;
     }
 
-    public Identifier getModelLocation() {
+    public ResourceLocation getModelLocation() {
         return modelLocation;
     }
 }

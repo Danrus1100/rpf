@@ -8,7 +8,7 @@ import net.fabricmc.fabric.api.client.gametest.v1.FabricClientGameTest;
 import net.fabricmc.fabric.api.client.gametest.v1.context.ClientGameTestContext;
 import net.minecraft.client.renderer.item.EmptyModel;
 import net.minecraft.client.renderer.item.ItemModel;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -42,7 +42,7 @@ public class RpfItemModelTest implements FabricClientGameTest {
         RpfItemModel rpfModel = (RpfItemModel) emptyModel;
         
         LoggingTestsResultCollector collector = new LoggingTestsResultCollector(
-            Identifier.fromNamespaceAndPath("test", "empty"), "test"
+            ResourceLocation.fromNamespaceAndPath("test", "empty"), "test"
         );
         
         boolean result = rpfModel.rpf$doDelegate(null, ItemStack.EMPTY, null, null, collector);
@@ -66,7 +66,7 @@ public class RpfItemModelTest implements FabricClientGameTest {
         model.rpf$markAsFallback();
         
         LoggingTestsResultCollector collector = new LoggingTestsResultCollector(
-            Identifier.fromNamespaceAndPath("test", "fallback"), "test"
+            ResourceLocation.fromNamespaceAndPath("test", "fallback"), "test"
         );
         
         boolean result = model.rpf$doDelegate(null, ItemStack.EMPTY, null, null, collector);
@@ -82,7 +82,7 @@ public class RpfItemModelTest implements FabricClientGameTest {
         TestRpfItemModel model = new TestRpfItemModel();
         
         LoggingTestsResultCollector collector = new LoggingTestsResultCollector(
-            Identifier.fromNamespaceAndPath("test", "no_fallback"), "test"
+            ResourceLocation.fromNamespaceAndPath("test", "no_fallback"), "test"
         );
         
         boolean result = model.rpf$doDelegate(null, ItemStack.EMPTY, null, null, collector);

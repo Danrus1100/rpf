@@ -3,14 +3,14 @@ package com.danrus.rpf.api.event.type;
 import com.danrus.rpf.api.event.RpfEvent;
 import net.minecraft.client.renderer.item.ClientItem;
 import net.minecraft.client.renderer.item.ItemModel;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 
 public class PreBakeEvent extends RpfEvent {
     private final ClientItem clientItem;
-    private final Identifier modelId;
+    private final ResourceLocation modelId;
     private final ItemModel.BakingContext bakingContext;
 
-    public PreBakeEvent(ClientItem clientItem,  Identifier modelId, ItemModel.BakingContext bakingContext) {
+    public PreBakeEvent(ClientItem clientItem,  ResourceLocation modelId, ItemModel.BakingContext bakingContext) {
         this.clientItem = clientItem;
         this.modelId = modelId;
         this.bakingContext = bakingContext;
@@ -24,7 +24,7 @@ public class PreBakeEvent extends RpfEvent {
         return bakingContext;
     }
 
-    public Identifier getModelLocation() {
+    public ResourceLocation getModelLocation() {
         return modelId;
     }
 }

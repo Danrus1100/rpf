@@ -11,11 +11,11 @@ import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.client.Minecraft;
-import net.minecraft.commands.arguments.IdentifierArgument;
+import net.minecraft.commands.arguments.ResourceLocationArgument;
 import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.HoverEvent;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 
 import java.nio.file.Path;
 import java.util.Comparator;
@@ -40,7 +40,7 @@ public class RpfCommands {
         return literal("resolver")
                 .executes(RpfCommands::executePrintCurrentResolver)
                 .then(literal("set")
-                        .then(argument("id", IdentifierArgument.id())
+                        .then(argument("id", ResourceLocationArgument.id())
                                 .suggests(RpfCommands::suggestAvailableResolvers)
                                 .executes(RpfCommands::executeSetCurrentResolver)
                         )
@@ -53,7 +53,7 @@ public class RpfCommands {
                 .then(literal("toggle").executes(RpfCommands::executeToggleDebug))
                 .then(literal("clear").executes(RpfCommands::executeClearDebug))
                 .then(literal("export")
-                        .then(argument("item", IdentifierArgument.id())
+                        .then(argument("item", ResourceLocationArgument.id())
                                 .suggests(RpfCommands::suggestLoggedItems)
                                 .executes(RpfCommands::executeExportDebugItem)
                         )
@@ -73,7 +73,7 @@ public class RpfCommands {
     }
 
     private static int executeExportDebugItem(CommandContext<FabricClientCommandSource> ctx){
-        Identifier id = ctx.getArgument("item", Identifier.class);
+        ResourceLocation id = ctx.getArgument("item", ResourceLocation.class);
         Path saved = RpfDebugSystem.getInstance().exportDump(id);
         if (saved == null) {
             ctx.getSource().sendError(Component.translatable("rpf.debug.export.error", id));
@@ -96,7 +96,7 @@ public class RpfCommands {
     }
 
     private static int executeSetCurrentResolver(CommandContext<FabricClientCommandSource> ctx){
-        Identifier id = ctx.getArgument("id", Identifier.class);
+        ResourceLocation id = ctx.getArgument("id", ResourceLocation.class);
         RpfResolversManager.getInstance().setPendingResolver(id);
         Minecraft.getInstance().reloadResourcePacks();
         Rpf.getConfig().setResolver(id);
@@ -106,17 +106,17 @@ public class RpfCommands {
     }
 
     private static CompletableFuture<Suggestions> suggestAvailableResolvers(CommandContext<FabricClientCommandSource> ctx, SuggestionsBuilder b) {
-        List<Identifier> list = RpfResolversManager.getInstance().getAvailable();
+        List<ResourceLocation> list = RpfResolversManager.getInstance().getAvailable();
         list.sort(Comparator.naturalOrder());
-        for (Identifier l : list) {
+        for (ResourceLocation l : list) {
             b.suggest(l.toString());
         }
         return b.buildFuture();
     }
 
     private static CompletableFuture<Suggestions> suggestLoggedItems(CommandContext<FabricClientCommandSource> ctx, SuggestionsBuilder b) {
-        List<Identifier> list = RpfDebugSystem.getInstance().getDatabaseKeys();
-        for (Identifier l : list) {
+        List<ResourceLocation> list = RpfDebugSystem.getInstance().getDatabaseKeys();
+        for (ResourceLocation l : list) {
             b.suggest(l.toString());
         }
         return b.buildFuture();

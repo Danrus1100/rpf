@@ -3,7 +3,7 @@ package com.danrus.rpf.core.init.config;
 import com.danrus.rpf.Rpf;
 import com.danrus.rpf.core.item.RpfResolversManager;
 import com.google.gson.*;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,12 +17,12 @@ public class RpfConfig {
 
     private static final Gson GSON = new GsonBuilder()
             .setPrettyPrinting()
-            .registerTypeAdapter(Identifier.class, new IdentifierAdapter())
+            .registerTypeAdapter(ResourceLocation.class, new ResourceLocationAdapter())
             .create();
     private static final Logger log = LoggerFactory.getLogger(RpfConfig.class);
 
     @RpfConfigField
-    private Identifier resolver;
+    private ResourceLocation resolver;
     @RpfConfigField
     private boolean isDebug;
 
@@ -33,11 +33,11 @@ public class RpfConfig {
         this.isDebug = false;
     }
 
-    public Identifier getResolver() {
+    public ResourceLocation getResolver() {
         return resolver;
     }
 
-    public void setResolver(Identifier resolver) {
+    public void setResolver(ResourceLocation resolver) {
         this.resolver = resolver;
     }
 
@@ -123,16 +123,16 @@ public class RpfConfig {
         return isDebug;
     }
 
-    public static class IdentifierAdapter implements JsonSerializer<Identifier>, JsonDeserializer<Identifier> {
+    public static class ResourceLocationAdapter implements JsonSerializer<ResourceLocation>, JsonDeserializer<ResourceLocation> {
         @Override
-        public JsonElement serialize(Identifier src, Type typeOfSrc, JsonSerializationContext context) {
+        public JsonElement serialize(ResourceLocation src, Type typeOfSrc, JsonSerializationContext context) {
             return new JsonPrimitive(src.toString());
         }
 
         @Override
-        public Identifier deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+        public ResourceLocation deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
             // Используем tryParse или parse в зависимости от версии MC
-            return Identifier.parse(json.getAsString());
+            return ResourceLocation.parse(json.getAsString());
         }
     }
 }

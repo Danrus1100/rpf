@@ -6,7 +6,7 @@ import com.danrus.rpf.debug.LoggingTestsResultCollector;
 import com.danrus.rpf.api.TestsResultCollector;
 import net.fabricmc.fabric.api.client.gametest.v1.FabricClientGameTest;
 import net.fabricmc.fabric.api.client.gametest.v1.context.ClientGameTestContext;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -53,7 +53,7 @@ public class RpfDebugSystemGameTest implements FabricClientGameTest {
         
         TestsResultCollector offResult = debugSystem.optimiseCollector(
             () -> new LoggingTestsResultCollector(
-                Identifier.fromNamespaceAndPath("test", "model"), "pack"
+                ResourceLocation.fromNamespaceAndPath("test", "model"), "pack"
             )
         );
         assertInstanceOf(DummyTestsResultsCollector.class, offResult, "Should return dummy collector when debug is off");
@@ -62,7 +62,7 @@ public class RpfDebugSystemGameTest implements FabricClientGameTest {
         
         TestsResultCollector onResult = debugSystem.optimiseCollector(
             () -> new LoggingTestsResultCollector(
-                Identifier.fromNamespaceAndPath("test", "model"), "pack"
+                ResourceLocation.fromNamespaceAndPath("test", "model"), "pack"
             )
         );
         assertInstanceOf(LoggingTestsResultCollector.class, onResult, "Should return logging collector when debug is on");
@@ -83,7 +83,7 @@ public class RpfDebugSystemGameTest implements FabricClientGameTest {
     private void testExportDump() {
         RpfDebugSystem debugSystem = RpfDebugSystem.getInstance();
         
-        Identifier nonExistent = Identifier.fromNamespaceAndPath("test", "nonexistent");
+        ResourceLocation nonExistent = ResourceLocation.fromNamespaceAndPath("test", "nonexistent");
         assertNull(debugSystem.exportDump(nonExistent), 
             "Export dump should return null for non-existent location");
     }
