@@ -9,7 +9,8 @@
   ],
   "contact": {
     "issues": "https://github.com/Danrus1100/rpf/issues",
-    "sources": "https://github.com/Danrus1100/rpf"
+    "sources": "https://github.com/Danrus1100/rpf",
+    "homepage": "https://danrus1100.github.io/rtp-rpf-docs/"
   },
   "license": "MIT",
   "icon": "assets/rpf/icon.png",

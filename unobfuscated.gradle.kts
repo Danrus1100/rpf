@@ -1,5 +1,5 @@
 plugins {
-    id("net.fabricmc.fabric-loom-remap") version "1.15-SNAPSHOT"
+    id("net.fabricmc.fabric-loom") version "1.15-SNAPSHOT"
     id("me.modmuss50.mod-publish-plugin") version "0.8.4"
     id("java")
     id("maven-publish")
@@ -30,7 +30,7 @@ repositories {
 }
 
 loom {
-    accessWidenerPath = rootProject.file("src/main/resources/rpf.accesswidener")
+    accessWidenerPath = rootProject.file("src/main/resources/rpf_unobfuscated.accesswidener")
 
     runs {
         create("gameTest") {
@@ -84,37 +84,37 @@ stonecutter{
 
 dependencies {
     minecraft("com.mojang:minecraft:${findProperty("deps.mc")}")
-    mappings(loom.layered() {
-        officialMojangMappings()
-        opt("deps.parchment") {
-            parchment("org.parchmentmc.data:parchment-${findProperty("deps.mc")}:${it}@zip")
-        }
-    })
-    modImplementation("net.fabricmc:fabric-loader:${findProperty("deps.fabric")}")
-    modImplementation("net.fabricmc.fabric-api:fabric-api:${findProperty("deps.fapi")}")
+//    mappings(loom.layered() {
+//        officialMojangMappings()
+//        opt("deps.parchment") {
+//            parchment("org.parchmentmc.data:parchment-${findProperty("deps.mc")}:${it}@zip")
+//        }
+//    })
+    implementation("net.fabricmc:fabric-loader:${findProperty("deps.fabric")}")
+    implementation("net.fabricmc.fabric-api:fabric-api:${findProperty("deps.fapi")}")
     opt("deps.rprenames") {
-//        modImplementation(rootProject.files("lib/${it}.jar"))
+//        implementation(rootProject.files("lib/${it}.jar"))
     }
 
     // modCompileOnly
-    // modImplementation
+    // implementation
 
-    modImplementation("maven.modrinth:my_totem_doll:${findProperty("deps.mtd")}")
-    modImplementation("maven.modrinth:rp-renames:Q7MQm2v2")
+//    implementation("maven.modrinth:my_totem_doll:${findProperty("deps.mtd")}")
+//    implementation("maven.modrinth:rp-renames:Q7MQm2v2")
 //    if (sc.eval(sc.current.version, "=1.21.8") == true) {
 //        modRuntimeOnly("maven.modrinth:rp-renames:Q7MQm2v2")
 //    }
 
-    testImplementation("net.fabricmc:fabric-loader-junit:${findProperty("deps.fabric")}")
-    testImplementation("org.mockito:mockito-core:5.21.0")
-    testImplementation("org.mockito:mockito-junit-jupiter:5.21.0")
-    add("gametestImplementation", "net.fabricmc:fabric-loader-junit:${findProperty("deps.fabric")}")
+//    testImplementation("net.fabricmc:fabric-loader-junit:${findProperty("deps.fabric")}")
+//    testImplementation("org.mockito:mockito-core:5.21.0")
+//    testImplementation("org.mockito:mockito-junit-jupiter:5.21.0")
+//    add("gametestImplementation", "net.fabricmc:fabric-loader-junit:${findProperty("deps.fabric")}")
 }
 
 tasks {
-    test {
-        useJUnitPlatform()
-    }
+//    test {
+//        useJUnitPlatform()
+//    }
     processResources {
         inputs.property("id", findProperty("mod.id"))
         inputs.property("name", findProperty("mod.name"))
@@ -160,7 +160,7 @@ publishMods {
 
     type = STABLE
 
-    file.set(tasks.named("remapJar").flatMap { (it as org.gradle.jvm.tasks.Jar).archiveFile })
+//    file.set(tasks.named("remapJar").flatMap { (it as org.gradle.jvm.tasks.Jar).archiveFile }) // TODO: no more remap
 
     changelog = rootProject.file("CHANGELOG.md").readText()
 
