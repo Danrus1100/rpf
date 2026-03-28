@@ -14,7 +14,7 @@
   },
   "license": "MIT",
   "icon": "assets/rpf/icon.png",
-  "accessWidener": "rpf.accesswidener",
+  "accessWidener": "${aw}",
   "environment": "client",
   "entrypoints": {
     "client": [

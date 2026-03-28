@@ -1,5 +1,6 @@
 package com.danrus.rpf.compat.rprenames;
 
+//? <26.1 {
 import com.hiword9.rprenames.api.core.renames_manager.RenamesManager;
 import com.hiword9.rprenames.mod.impl.rename.ItemModelRename;
 import com.hiword9.rprenames.mod.impl.renames_manager.updatable.parser.item_model.ItemModelParser;
@@ -32,3 +33,5 @@ public class RpfParser extends ItemModelParser {
     }
 
 }
+
+//? }

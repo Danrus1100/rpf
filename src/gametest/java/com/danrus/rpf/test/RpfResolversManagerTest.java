@@ -4,7 +4,7 @@ import com.danrus.rpf.api.RpfItemModelResolver;
 import com.danrus.rpf.core.item.RpfResolversManager;
 import net.fabricmc.fabric.api.client.gametest.v1.FabricClientGameTest;
 import net.fabricmc.fabric.api.client.gametest.v1.context.ClientGameTestContext;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.util.List;
 
@@ -42,7 +42,7 @@ public class RpfResolversManagerTest implements FabricClientGameTest {
 
     private void testVanillaResolver() {
         RpfResolversManager manager = RpfResolversManager.getInstance();
-        List<ResourceLocation> available = manager.getAvailable();
+        List<Identifier> available = manager.getAvailable();
         
         assertTrue(
             available.contains(RpfResolversManager.VANILLA_RESOLVER),
@@ -52,7 +52,7 @@ public class RpfResolversManagerTest implements FabricClientGameTest {
 
     private void testGetAvailable() {
         RpfResolversManager manager = RpfResolversManager.getInstance();
-        List<ResourceLocation> available = manager.getAvailable();
+        List<Identifier> available = manager.getAvailable();
         
         assertFalse(available.isEmpty(), "Available resolvers should not be empty");
         assertTrue(
@@ -63,9 +63,9 @@ public class RpfResolversManagerTest implements FabricClientGameTest {
 
     private void testSetPendingResolver() {
         RpfResolversManager manager = RpfResolversManager.getInstance();
-        ResourceLocation originalResolver = manager.getCurrent();
+        Identifier originalResolver = manager.getCurrent();
         
-        ResourceLocation testResolver = RpfResolversManager.VANILLA_RESOLVER;
+        Identifier testResolver = RpfResolversManager.VANILLA_RESOLVER;
         manager.setPendingResolver(testResolver);
         
         assertEquals(
@@ -79,9 +79,9 @@ public class RpfResolversManagerTest implements FabricClientGameTest {
 
     private void testApplyPendingResolver() {
         RpfResolversManager manager = RpfResolversManager.getInstance();
-        ResourceLocation originalResolver = manager.getCurrent();
+        Identifier originalResolver = manager.getCurrent();
         
-        ResourceLocation testResolver = RpfResolversManager.VANILLA_RESOLVER;
+        Identifier testResolver = RpfResolversManager.VANILLA_RESOLVER;
         manager.setPendingResolver(testResolver);
         manager.applyPendingResolver();
         

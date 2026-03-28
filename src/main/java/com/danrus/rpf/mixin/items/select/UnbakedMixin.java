@@ -8,6 +8,7 @@ import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.client.renderer.item.ItemModel;
 import net.minecraft.client.renderer.item.SelectItemModel;
+import org.joml.Matrix4fc;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -30,7 +31,10 @@ public class UnbakedMixin implements DelegateItemModel.Unbaked {
             method = "bake",
             at = @At("HEAD")
     )
-    private void rpf$bakeDelegationForSwitch(ItemModel.BakingContext context, CallbackInfoReturnable<ItemModel> cir) {
+    private void rpf$bakeDelegationForSwitch(ItemModel.BakingContext context,
+                                             //? >=26.1
+                                             //Matrix4fc transformation,
+                                             CallbackInfoReturnable<ItemModel> cir) {
         ((RpfSelectModelUnbakedSwitch) (Object) unbakedSwitch).rpf$setUnbakedDelegation(rpf$doDelegate);
     }
 
@@ -38,7 +42,10 @@ public class UnbakedMixin implements DelegateItemModel.Unbaked {
             method = "bake",
             at = @At("RETURN")
     )
-    private void rpf$setFallbackModel(ItemModel.BakingContext context, CallbackInfoReturnable<ItemModel> cir, @Local ItemModel itemModel) {
+    private void rpf$setFallbackModel(ItemModel.BakingContext context,
+                                      //? >=26.1
+                                      //Matrix4fc transformation,
+                                      CallbackInfoReturnable<ItemModel> cir, @Local ItemModel itemModel) {
         ((RpfItemModel) itemModel).rpf$markAsFallback();
     }
 
