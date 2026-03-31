@@ -1,2 +1,1 @@
- - Revert Debug system changes
- - Updated compatibility with `Rp Renames`
+ - Small changes related with future RPT update

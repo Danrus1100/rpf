@@ -2,6 +2,7 @@ package com.danrus.rpf.mixin;
 
 import com.danrus.rpf.duck.RpfClientItem;
 import net.minecraft.client.renderer.item.ClientItem;
+import net.minecraft.server.packs.PackLocationInfo;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 
@@ -9,15 +10,15 @@ import org.spongepowered.asm.mixin.Unique;
 public class ClientItemMixin implements RpfClientItem {
 
     @Unique
-    private String rpf$packName;
+    private PackLocationInfo rpf$packName;
 
     @Override
-    public void rpf$setPackName(String name) {
+    public void rpf$setPackLocationInfo(PackLocationInfo name) {
         rpf$packName = name;
     }
 
     @Override
-    public String rpf$getPackName() {
+    public PackLocationInfo rpf$getPackLocationInfo() {
         return rpf$packName;
     }
 }

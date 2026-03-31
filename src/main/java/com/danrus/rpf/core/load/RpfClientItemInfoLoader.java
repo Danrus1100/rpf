@@ -103,7 +103,7 @@ public class RpfClientItemInfoLoader {
                     .orElse(null);
 
             if (clientItem != null) {
-                RpfClientItem.class.cast(clientItem).rpf$setPackName(resource.sourcePackId());
+                RpfClientItem.class.cast(clientItem).rpf$setPackLocationInfo(resource.source().location());
             }
 
             ResourceParsingEvent postEvent = new ResourceParsingEvent(AbstractStagedEvent.Stage.POST, id, resource, registryAccess, clientItem);

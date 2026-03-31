@@ -47,7 +47,7 @@ public class RpfExperimentalResolver extends AbstractResolverWithCandidates {
                     return;
                 }
 
-                ExperimentalModelTestCollector collector = new ExperimentalModelTestCollector(context.location(), model.name());
+                ExperimentalModelTestCollector collector = new ExperimentalModelTestCollector(context.location(), model.info().id());
                 collector.resetShift();
                 model.doDelegate(context, stack, entity, collector);
                 collector.addAdditionalScore(packCounter);
