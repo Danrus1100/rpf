@@ -96,7 +96,7 @@ public class ModelBakeryMixin implements RpfModelBakery {
                             Rpf.getEventBus().post(preEvent);
                             if (preEvent.isCancelled()) return null;
                             ItemModel model = clientItem.model().bake(preEvent.getBakingContext());
-                            SignedItemModel result = new SignedItemModel(RpfClientItem.class.cast(clientItem).rpf$getPackName(), model);
+                            SignedItemModel result = new SignedItemModel(RpfClientItem.class.cast(clientItem).rpf$getPackLocationInfo(), model);
                             PostBakeEvent postEvent = new PostBakeEvent(clientItem, result);
                             Rpf.getEventBus().post(postEvent);
                             if (postEvent.isCancelled()) return null;
