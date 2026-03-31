@@ -18,15 +18,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import net.minecraft.client.renderer.item.BlockModelWrapper;
-import net.minecraft.client.renderer.item.BundleSelectedItemSpecialRenderer;
-import net.minecraft.client.renderer.item.CompositeModel;
-import net.minecraft.client.renderer.item.ConditionalItemModel;
-import net.minecraft.client.renderer.item.EmptyModel;
-import net.minecraft.client.renderer.item.MissingItemModel;
-import net.minecraft.client.renderer.item.RangeSelectItemModel;
-import net.minecraft.client.renderer.item.SelectItemModel;
-import net.minecraft.client.renderer.item.SpecialModelWrapper;
+import net.minecraft.client.renderer.item.*;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
@@ -79,7 +71,18 @@ public class RpfExperimentalResolver extends AbstractResolverWithCandidates {
     }
 
     private static class ExperimentalModelTestCollector extends AbstractTestResultCollector {
-        private static final Map<Class<?>, Integer> REWARDS_BY_CLASS = Map.of(BlockModelWrapper.class, 1, BundleSelectedItemSpecialRenderer.class, 1, CompositeModel.class, 2, ConditionalItemModel.class, 3, EmptyModel.class, 0, MissingItemModel.class, -1, RangeSelectItemModel.class, 4, SelectItemModel.class, 3, SpecialModelWrapper.class, 1);
+        private static final Map<Class<?>, Integer> REWARDS_BY_CLASS = Map.of(
+                //~ block_rename
+                BlockModelWrapper.class, 1,
+                BundleSelectedItemSpecialRenderer.class, 1,
+                CompositeModel.class, 2,
+                ConditionalItemModel.class, 3,
+                EmptyModel.class, 0,
+                MissingItemModel.class, -1,
+                RangeSelectItemModel.class, 4,
+                SelectItemModel.class, 3,
+                SpecialModelWrapper.class, 1
+        );
         private static final Map<TestsResultCollector.TestResultType, Integer> REWARDS_BY_RESULT;
         protected final List<ExperimentalResultUnit> eUnits = new LinkedList();
 

@@ -5,6 +5,7 @@ import com.danrus.rpf.core.item.ModelUpdateContext;
 import com.danrus.rpf.duck.item.RpfBlockModelWrapper;
 import com.danrus.rpf.api.TestsResultCollector;
 import net.minecraft.client.multiplayer.ClientLevel;
+//~ block_rename
 import net.minecraft.client.renderer.item.BlockModelWrapper;
 import net.minecraft.client.renderer.item.ItemModel;
 import net.minecraft.client.renderer.item.ItemModelResolver;
@@ -18,6 +19,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 
 @Mixin(BlockModelWrapper.class)
+//~ !block_rename
 public abstract class BlockModelWrapperMixin implements RpfItemModel, RpfBlockModelWrapper {
 
     @Unique private ResourceLocation rpf$modelLink;

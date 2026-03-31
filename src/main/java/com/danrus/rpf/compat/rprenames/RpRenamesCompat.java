@@ -6,6 +6,8 @@
 package com.danrus.rpf.compat.rprenames;
 
 import com.danrus.rpf.compat.RpfCompatInitializer;
+
+//? <26.1 {
 import com.hiword9.rprenames.mod.RPRenames;
 import com.hiword9.rprenames.mod.item_group.RPRenamesItemGroup;
 
@@ -24,3 +26,14 @@ public class RpRenamesCompat implements RpfCompatInitializer {
         RPRenamesItemGroup.update();
     }
 }
+//?} else {
+/*public class RpRenamesCompat implements RpfCompatInitializer {
+
+    @Override
+    public void init() {
+
+    }
+
+    public static void update() {}
+}
+*///?}
