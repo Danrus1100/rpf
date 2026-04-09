@@ -3,6 +3,7 @@ package com.danrus.rpf.mixin.load;
 import com.danrus.rpf.Rpf;
 import com.danrus.rpf.api.event.type.ModelDiscoveryEvent;
 import com.danrus.rpf.core.item.RpfResolversManager;
+import com.danrus.rpf.core.load.ResourceLoadManager;
 import com.danrus.rpf.core.load.RpfClientItemInfoLoader;
 import com.danrus.rpf.compat.rprenames.RenamesBridge;
 import com.danrus.rpf.core.item.RpfModelIdentity;
@@ -52,7 +53,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
 import java.util.function.Supplier;
 
-@Mixin(value = ModelManager.class, priority = 2000)
+@Mixin(value = ModelManager.class)
 public abstract class ModelManagerMixin implements RpfModelManager {
 
     @Unique
@@ -67,9 +68,6 @@ public abstract class ModelManagerMixin implements RpfModelManager {
 
     @Unique
     private Map<RpfModelIdentity, ClientItem.Properties> rpf$itemPropertiesByIdentity;
-
-    @Unique
-    private final Map<ResourceLocation, SignedItemModel> rpf$vanillaModelCache = new ConcurrentHashMap<>();
 
     @Unique
     private static final ClientItemInfoLoader.LoadedClientInfos EMPTY_LOADED_INFOS =
@@ -234,7 +232,7 @@ public abstract class ModelManagerMixin implements RpfModelManager {
             
             // Clear vanilla model cache on resource reload
             try {
-                this.rpf$vanillaModelCache.clear();
+                ResourceLoadManager.vanillaModelCache.clear();
             } catch (Exception e) {
                 LOGGER.warn("Failed to do stuff with vanilla cache: ", e);
             }
@@ -274,7 +272,7 @@ public abstract class ModelManagerMixin implements RpfModelManager {
     @Override
     public SignedItemModel rpf$getVanillaModel(ResourceLocation location) {
         // Check cache first for O(1) lookup
-        SignedItemModel cached = rpf$vanillaModelCache.get(location);
+        SignedItemModel cached = ResourceLoadManager.vanillaModelCache.get(location);
         if (cached != null) {
             return cached;
         }
@@ -284,7 +282,7 @@ public abstract class ModelManagerMixin implements RpfModelManager {
             SignedItemModel model = map.get(location);
             if (model != null && "vanilla".equals(model.name())) {
                 // Cache the result before returning
-                rpf$vanillaModelCache.put(location, model);
+                ResourceLoadManager.vanillaModelCache.put(location, model);
                 return model;
             }
         }

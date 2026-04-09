@@ -127,8 +127,6 @@ public class ModelBakeryMixin implements RpfModelBakery {
                                     //? >=26.1
                                     //, IDENTITY
                             );
-                            SignedItemModel result = new SignedItemModel(RpfClientItem.class.cast(clientItem).rpf$getPackName(), model);
-                            ItemModel model = clientItem.model().bake(preEvent.getBakingContext());
                             SignedItemModel result = new SignedItemModel(RpfClientItem.class.cast(clientItem).rpf$getPackLocationInfo(), model);
                             PostBakeEvent postEvent = new PostBakeEvent(clientItem, result);
                             Rpf.getEventBus().post(postEvent);

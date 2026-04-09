@@ -1,1 +1,3 @@
- - Small changes related with future RPT update
+ - Fixed version number
+ - Make compatible with 26.1.1 and higher
+ - Fixed "Failed to do stuff with vanilla cache"

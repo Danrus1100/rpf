@@ -1,11 +1,11 @@
 {
   "schemaVersion": 1,
-  "id": "${id}",
-  "version": "${version}",
-  "name": "${name}",
-  "description": "${description}",
+  "id": "${mod_id}",
+  "version": "${mod_version}",
+  "name": "${mod_name}",
+  "description": "${mod_description}",
   "authors": [
-    "${author}"
+    "${mod_author}"
   ],
   "contact": {
     "issues": "https://github.com/Danrus1100/rpf/issues",
@@ -14,16 +14,12 @@
   },
   "license": "MIT",
   "icon": "assets/rpf/icon.png",
-  "accessWidener": "${aw}",
   "environment": "client",
   "entrypoints": {
     "client": [
       "com.danrus.rpf.Rpf"
     ]
   },
-  "mixins": [
-    "rpf.mixins.json"
-  ],
   "depends": {
     "fabricloader": ">=0.17",
     "minecraft": "${mcdep}"
