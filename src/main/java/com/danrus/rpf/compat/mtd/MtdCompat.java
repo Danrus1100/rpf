@@ -6,7 +6,6 @@
 package com.danrus.rpf.compat.mtd;
 
 import com.danrus.rpf.compat.RpfCompatInitializer;
-//? <26.1 {
 import net.lopymine.mtd.client.MyTotemDollClient;
 import net.lopymine.mtd.extension.ItemStackExtension;
 import net.lopymine.mtd.utils.mixin.ItemRenderStateWithStack;
@@ -38,14 +37,3 @@ public class MtdCompat implements RpfCompatInitializer {
         };
     }
 }
-//?} else {
-
-/*public class MtdCompat implements RpfCompatInitializer {
-
-    @Override
-    public void init() {
-
-    }
-}
-
-*///?}

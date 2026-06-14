@@ -1,0 +1,13 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "com.danrus.rpf.compat.rprenames.mixin",
+  "plugin": "com.danrus.rpf.compat.rprenames.RpRenamesPlugin",
+  "compatibilityLevel": "JAVA_21",
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "client": [
+    "SettingsMixin"
+  ]
+}

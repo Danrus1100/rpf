@@ -93,7 +93,9 @@ modstitch {
         addMixinsToModManifest = true
 
         configs.register("rpf")
-
+        if (versionAtLeast(project.name, "26.1")) {
+            configs.register("rpf.rpr")
+        }
     }
 }
 

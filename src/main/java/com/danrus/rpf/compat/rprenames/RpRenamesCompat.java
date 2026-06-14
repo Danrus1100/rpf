@@ -9,11 +9,15 @@ import com.danrus.rpf.compat.RpfCompatInitializer;
 
 import com.hiword9.rprenames.mod.RPRenames;
 import com.hiword9.rprenames.mod.item_group.RPRenamesItemGroup;
+import net.fabricmc.loader.api.FabricLoader;
 
 
 public class RpRenamesCompat implements RpfCompatInitializer {
 
     public void init() {
+        // if >=26.1
+        com.hiword9.rprenames.mod.Settings.setConfigDir(FabricLoader.getInstance().getConfigDir());
+
         RpfParser parser = new RpfParser(RPRenames.updatableRenamesManager);
         RenamesBridge.itemSetter = parser::updateClientItem;
         RenamesBridge.parser = parser::parse;

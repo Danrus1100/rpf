@@ -1,3 +1,1 @@
- - Fixed version number
- - Make compatible with 26.1.1 and higher
- - Fixed "Failed to do stuff with vanilla cache"
+ - fix rprenames compatibility with 0.12.0 version
