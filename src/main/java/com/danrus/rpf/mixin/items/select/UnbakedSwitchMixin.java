@@ -37,8 +37,7 @@ public abstract class UnbakedSwitchMixin <P extends SelectItemModelProperty<T>, 
             cancellable = true
     )
     private void rpf$selectInit(ItemModel.BakingContext bakingContext,
-                                //? >=26.1
-                                //Matrix4fc transformation,
+                                Matrix4fc transformation,
                                 ItemModel model, CallbackInfoReturnable<ItemModel> cir, @Local Object2ObjectMap<T, ItemModel> object2ObjectMap) {
         SelectItemModel<T> selectItemModel = new SelectItemModel<>(this.property, this.createModelGetter(object2ObjectMap, bakingContext.contextSwapper()));
         ((DelegateItemModel) selectItemModel).rpf$setDeligation(this.delegation);

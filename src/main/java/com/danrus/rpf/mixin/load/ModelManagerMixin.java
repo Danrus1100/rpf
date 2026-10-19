@@ -5,7 +5,8 @@ import com.danrus.rpf.api.event.type.ModelDiscoveryEvent;
 import com.danrus.rpf.core.item.RpfResolversManager;
 import com.danrus.rpf.core.load.ResourceLoadManager;
 import com.danrus.rpf.core.load.RpfClientItemInfoLoader;
-import com.danrus.rpf.compat.rprenames.RenamesBridge;
+// rp-renames has no build for this Minecraft version yet
+// import com.danrus.rpf.compat.rprenames.RenamesBridge;
 import com.danrus.rpf.core.item.RpfModelIdentity;
 import com.danrus.rpf.core.item.SignedItemModel;
 import com.danrus.rpf.debug.RpfDebugSystem;
@@ -17,26 +18,19 @@ import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.color.block.BlockColors;
 import net.minecraft.client.model.geom.EntityModelSet;
-//? <26.1
-import net.minecraft.client.renderer.block.model.ItemModelGenerator;
-//? >=26.1
-//import net.minecraft.client.resources.model.cuboid.ItemModelGenerator;
+import net.minecraft.client.renderer.PlayerSkinRenderCache;
+import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
 import net.minecraft.client.renderer.item.ClientItem;
 import net.minecraft.client.renderer.item.ItemModel;
 import net.minecraft.client.resources.model.*;
-//? <26.1
-import net.minecraft.client.resources.model.SpriteGetter;
-//? >=26.1
-//import net.minecraft.client.resources.model.cuboid.MissingBlockModel;
-//? >=26.1
-//import net.minecraft.client.resources.model.sprite.SpriteGetter;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.client.resources.model.cuboid.ItemModelGenerator;
+import net.minecraft.client.resources.model.cuboid.MissingCuboidModel;
+import net.minecraft.client.resources.model.sprite.SpriteGetter;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.profiling.Profiler;
-import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.util.profiling.Zone;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
@@ -60,11 +54,11 @@ public abstract class ModelManagerMixin implements RpfModelManager {
     private static final Logger LOGGER = LoggerFactory.getLogger("RpfModelManager");
 
     @Unique
-//    private List<Map<ResourceLocation, ItemModel>> rpf$bakedItemStackModels;
-    private List<Map<ResourceLocation, SignedItemModel>> rpf$bakedItemStackSignetModels;
+//    private List<Map<Identifier, ItemModel>> rpf$bakedItemStackModels;
+    private List<Map<Identifier, SignedItemModel>> rpf$bakedItemStackSignetModels;
 
     @Unique
-    private List<Map<ResourceLocation, ClientItem.Properties>> rpf$itemProperties;
+    private List<Map<Identifier, ClientItem.Properties>> rpf$itemProperties;
 
     @Unique
     private Map<RpfModelIdentity, ClientItem.Properties> rpf$itemPropertiesByIdentity;
@@ -83,7 +77,7 @@ public abstract class ModelManagerMixin implements RpfModelManager {
     private BlockColors blockColors;
 
     @Shadow
-    private static CompletableFuture<Map<ResourceLocation, UnbakedModel>> loadBlockModels(ResourceManager resourceManager, Executor executor) {
+    private static CompletableFuture<Map<Identifier, UnbakedModel>> loadBlockModels(ResourceManager resourceManager, Executor executor) {
         return null; // Shadowed implementation
     }
 
@@ -93,10 +87,7 @@ public abstract class ModelManagerMixin implements RpfModelManager {
     }
 
     @Shadow
-    protected abstract void apply(ModelManager.ReloadState reloadState
-            //? if <=1.21.8
-            , ProfilerFiller profiler
-    );
+    protected abstract void apply(ModelManager.ReloadState reloadState);
 
     @WrapOperation(
             method = "reload",
@@ -112,82 +103,68 @@ public abstract class ModelManagerMixin implements RpfModelManager {
     }
 
     @WrapOperation(
-            method =
-                    //? <26.1 {
-                    "net/minecraft/client/resources/model/ModelManager.method_65747(Ljava/util/concurrent/CompletableFuture;Ljava/util/concurrent/CompletableFuture;Ljava/util/concurrent/CompletableFuture;Ljava/lang/Void;)Lnet/minecraft/client/resources/model/ModelManager$ResolvedModels;",
-                    //?} else {
-                    /*"lambda$reload$1",
-                    *///?}
+            method = "lambda$reload$1",
             at = @At(value = "INVOKE", target =
                     "Lnet/minecraft/client/resources/model/ModelManager;discoverModelDependencies(Ljava/util/Map;Lnet/minecraft/client/resources/model/BlockStateModelLoader$LoadedModels;Lnet/minecraft/client/resources/model/ClientItemInfoLoader$LoadedClientInfos;)Lnet/minecraft/client/resources/model/ModelManager$ResolvedModels;")
     )
-    private static ModelManager.ResolvedModels rpf$wrapDiscovery(Map<ResourceLocation, UnbakedModel> inputModels, BlockStateModelLoader.LoadedModels loadedModels, ClientItemInfoLoader.LoadedClientInfos loadedClientInfos, Operation<ModelManager.ResolvedModels> original) {
+    private static ModelManager.ResolvedModels rpf$wrapDiscovery(Map<Identifier, UnbakedModel> inputModels, BlockStateModelLoader.LoadedModels loadedModels, ClientItemInfoLoader.LoadedClientInfos loadedClientInfos, Operation<ModelManager.ResolvedModels> original) {
         return rpf$discoverModelDependencies(inputModels, loadedModels, Rpf.getResourceLoadManager().getCurrentFuture().join(), () -> original.call(inputModels, loadedModels, loadedClientInfos));
     }
 
     @Unique
-    private static final String redirectModelBakeryConstructorTarget =
-            //? if 1.21.8
-            "net/minecraft/client/resources/model/ModelManager.method_65753(Ljava/util/Map;Ljava/util/concurrent/CompletableFuture;Ljava/util/concurrent/CompletableFuture;Ljava/util/concurrent/CompletableFuture;Ljava/util/concurrent/CompletableFuture;Ljava/util/concurrent/CompletableFuture;Ljava/util/concurrent/CompletableFuture;Ljava/util/concurrent/CompletableFuture;Ljava/util/concurrent/Executor;Ljava/lang/Void;)Ljava/util/concurrent/CompletionStage;";
-            //? if 1.21.10
-            //"net/minecraft/client/resources/model/ModelManager.method_65753(Ljava/util/concurrent/CompletableFuture;Ljava/util/concurrent/CompletableFuture;Ljava/util/concurrent/CompletableFuture;Ljava/util/concurrent/CompletableFuture;Ljava/util/concurrent/CompletableFuture;Ljava/util/concurrent/CompletableFuture;Ljava/util/concurrent/CompletableFuture;Ljava/util/concurrent/CompletableFuture;Ljava/util/concurrent/Executor;Ljava/lang/Void;)Ljava/util/concurrent/CompletionStage;";
-            //? if 1.21.11
-            //"net/minecraft/client/resources/model/ModelManager.method_65753(Ljava/util/concurrent/CompletableFuture;Ljava/util/concurrent/CompletableFuture;Ljava/util/concurrent/CompletableFuture;Ljava/util/concurrent/CompletableFuture;Ljava/util/concurrent/CompletableFuture;Ljava/util/concurrent/CompletableFuture;Ljava/util/concurrent/CompletableFuture;Ljava/util/concurrent/CompletableFuture;Ljava/util/concurrent/CompletableFuture;Ljava/util/concurrent/Executor;Ljava/lang/Void;)Ljava/util/concurrent/CompletionStage;";
-            //? if 26.1
-            //"lambda$reload$4";
+    private static final String redirectModelBakeryConstructorTarget = "lambda$reload$4";
 
     @Unique
     private static final String redirectModelBakeryConstructorBakeryTarget =
-            //? if 1.21.8
-            "(Lnet/minecraft/client/model/geom/EntityModelSet;Ljava/util/Map;Ljava/util/Map;Ljava/util/Map;Lnet/minecraft/client/resources/model/ResolvedModel;)Lnet/minecraft/client/resources/model/ModelBakery;";
-            //? if >=1.21.10 && <26.1
-            //"(Lnet/minecraft/client/model/geom/EntityModelSet;Lnet/minecraft/client/resources/model/MaterialSet;Lnet/minecraft/client/renderer/PlayerSkinRenderCache;Ljava/util/Map;Ljava/util/Map;Ljava/util/Map;Lnet/minecraft/client/resources/model/ResolvedModel;)Lnet/minecraft/client/resources/model/ModelBakery;";
-            //? if >=26.1
-            //"(Lnet/minecraft/client/model/geom/EntityModelSet;Lnet/minecraft/client/resources/model/sprite/SpriteGetter;Lnet/minecraft/client/renderer/PlayerSkinRenderCache;Ljava/util/Map;Ljava/util/Map;Ljava/util/Map;Lnet/minecraft/client/resources/model/ResolvedModel;)Lnet/minecraft/client/resources/model/ModelBakery;";
+            "(Lnet/minecraft/client/model/geom/EntityModelSet;Lnet/minecraft/client/resources/model/sprite/SpriteGetter;Lnet/minecraft/client/renderer/PlayerSkinRenderCache;Ljava/util/Map;Ljava/util/Map;Ljava/util/Map;Lnet/minecraft/client/resources/model/ResolvedModel;)Lnet/minecraft/client/resources/model/ModelBakery;";
 
     @WrapOperation(
             method = redirectModelBakeryConstructorTarget,
             at = @At(value = "NEW", target = redirectModelBakeryConstructorBakeryTarget)
     )
-    private static ModelBakery rpf$redirectModelBakeryConstructor
-            //? if 1.21.8
-            (EntityModelSet entityModelSet, Map unbakedBlockStateModels, Map clientInfos, Map resolvedModels, ResolvedModel missingModel, Operation<ModelBakery> original)
-            //? if >=1.21.10 && <26.1
-            //(EntityModelSet entityModelSet, MaterialSet materials, net.minecraft.client.renderer.PlayerSkinRenderCache playerSkinRenderCache, Map unbakedBlockStateModels, Map clientInfos, Map resolvedModels, ResolvedModel missingModel, Operation<ModelBakery> original)
-            //? if >=26.1
-            //(final EntityModelSet entityModelSet, final SpriteGetter sprites, final net.minecraft.client.renderer.PlayerSkinRenderCache playerSkinRenderCache, final Map<BlockState, net.minecraft.client.renderer.block.dispatch.BlockStateModel.UnbakedRoot> unbakedBlockStateModels, final Map<ResourceLocation, ClientItem> clientInfos, final Map<ResourceLocation, ResolvedModel> resolvedModels, final ResolvedModel missingModel, Operation<ModelBakery> original)
-    {
-        List<Map<ResourceLocation, ClientItem>> rawLayers = new ArrayList<>();
+    private static ModelBakery rpf$redirectModelBakeryConstructor(
+            final EntityModelSet entityModelSet,
+            final SpriteGetter sprites,
+            final PlayerSkinRenderCache playerSkinRenderCache,
+            final Map<BlockState, BlockStateModel.UnbakedRoot> unbakedBlockStateModels,
+            final Map<Identifier, ClientItem> clientInfos,
+            final Map<Identifier, ResolvedModel> resolvedModels,
+            final ResolvedModel missingModel,
+            Operation<ModelBakery> original
+    ) {
+        List<Map<Identifier, ClientItem>> rawLayers = new ArrayList<>();
         for (RpfClientItemInfoLoader.LoadedClientInfos layer : Rpf.getResourceLoadManager().getCurrentFuture().join()) {
             rawLayers.add(layer.contents());
         }
-        if (RenamesBridge.active) {
-            RenamesBridge.itemSetter.accept(rawLayers);
-            RenamesBridge.parser.accept(
-                    Minecraft.getInstance().getResourceManager(),
-                    Profiler.get()
-            );
-            RenamesBridge.update();
-        }
-        return ((RpfModelBakery) original.call
-                //? if 1.21.8
-                (entityModelSet, unbakedBlockStateModels, clientInfos, resolvedModels, missingModel)
-                //? if >=1.21.10 && <26.1
-                //(entityModelSet, materials, playerSkinRenderCache, unbakedBlockStateModels, clientInfos, resolvedModels, missingModel)
-                //? if >=26.1
-                //(entityModelSet, sprites, playerSkinRenderCache, unbakedBlockStateModels, clientInfos, resolvedModels, missingModel)
-        ).rpf$setClientItems(rawLayers);
+        // rp-renames has no build for this Minecraft version yet
+        // if (RenamesBridge.active) {
+        //     RenamesBridge.itemSetter.accept(rawLayers);
+        //     RenamesBridge.parser.accept(
+        //             Minecraft.getInstance().getResourceManager(),
+        //             Profiler.get()
+        //     );
+        //     RenamesBridge.update();
+        // }
+        return ((RpfModelBakery) original.call(
+                entityModelSet,
+                sprites,
+                playerSkinRenderCache,
+                unbakedBlockStateModels,
+                clientInfos,
+                resolvedModels,
+                missingModel
+        )).rpf$setClientItems(rawLayers);
     }
 
     @Unique
     private static ModelManager.ResolvedModels rpf$discoverModelDependencies(
-            Map<ResourceLocation, UnbakedModel> blockModels,
+            Map<Identifier, UnbakedModel> blockModels,
             BlockStateModelLoader.LoadedModels loadedModels,
             List<RpfClientItemInfoLoader.LoadedClientInfos> itemLayers,
             Supplier<ModelManager.ResolvedModels> originalDiscoverModelDependencies
     ) {
         try (Zone zone = Profiler.get().zone("dependencies")) {
-            ModelDiscovery modelDiscovery = new ModelDiscovery(blockModels, MissingBlockModel.missingModel());
+            ModelDiscovery modelDiscovery = new ModelDiscovery(blockModels, MissingCuboidModel.missingModel());
             ModelDiscoveryEvent preEvent = new ModelDiscoveryEvent(ModelDiscoveryEvent.Stage.PRE, modelDiscovery, blockModels, loadedModels, itemLayers);
             Rpf.getEventBus().post(preEvent);
             if (preEvent.isCancelled()) {
@@ -219,8 +196,6 @@ public abstract class ModelManagerMixin implements RpfModelManager {
     )
     private void rpf$apply(
             ModelManager.ReloadState reloadState,
-            //? if <= 1.21.8
-            ProfilerFiller profiler,
             CallbackInfo ci,
             @Local ModelBakery.BakingResult bakingResult
     ) {
@@ -249,8 +224,8 @@ public abstract class ModelManagerMixin implements RpfModelManager {
     @WrapMethod(
             method = "getItemModel"
     )
-    private ItemModel rpf$wrapGetItemModel(ResourceLocation modelLocation, Operation<ItemModel> original) {
-        for (Map<ResourceLocation, SignedItemModel> layer : this.rpf$bakedItemStackSignetModels) {
+    private ItemModel rpf$wrapGetItemModel(Identifier modelLocation, Operation<ItemModel> original) {
+        for (Map<Identifier, SignedItemModel> layer : this.rpf$bakedItemStackSignetModels) {
             SignedItemModel model = layer.get(modelLocation);
             if (model != null) {
                 return model.model();
@@ -260,17 +235,17 @@ public abstract class ModelManagerMixin implements RpfModelManager {
     }
 
     @Override
-    public List<Map<ResourceLocation, SignedItemModel>> rpf$getSignedModels() {
+    public List<Map<Identifier, SignedItemModel>> rpf$getSignedModels() {
         return rpf$bakedItemStackSignetModels;
     }
 
     @Override
-    public List<Map<ResourceLocation, ClientItem.Properties>> rpf$getItemPropertiesMaps() {
+    public List<Map<Identifier, ClientItem.Properties>> rpf$getItemPropertiesMaps() {
         return this.rpf$itemProperties;
     }
 
     @Override
-    public SignedItemModel rpf$getVanillaModel(ResourceLocation location) {
+    public SignedItemModel rpf$getVanillaModel(Identifier location) {
         // Check cache first for O(1) lookup
         SignedItemModel cached = ResourceLoadManager.vanillaModelCache.get(location);
         if (cached != null) {
@@ -278,7 +253,7 @@ public abstract class ModelManagerMixin implements RpfModelManager {
         }
 
         // Cache miss - search through packs
-        for (Map<ResourceLocation, SignedItemModel> map : rpf$getSignedModels()) {
+        for (Map<Identifier, SignedItemModel> map : rpf$getSignedModels()) {
             SignedItemModel model = map.get(location);
             if (model != null && "vanilla".equals(model.name())) {
                 // Cache the result before returning

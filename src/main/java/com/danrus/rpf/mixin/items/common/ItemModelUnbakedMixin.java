@@ -8,9 +8,8 @@ import net.minecraft.client.renderer.item.*;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Pseudo;
 
-//~ block_rename
 @Pseudo
-@Mixin({BlockModelWrapper.Unbaked.class,
+@Mixin({CuboidItemModelWrapper.Unbaked.class,
         BundleSelectedItemSpecialRenderer.Unbaked.class,
         CompositeModel.Unbaked.class,
         ConditionalItemModel.Unbaked.class,

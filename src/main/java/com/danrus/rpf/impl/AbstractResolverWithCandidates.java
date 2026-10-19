@@ -14,18 +14,18 @@ import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.entity.ItemOwner;
 import net.minecraft.world.item.ItemStack;
 
 public abstract class AbstractResolverWithCandidates implements RpfItemModelResolver {
-    public void resolveAndAppendLayer(ModelUpdateContext context, ItemStack stack, LivingEntity holder, Operation<Void> vanilla) {
+    public void resolveAndAppendLayer(ModelUpdateContext context, ItemStack stack, ItemOwner holder, Operation<Void> vanilla) {
         MtdBridge.capturer.captureEntity(stack, holder == null ? null : holder, context.renderState());
         RpfModelManager rpfModelManager = RpfItemModelResolver.getModelManager();
-        List<Map<ResourceLocation, SignedItemModel>> packs = rpfModelManager.rpf$getSignedModels();
+        List<Map<Identifier, SignedItemModel>> packs = rpfModelManager.rpf$getSignedModels();
         List<SignedItemModel> candidates = new ArrayList<>();
 
-        for(Map<ResourceLocation, SignedItemModel> currentPack : packs) {
+        for(Map<Identifier, SignedItemModel> currentPack : packs) {
             SignedItemModel model = currentPack.get(context.location());
             if (model != null) {
                 candidates.add(model);
@@ -35,5 +35,5 @@ public abstract class AbstractResolverWithCandidates implements RpfItemModelReso
         this.resolveAndAppendLayer(context, candidates, stack, holder, vanilla);
     }
 
-    abstract void resolveAndAppendLayer(ModelUpdateContext context, List<SignedItemModel> candidates, ItemStack stack, LivingEntity holder, Operation<Void> vanilla);
+    abstract void resolveAndAppendLayer(ModelUpdateContext context, List<SignedItemModel> candidates, ItemStack stack, ItemOwner holder, Operation<Void> vanilla);
 }

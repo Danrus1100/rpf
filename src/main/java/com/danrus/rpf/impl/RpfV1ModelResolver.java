@@ -23,8 +23,8 @@ import java.util.WeakHashMap;
 import net.minecraft.client.renderer.item.ClientItem;
 import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.core.component.DataComponents;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.entity.ItemOwner;
 import net.minecraft.world.item.ItemStack;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,7 +33,7 @@ public class RpfV1ModelResolver extends AbstractResolverWithCandidates {
     private static final Logger LOGGER = LoggerFactory.getLogger(RpfV1ModelResolver.class);
     private final Map<DataComponentMap, ClientItem.Properties> componentsToProperties = Collections.synchronizedMap(new WeakHashMap());
 
-    public void resolveAndAppendLayer(ModelUpdateContext context, List<SignedItemModel> candidates, ItemStack stack, LivingEntity entity, Operation<Void> vanilla) {
+    public void resolveAndAppendLayer(ModelUpdateContext context, List<SignedItemModel> candidates, ItemStack stack, ItemOwner entity, Operation<Void> vanilla) {
         TestsResultCollector collector = RpfDebugSystem.getInstance().optimiseCollector(() -> new LoggingTestsResultCollector(context.location(), ((SignedItemModel)candidates.getFirst()).name()));
         RpfEvent preEvent = new PreModelResolveEvent(context, stack, candidates, collector, entity);
         Rpf.getEventBus().post(preEvent);
@@ -65,8 +65,8 @@ public class RpfV1ModelResolver extends AbstractResolverWithCandidates {
     }
 
     public boolean shouldPlaySwapAnimation(ItemStack stack, Operation<Boolean> vanilla) {
-        ResourceLocation resourceLocation = (ResourceLocation)stack.get(DataComponents.ITEM_MODEL);
+        Identifier Identifier = (Identifier)stack.get(DataComponents.ITEM_MODEL);
         ClientItem.Properties properties = (ClientItem.Properties)this.componentsToProperties.get(stack.getComponents());
-        return resourceLocation != null && properties != null ? properties.handAnimationOnSwap() : true;
+        return Identifier != null && properties != null ? properties.handAnimationOnSwap() : true;
     }
 }

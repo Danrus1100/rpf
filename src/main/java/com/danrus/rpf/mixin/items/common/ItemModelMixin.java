@@ -5,8 +5,7 @@ import net.minecraft.client.renderer.item.*;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 
-//~ block_rename
-@Mixin({BlockModelWrapper.class,
+@Mixin({CuboidItemModelWrapper.class,
         BundleSelectedItemSpecialRenderer.class,
         CompositeModel.class,
         ConditionalItemModel.class,

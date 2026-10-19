@@ -4,7 +4,7 @@ import com.danrus.rpf.api.event.RpfEvent;
 import com.danrus.rpf.core.item.ModelUpdateContext;
 import net.minecraft.client.renderer.item.SelectItemModel;
 import net.minecraft.client.renderer.item.properties.select.SelectItemModelProperty;
-import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ItemOwner;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
@@ -15,11 +15,11 @@ public class SelectModelPropertyGetWhenDoDelegateEvent<T> extends RpfEvent {
     private final ModelUpdateContext context;
     private final ItemStack stack;
     @Nullable
-    private final LivingEntity owner;
+    private final ItemOwner owner;
     private final SelectItemModelProperty<T> property;
     private Supplier<T> getter;
 
-    public SelectModelPropertyGetWhenDoDelegateEvent(ModelUpdateContext context, ItemStack stack, @Nullable LivingEntity owner, SelectItemModelProperty<T> property, SelectItemModel<T> model, Supplier<T> getter) {
+    public SelectModelPropertyGetWhenDoDelegateEvent(ModelUpdateContext context, ItemStack stack, @Nullable ItemOwner owner, SelectItemModelProperty<T> property, SelectItemModel<T> model, Supplier<T> getter) {
         this.context = context;
         this.stack = stack;
         this.owner = owner;
@@ -36,7 +36,7 @@ public class SelectModelPropertyGetWhenDoDelegateEvent<T> extends RpfEvent {
         return stack;
     }
 
-    public @Nullable LivingEntity getOwner() {
+    public @Nullable ItemOwner getOwner() {
         return owner;
     }
 

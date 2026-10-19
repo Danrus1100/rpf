@@ -32,8 +32,7 @@ public class UnbakedMixin implements DelegateItemModel.Unbaked {
             at = @At("HEAD")
     )
     private void rpf$bakeDelegationForSwitch(ItemModel.BakingContext context,
-                                             //? >=26.1
-                                             //Matrix4fc transformation,
+                                             Matrix4fc transformation,
                                              CallbackInfoReturnable<ItemModel> cir) {
         ((RpfSelectModelUnbakedSwitch) (Object) unbakedSwitch).rpf$setUnbakedDelegation(rpf$doDelegate);
     }
@@ -43,8 +42,7 @@ public class UnbakedMixin implements DelegateItemModel.Unbaked {
             at = @At("RETURN")
     )
     private void rpf$setFallbackModel(ItemModel.BakingContext context,
-                                      //? >=26.1
-                                      //Matrix4fc transformation,
+                                      Matrix4fc transformation,
                                       CallbackInfoReturnable<ItemModel> cir, @Local ItemModel itemModel) {
         ((RpfItemModel) itemModel).rpf$markAsFallback();
     }

@@ -19,15 +19,15 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import net.minecraft.client.renderer.item.*;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.entity.ItemOwner;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
 public class RpfExperimentalResolver extends AbstractResolverWithCandidates {
     private static final TestsResultCollector DUMMY_COLLECTOR = new DummyTestsResultsCollector();
 
-    public void resolveAndAppendLayer(ModelUpdateContext context, List<SignedItemModel> candidates, ItemStack stack, LivingEntity entity, Operation<Void> vanilla) {
+    public void resolveAndAppendLayer(ModelUpdateContext context, List<SignedItemModel> candidates, ItemStack stack, ItemOwner entity, Operation<Void> vanilla) {
         int packCounter = 0;
         Map<SignedItemModel, Integer> results = new HashMap(candidates.size());
 
@@ -72,8 +72,7 @@ public class RpfExperimentalResolver extends AbstractResolverWithCandidates {
 
     private static class ExperimentalModelTestCollector extends AbstractTestResultCollector {
         private static final Map<Class<?>, Integer> REWARDS_BY_CLASS = Map.of(
-                //~ block_rename
-                BlockModelWrapper.class, 1,
+                CuboidItemModelWrapper.class, 1,
                 BundleSelectedItemSpecialRenderer.class, 1,
                 CompositeModel.class, 2,
                 ConditionalItemModel.class, 3,
@@ -86,7 +85,7 @@ public class RpfExperimentalResolver extends AbstractResolverWithCandidates {
         private static final Map<TestsResultCollector.TestResultType, Integer> REWARDS_BY_RESULT;
         protected final List<ExperimentalResultUnit> eUnits = new LinkedList();
 
-        public ExperimentalModelTestCollector(ResourceLocation modelLocation, String packName) {
+        public ExperimentalModelTestCollector(Identifier modelLocation, String packName) {
             super(modelLocation, packName);
         }
 

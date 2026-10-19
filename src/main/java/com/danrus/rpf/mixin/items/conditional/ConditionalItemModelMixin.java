@@ -9,8 +9,8 @@ import net.minecraft.client.renderer.item.ItemModel;
 import net.minecraft.client.renderer.item.ItemModelResolver;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
 import net.minecraft.client.renderer.item.properties.conditional.ItemModelPropertyTest;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.entity.ItemOwner;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
@@ -34,14 +34,11 @@ public abstract class ConditionalItemModelMixin implements RpfItemModel {
     private ItemModel onFalse;
 
     @Override
-    public boolean rpf$doDelegate(ModelUpdateContext context, ItemStack stack, @Nullable LivingEntity owner, @Nullable ItemModel prev, TestsResultCollector collector) {
+    public boolean rpf$doDelegate(ModelUpdateContext context, ItemStack stack, @Nullable ItemOwner owner, @Nullable ItemModel prev, TestsResultCollector collector) {
         boolean isTrue = property.get(
                 stack,
                 context.level(),
-                owner == null ? null : owner
-                //? if >=1.21.10
-                //.asLivingEntity()
-                ,
+                owner == null ? null : owner.asLivingEntity(),
                 context.seed(),
                 context.displayContext()
         );

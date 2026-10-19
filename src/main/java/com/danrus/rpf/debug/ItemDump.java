@@ -1,7 +1,7 @@
 package com.danrus.rpf.debug;
 
-import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.client.Minecraft;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
@@ -13,14 +13,18 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
-public record ItemDump(Type type, ResourceLocation item, List<String> strings) {
+public record ItemDump(Type type, Identifier item, List<String> strings) {
 
-    private static final Path EXPORT_PATH = FabricLoader.getInstance().getGameDir().resolve("debug/rpf");
     private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss");
+
+    private static Path exportPath() {
+        return Minecraft.getInstance().gameDirectory.toPath().resolve("debug/rpf");
+    }
 
     public void save() {
         try {
-            Files.createDirectories(EXPORT_PATH);
+            Path exportPath = exportPath();
+            Files.createDirectories(exportPath);
             String timestamp = LocalDateTime.now().format(TIME_FORMATTER);
 
             String fileName = String.format("%s_%s_%s_%s.log",
@@ -30,7 +34,7 @@ public record ItemDump(Type type, ResourceLocation item, List<String> strings) {
                     timestamp
             );
 
-            Path toSave = EXPORT_PATH.resolve(fileName);
+            Path toSave = exportPath.resolve(fileName);
             Files.write(toSave, strings, StandardCharsets.UTF_8);
             RpfLogger.get().info("Debug log saved to: " + toSave.toAbsolutePath());
 
@@ -40,11 +44,12 @@ public record ItemDump(Type type, ResourceLocation item, List<String> strings) {
     }
 
     @Nullable
-    public static Path saveCombined(ResourceLocation item, List<ItemDump> dumps) {
+    public static Path saveCombined(Identifier item, List<ItemDump> dumps) {
         if (dumps.isEmpty()) return null;
 
         try {
-            Files.createDirectories(EXPORT_PATH);
+            Path exportPath = exportPath();
+            Files.createDirectories(exportPath);
             String timestamp = LocalDateTime.now().format(TIME_FORMATTER);
 
             String fileName = String.format("%s_%s_%s.log",
@@ -53,7 +58,7 @@ public record ItemDump(Type type, ResourceLocation item, List<String> strings) {
                     timestamp
             );
 
-            Path toSave = EXPORT_PATH.resolve(fileName);
+            Path toSave = exportPath.resolve(fileName);
 
             List<String> allLines = new ArrayList<>();
             for (ItemDump dump : dumps) {

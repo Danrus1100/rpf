@@ -1,1 +1,2 @@
- - fix rprenames compatibility with 0.12.0 version
+ - Port to 26.3
+ - Port for NeoForge

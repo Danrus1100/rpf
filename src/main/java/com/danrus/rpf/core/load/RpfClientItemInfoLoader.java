@@ -8,14 +8,11 @@ import com.google.gson.JsonElement;
 import com.mojang.logging.LogUtils;
 import com.mojang.serialization.DynamicOps;
 import com.mojang.serialization.JsonOps;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
-import net.minecraft.Util;
 import net.minecraft.client.multiplayer.ClientRegistryLayer;
 import net.minecraft.client.renderer.item.ClientItem;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.FileToIdConverter;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.PlaceholderLookupProvider;
@@ -44,7 +41,7 @@ public class RpfClientItemInfoLoader {
     }
 
     private static CompletableFuture<List<PendingStack>> loadAllStacks(
-            Map<ResourceLocation, List<Resource>> stacks,
+            Map<Identifier, List<Resource>> stacks,
             RegistryAccess.Frozen registryAccess,
             Executor executor
     ) {
@@ -58,15 +55,15 @@ public class RpfClientItemInfoLoader {
             futures.add(future);
         });
 
-        return Util.sequence(futures);
+        return net.minecraft.util.Util.sequence(futures);
     }
 
     private static PendingStack processSingleStack(
-            ResourceLocation fileLocation,
+            Identifier fileLocation,
             List<Resource> resources,
             RegistryAccess.Frozen registryAccess
     ) {
-        ResourceLocation id = LISTER.fileToId(fileLocation);
+        Identifier id = LISTER.fileToId(fileLocation);
         List<ClientItem> loadedItems = new ArrayList<>(resources.size());
 
         for (Resource resource : resources) {
@@ -81,7 +78,7 @@ public class RpfClientItemInfoLoader {
 
     @Nullable
     private static ClientItem parseResource(
-            ResourceLocation id,
+            Identifier id,
             Resource resource,
             RegistryAccess.Frozen registryAccess
     ) {
@@ -126,7 +123,7 @@ public class RpfClientItemInfoLoader {
             maxDepth = Math.max(maxDepth, stack.items().size());
         }
 
-        List<Map<ResourceLocation, ClientItem>> layers = new ArrayList<>(maxDepth);
+        List<Map<Identifier, ClientItem>> layers = new ArrayList<>(maxDepth);
         for (int i = 0; i < maxDepth; i++) {
             layers.add(new HashMap<>());
         }
@@ -139,17 +136,16 @@ public class RpfClientItemInfoLoader {
         }
 
         List<LoadedClientInfos> result = new ArrayList<>(maxDepth);
-        for (Map<ResourceLocation, ClientItem> layer : layers) {
+        for (Map<Identifier, ClientItem> layer : layers) {
             result.add(new LoadedClientInfos(layer));
         }
 
         return result;
     }
 
-    @Environment(EnvType.CLIENT)
-    public record LoadedClientInfos(Map<ResourceLocation, ClientItem> contents) {
+    public record LoadedClientInfos(Map<Identifier, ClientItem> contents) {
     }
 
-    private record PendingStack(ResourceLocation id, List<ClientItem> items) {
+    private record PendingStack(Identifier id, List<ClientItem> items) {
     }
 }

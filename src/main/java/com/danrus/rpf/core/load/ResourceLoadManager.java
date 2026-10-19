@@ -1,7 +1,7 @@
 package com.danrus.rpf.core.load;
 
 import com.danrus.rpf.core.item.SignedItemModel;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.spongepowered.asm.mixin.Unique;
 
 import java.util.List;
@@ -28,7 +28,7 @@ public class ResourceLoadManager {
     private final AtomicReference<CompletableFuture<List<RpfClientItemInfoLoader.LoadedClientInfos>>> 
         currentFuture = new AtomicReference<>();
 
-    public static final Map<ResourceLocation, SignedItemModel> vanillaModelCache = new ConcurrentHashMap<>();
+    public static final Map<Identifier, SignedItemModel> vanillaModelCache = new ConcurrentHashMap<>();
 
 
     /**
