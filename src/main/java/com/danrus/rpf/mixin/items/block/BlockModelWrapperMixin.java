@@ -27,15 +27,17 @@ public abstract class BlockModelWrapperMixin implements RpfItemModel, RpfBlockMo
 
     @Override
     public boolean rpf$doDelegate(ModelUpdateContext context, ItemStack stack, @Nullable ItemOwner owner, @Nullable ItemModel prev, TestsResultCollector collector){
+        Identifier modelLink = this.rpf$modelLink;
+        // Vanilla links an item model "ns:path" to the block model "ns:item/path".
+        // Compare exactly: "contains" would also match "item/path_alt".
         boolean delegate = this.rpf$isFallback()
-                
-                // try to predict is this model from vanilla resources
-                && this.rpf$modelLink.getNamespace().equals(context.location().getNamespace())
-                && this.rpf$modelLink.getPath().contains(context.location().getPath());
+                && modelLink != null
+                && modelLink.equals(context.location().withPrefix("item/"));
+        String link = modelLink == null ? "null" : modelLink.toString();
         if (delegate) {
-            collector.delegate(this.getClass(), ": " + rpf$getModelLink().toString());
+            collector.delegate(this.getClass(), ": " + link);
         } else {
-            collector.hit(this.getClass(), ": " + rpf$getModelLink().toString());
+            collector.hit(this.getClass(), ": " + link);
         }
 
         return delegate;
