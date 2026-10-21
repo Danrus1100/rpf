@@ -34,7 +34,7 @@ import java.util.Map;
  * working if NeoForge changes its patches again.</p>
  */
 @Mixin(ModelBakery.class)
-public abstract class ModelBakeryPlatformMixin implements RpfBakingContextFactory {
+public abstract class ModelBakeryNeoForgeMixin implements RpfBakingContextFactory {
 
     private static final Logger LOGGER = LoggerFactory.getLogger("RpfModelBakery");
 

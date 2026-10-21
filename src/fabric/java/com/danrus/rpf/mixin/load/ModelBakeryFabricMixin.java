@@ -17,7 +17,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import java.util.Map;
 
 @Mixin(ModelBakery.class)
-public abstract class ModelBakeryPlatformMixin implements RpfBakingContextFactory {
+public abstract class ModelBakeryFabricMixin implements RpfBakingContextFactory {
 
     @Override
     public ItemModel.BakingContext rpf$createBakingContext(

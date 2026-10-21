@@ -27,7 +27,7 @@ import java.util.Map;
  * Fabric entry points for the ModelManager model-loading hooks.
  */
 @Mixin(ModelManager.class)
-public abstract class ModelManagerPlatformMixin {
+public abstract class ModelManagerFabricMixin {
 
     @WrapOperation(
             method = "lambda$reload$1",

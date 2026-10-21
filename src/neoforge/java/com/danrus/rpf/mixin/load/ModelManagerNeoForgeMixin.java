@@ -31,7 +31,7 @@ import java.util.Map;
  * animations. The actual logic lives in {@link ModelManagerHooks}.</p>
  */
 @Mixin(ModelManager.class)
-public abstract class ModelManagerPlatformMixin {
+public abstract class ModelManagerNeoForgeMixin {
 
     @WrapOperation(
             method = "lambda$reload$1",

@@ -1,0 +1,13 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "com.danrus.rpf.mixin",
+  "compatibilityLevel": "JAVA_13",
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "client": [
+    "load.ModelBakeryFabricMixin",
+    "load.ModelManagerFabricMixin"
+  ]
+}

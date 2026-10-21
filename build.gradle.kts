@@ -121,6 +121,7 @@ manifests {
         client()
         entrypoint("client", "com.danrus.rpf.fabric.RpfFabric")
         accessWidener("rpf.accesswidener")
+        mixin("rpf.fabric.mixins.json", Side.CLIENT)
 
         dependency("fabricloader", DependencyType.REQUIRED, "[${prop("deps.fabric")},)")
         dependency("fabric-api", DependencyType.REQUIRED, "[0.160.0,)")
@@ -132,6 +133,7 @@ manifests {
         modLoader = "javafml"
         loaderVersion = "[4,)"
         accessTransformer(neoforgeAccessTransformer)
+        mixin("rpf.neoforge.mixins.json", Side.CLIENT)
 
         dependency("neoforge", DependencyType.REQUIRED, "[${prop("deps.neoforge")},)")
     }
