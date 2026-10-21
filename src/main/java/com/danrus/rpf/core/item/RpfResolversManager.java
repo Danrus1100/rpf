@@ -64,6 +64,22 @@ public class RpfResolversManager {
         }
     }
 
+    public float swapAnimationScale(ItemStack stack, Operation<Float> vanilla) {
+        try {
+            return currentResolver().swapAnimationScale(stack, vanilla);
+        } catch (Exception exception) {
+            log.error("Resolver '{}' failed while resolving the swap animation scale; falling back to vanilla.",
+                    currentResolver, exception);
+            return vanilla.call(stack);
+        }
+    }
+
+    public void clearCaches() {
+        for (RpfItemModelResolver resolver : this.resolvers.values()) {
+            resolver.rpf$onReload();
+        }
+    }
+
     public void setPendingResolver(Identifier pendingResolver) {
         this.pendingResolver = pendingResolver;
     }

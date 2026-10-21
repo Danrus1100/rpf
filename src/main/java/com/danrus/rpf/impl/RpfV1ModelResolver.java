@@ -16,12 +16,10 @@ import com.danrus.rpf.core.item.SignedItemModel;
 import com.danrus.rpf.debug.LoggingTestsResultCollector;
 import com.danrus.rpf.debug.RpfDebugSystem;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.WeakHashMap;
+import java.util.concurrent.ConcurrentHashMap;
 import net.minecraft.client.renderer.item.ClientItem;
-import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.ItemOwner;
@@ -31,7 +29,7 @@ import org.slf4j.LoggerFactory;
 
 public class RpfV1ModelResolver extends AbstractResolverWithCandidates {
     private static final Logger LOGGER = LoggerFactory.getLogger(RpfV1ModelResolver.class);
-    private final Map<DataComponentMap, ClientItem.Properties> componentsToProperties = Collections.synchronizedMap(new WeakHashMap());
+    private final Map<Identifier, ClientItem.Properties> propertiesByModel = new ConcurrentHashMap<>();
 
     public void resolveAndAppendLayer(ModelUpdateContext context, List<SignedItemModel> candidates, ItemStack stack, ItemOwner entity, Operation<Void> vanilla) {
         String initialPackName = candidates.isEmpty() ? "unknown" : candidates.getFirst().name();
@@ -53,7 +51,7 @@ public class RpfV1ModelResolver extends AbstractResolverWithCandidates {
                     }
 
                     if (!model.doDelegate(context, stack, entity, collector) || i == candidates.size() - 1) {
-                        RpfItemModelResolver.appendModelLayer(context, stack, entity, this.componentsToProperties, model);
+                        RpfItemModelResolver.appendModelLayer(context, stack, entity, this.propertiesByModel, model);
                         RpfDebugSystem.getInstance().logItem(collector);
                         return;
                     }
@@ -68,8 +66,23 @@ public class RpfV1ModelResolver extends AbstractResolverWithCandidates {
     }
 
     public boolean shouldPlaySwapAnimation(ItemStack stack, Operation<Boolean> vanilla) {
-        Identifier Identifier = (Identifier)stack.get(DataComponents.ITEM_MODEL);
-        ClientItem.Properties properties = (ClientItem.Properties)this.componentsToProperties.get(stack.getComponents());
-        return Identifier != null && properties != null ? properties.handAnimationOnSwap() : true;
+        ClientItem.Properties properties = propertiesFor(stack);
+        return properties == null ? vanilla.call(stack) : properties.handAnimationOnSwap();
+    }
+
+    @Override
+    public float swapAnimationScale(ItemStack stack, Operation<Float> vanilla) {
+        ClientItem.Properties properties = propertiesFor(stack);
+        return properties == null ? vanilla.call(stack) : properties.swapAnimationScale();
+    }
+
+    @Override
+    public void rpf$onReload() {
+        this.propertiesByModel.clear();
+    }
+
+    private ClientItem.Properties propertiesFor(ItemStack stack) {
+        Identifier modelId = stack.get(DataComponents.ITEM_MODEL);
+        return modelId == null ? null : this.propertiesByModel.get(modelId);
     }
 }

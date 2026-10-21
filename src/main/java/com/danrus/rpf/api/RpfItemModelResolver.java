@@ -11,7 +11,7 @@ import com.danrus.rpf.duck.load.RpfModelManager;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.item.ClientItem;
-import net.minecraft.core.component.DataComponentMap;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.ItemOwner;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
@@ -28,6 +28,13 @@ public interface RpfItemModelResolver {
 
     boolean shouldPlaySwapAnimation(ItemStack stack, Operation<Boolean> vanilla);
 
+    default float swapAnimationScale(ItemStack stack, Operation<Float> vanilla) {
+        return vanilla.call(stack);
+    }
+
+    default void rpf$onReload() {
+    }
+
     public static RpfModelManager getModelManager() {
         return (RpfModelManager) Minecraft.getInstance().getModelManager();
     }
@@ -36,11 +43,11 @@ public interface RpfItemModelResolver {
         appendModelLayer(context, stack, entity, null, model);
     }
 
-    public static void appendModelLayer(ModelUpdateContext context, ItemStack stack, ItemOwner entity, @Nullable Map<DataComponentMap, ClientItem.Properties> componentsToProperties, SignedItemModel model) {
+    public static void appendModelLayer(ModelUpdateContext context, ItemStack stack, ItemOwner entity, @Nullable Map<Identifier, ClientItem.Properties> propertiesByModel, SignedItemModel model) {
         RpfModelIdentity identity = new RpfModelIdentity(context.location(), model.name());
         ClientItem.Properties properties = getModelManager().rpf$getProperties(identity);
         context.renderState().setOversizedInGui(properties != null && properties.oversizedInGui());
-        if (componentsToProperties != null) componentsToProperties.put(stack.getComponents(), properties);
+        if (propertiesByModel != null) propertiesByModel.put(context.location(), properties);
         context.renderState().appendModelIdentityElement(identity); // for correct GUI rendering
         model.update(context, stack, entity);
     }

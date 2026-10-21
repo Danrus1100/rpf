@@ -102,6 +102,7 @@ public abstract class ModelManagerMixin implements RpfModelManager {
 
             ResourceLoadManager.vanillaModelCache.clear();
             RpfResolversManager.getInstance().applyPendingResolver();
+            RpfResolversManager.getInstance().clearCaches();
             RpfDebugSystem.getInstance().clear();
         } catch (Exception exception) {
             LOGGER.error("[RPF] Failed to apply baked RPF model data; keeping vanilla model data.", exception);

@@ -67,7 +67,7 @@ public class RpfExperimentalResolver extends AbstractResolverWithCandidates {
     }
 
     public boolean shouldPlaySwapAnimation(ItemStack stack, Operation<Boolean> vanilla) {
-        return true;
+        return vanilla.call(stack);
     }
 
     private static class ExperimentalModelTestCollector extends AbstractTestResultCollector {

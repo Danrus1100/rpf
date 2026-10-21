@@ -45,4 +45,11 @@ public class ItemModelResolverMixin<T, R> {
     private boolean rpf$shouldPlaySwapAnimation(ItemStack stack, Operation<Boolean> original) {
         return RpfResolversManager.getInstance().shouldPlayAnimationOnSwap(stack, original);
     }
+
+    @WrapMethod(
+            method = "swapAnimationScale"
+    )
+    private float rpf$swapAnimationScale(ItemStack stack, Operation<Float> original) {
+        return RpfResolversManager.getInstance().swapAnimationScale(stack, original);
+    }
 }
