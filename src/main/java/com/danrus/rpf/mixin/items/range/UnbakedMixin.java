@@ -7,6 +7,7 @@ import net.minecraft.client.renderer.item.ItemModel;
 import net.minecraft.client.renderer.item.ItemModels;
 import net.minecraft.client.renderer.item.RangeSelectItemModel;
 import net.minecraft.resources.Identifier;
+import org.joml.Matrix4fc;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -18,6 +19,20 @@ public class UnbakedMixin implements DelegateItemModel.Unbaked {
 
     @Unique
     private boolean rpf$doDelegate = true;
+
+    @Inject(
+            method = "bake",
+            at = @At("RETURN")
+    )
+    private void rpf$applyDelegation(
+            ItemModel.BakingContext context,
+            Matrix4fc transformation,
+            CallbackInfoReturnable<ItemModel> cir
+    ) {
+        if (cir.getReturnValue() instanceof DelegateItemModel delegate) {
+            delegate.rpf$setDeligation(this.rpf$doDelegate);
+        }
+    }
 
     @Override
     public boolean rpf$getDelegation() {
