@@ -124,7 +124,7 @@ manifests {
         mixin("rpf.fabric.mixins.json", Side.CLIENT)
 
         dependency("fabricloader", DependencyType.REQUIRED, "[${prop("deps.fabric")},)")
-        dependency("fabric-api", DependencyType.REQUIRED, "[0.160.0,)")
+        dependency("fabric-api", DependencyType.REQUIRED, "[${prop("deps.fapi")},)")
     }
 
     neoForgeModsToml(sourceSets.neoforge.get()) {
