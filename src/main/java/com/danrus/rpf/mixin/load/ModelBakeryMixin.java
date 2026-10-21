@@ -93,6 +93,7 @@ public abstract class ModelBakeryMixin implements RpfModelBakery {
     private void rpf$collectBakeTasks(
             MaterialBaker materials,
             Executor executor,
+            CallbackInfoReturnable<CompletableFuture<ModelBakery.BakingResult>> cir,
             @Local ModelBakery.MissingModels missingModels,
             @Local ModelBakery.ModelBakerImpl modelBakerImpl
     ) {
