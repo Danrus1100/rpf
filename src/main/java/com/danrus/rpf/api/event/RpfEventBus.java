@@ -1,5 +1,8 @@
 package com.danrus.rpf.api.event;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -20,6 +23,8 @@ import java.util.function.Consumer;
  * @since 1.0.0
  */
 public class RpfEventBus {
+    private static final Logger LOGGER = LoggerFactory.getLogger(RpfEventBus.class);
+
     // ConcurrentHashMap for thread-safe map operations
     // CopyOnWriteArrayList allows safe concurrent modifications during iteration
     private final Map<Class<? extends RpfEvent>, List<Consumer<? extends RpfEvent>>> listeners = 
@@ -63,10 +68,9 @@ public class RpfEventBus {
             for (Consumer<? extends RpfEvent> listener : eventListeners) {
                 try {
                     ((Consumer<T>) listener).accept(event);
-                } catch (Exception e) {
-                    // Log exception but continue with other listeners
-                    System.err.println("Exception in event listener for " + event.getClass().getSimpleName() + ": " + e.getMessage());
-                    e.printStackTrace();
+                } catch (Exception exception) {
+                    // Log the exception but continue with the other listeners.
+                    LOGGER.error("Exception in event listener for {}", event.getClass().getSimpleName(), exception);
                 }
             }
         }

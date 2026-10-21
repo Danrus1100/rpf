@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public record ItemDump(Type type, Identifier item, List<String> strings) {
 
@@ -21,16 +22,21 @@ public record ItemDump(Type type, Identifier item, List<String> strings) {
         return Minecraft.getInstance().gameDirectory.toPath().resolve("debug/rpf");
     }
 
+    private static String sanitize(Identifier item) {
+        // Identifiers may contain '/', '..' or Windows-reserved names; keep each dump
+        // inside debug/rpf and use a single, predictable file name.
+        return (item.getNamespace() + "_" + item.getPath()).replaceAll("[^a-z0-9._-]", "_");
+    }
+
     public void save() {
         try {
             Path exportPath = exportPath();
             Files.createDirectories(exportPath);
             String timestamp = LocalDateTime.now().format(TIME_FORMATTER);
 
-            String fileName = String.format("%s_%s_%s_%s.log",
-                    item.getNamespace(),
-                    item.getPath(),
-                    type.name().toLowerCase(),
+            String fileName = String.format("%s_%s_%s.log",
+                    sanitize(item),
+                    type.name().toLowerCase(Locale.ROOT),
                     timestamp
             );
 
@@ -52,9 +58,8 @@ public record ItemDump(Type type, Identifier item, List<String> strings) {
             Files.createDirectories(exportPath);
             String timestamp = LocalDateTime.now().format(TIME_FORMATTER);
 
-            String fileName = String.format("%s_%s_%s.log",
-                    item.getNamespace(),
-                    item.getPath(),
+            String fileName = String.format("%s_%s.log",
+                    sanitize(item),
                     timestamp
             );
 
