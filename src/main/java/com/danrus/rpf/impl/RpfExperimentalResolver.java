@@ -12,9 +12,10 @@ import com.danrus.rpf.api.TestsResultCollector;
 import com.danrus.rpf.api.TestsResultCollector.TestResultType;
 import com.danrus.rpf.core.item.ModelUpdateContext;
 import com.danrus.rpf.core.item.SignedItemModel;
+import com.danrus.rpf.debug.RpfLogger;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -29,11 +30,11 @@ public class RpfExperimentalResolver extends AbstractResolverWithCandidates {
 
     public void resolveAndAppendLayer(ModelUpdateContext context, List<SignedItemModel> candidates, ItemStack stack, ItemOwner entity, Operation<Void> vanilla) {
         int packCounter = 0;
-        Map<SignedItemModel, Integer> results = new HashMap(candidates.size());
+        Map<SignedItemModel, Integer> results = new LinkedHashMap<>(candidates.size());
 
         for(int i = 0; i < candidates.size(); ++i) {
             try {
-                SignedItemModel model = (SignedItemModel)candidates.get(i);
+                SignedItemModel model = candidates.get(i);
                 if (!(model.model() instanceof RpfItemModel)) {
                     model.update(context, stack, entity);
                     return;
@@ -45,17 +46,18 @@ public class RpfExperimentalResolver extends AbstractResolverWithCandidates {
                 collector.addAdditionalScore(packCounter);
                 --packCounter;
                 results.put(model, collector.calculateResult());
-            } catch (Exception var12) {
+            } catch (Exception exception) {
+                RpfLogger.get().error("Experimental resolver failed for '" + context.location() + "'", exception);
             }
         }
 
         SignedItemModel modelToUpdate = null;
-        int highestScore = -999999;
+        int highestScore = Integer.MIN_VALUE;
 
         for(Map.Entry<SignedItemModel, Integer> entry : results.entrySet()) {
-            if ((Integer)entry.getValue() > highestScore) {
-                highestScore = (Integer)entry.getValue();
-                modelToUpdate = (SignedItemModel)entry.getKey();
+            if (entry.getValue() > highestScore) {
+                highestScore = entry.getValue();
+                modelToUpdate = entry.getKey();
             }
         }
 
@@ -83,7 +85,7 @@ public class RpfExperimentalResolver extends AbstractResolverWithCandidates {
                 SpecialModelWrapper.class, 1
         );
         private static final Map<TestsResultCollector.TestResultType, Integer> REWARDS_BY_RESULT;
-        protected final List<ExperimentalResultUnit> eUnits = new LinkedList();
+        protected final List<ExperimentalResultUnit> eUnits = new LinkedList<>();
 
         public ExperimentalModelTestCollector(Identifier modelLocation, String packName) {
             super(modelLocation, packName);
@@ -107,11 +109,8 @@ public class RpfExperimentalResolver extends AbstractResolverWithCandidates {
             this.eUnits.add(new ExperimentalResultUnit(clazz, description, this.packName, resultType, this.currentShift));
         }
 
-        public void touch(String modelType, String description, TestsResultCollector.TestResultType resultType) {
-        }
-
         public List<String> getStringsToLog() {
-            List<String> strings = new ArrayList(this.eUnits.size());
+            List<String> strings = new ArrayList<>(this.eUnits.size());
 
             for(ExperimentalResultUnit unit : this.eUnits) {
                 strings.add(unit.toString());
@@ -129,8 +128,12 @@ public class RpfExperimentalResolver extends AbstractResolverWithCandidates {
                 this(clazz, itemModelType, packName, resultType, shift, calculateScore(clazz, resultType));
             }
 
-            private static int calculateScore(Class<?> clazz, TestsResultCollector.TestResultType resultType) {
-                return (Integer)RpfExperimentalResolver.ExperimentalModelTestCollector.REWARDS_BY_CLASS.get(clazz) + (Integer)RpfExperimentalResolver.ExperimentalModelTestCollector.REWARDS_BY_RESULT.get(resultType);
+            private static int calculateScore(@Nullable Class<?> clazz, TestsResultCollector.TestResultType resultType) {
+                int classScore = clazz == null
+                        ? 0
+                        : RpfExperimentalResolver.ExperimentalModelTestCollector.REWARDS_BY_CLASS.getOrDefault(clazz, 0);
+                int resultScore = RpfExperimentalResolver.ExperimentalModelTestCollector.REWARDS_BY_RESULT.getOrDefault(resultType, 0);
+                return classScore + resultScore;
             }
         }
     }
