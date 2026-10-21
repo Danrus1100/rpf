@@ -25,6 +25,8 @@
     "items.select.UnbakedSwitchMixin",
     "load.BakingResultMixin",
     "load.ModelBakeryMixin",
-    "load.ModelManagerMixin"
+    "load.ModelBakeryPlatformMixin",
+    "load.ModelManagerMixin",
+    "load.ModelManagerPlatformMixin"
   ]
 }
