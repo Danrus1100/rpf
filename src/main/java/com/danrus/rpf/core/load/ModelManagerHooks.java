@@ -46,8 +46,12 @@ public final class ModelManagerHooks {
             ResourceManager resourceManager,
             Executor executor
     ) {
-        Rpf.getResourceLoadManager().setCurrentFuture(RpfClientItemInfoLoader.scheduleLoad(resourceManager, executor));
-        return CompletableFuture.completedFuture(EMPTY_LOADED_INFOS);
+        CompletableFuture<List<RpfClientItemInfoLoader.LoadedClientInfos>> future =
+                RpfClientItemInfoLoader.scheduleLoad(resourceManager, executor);
+        Rpf.getResourceLoadManager().setCurrentFuture(future);
+        // Complete the vanilla dependency only after RPF has parsed all layers. This keeps
+        // the later discoverModelDependencies hook from blocking the reload executor.
+        return future.thenApply(ignored -> EMPTY_LOADED_INFOS);
     }
 
     public static List<RpfClientItemInfoLoader.LoadedClientInfos> currentItemLayers() {
