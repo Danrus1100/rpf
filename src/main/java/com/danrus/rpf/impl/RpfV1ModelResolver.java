@@ -60,6 +60,7 @@ public class RpfV1ModelResolver extends AbstractResolverWithCandidates {
         }
     }
 
+    @Override
     public boolean shouldPlaySwapAnimation(ItemStack stack, Operation<Boolean> vanilla) {
         ClientItem.Properties properties = propertiesFor(stack);
         return properties == null ? vanilla.call(stack) : properties.handAnimationOnSwap();

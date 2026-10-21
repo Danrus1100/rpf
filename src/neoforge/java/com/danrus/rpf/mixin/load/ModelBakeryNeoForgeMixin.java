@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
@@ -36,16 +37,20 @@ import java.util.Map;
 @Mixin(ModelBakery.class)
 public abstract class ModelBakeryNeoForgeMixin implements RpfBakingContextFactory {
 
+    @Unique
     private static final Logger LOGGER = LoggerFactory.getLogger("RpfModelBakery");
 
+    @Unique
     @Nullable
     private static final Constructor<ItemModel.BakingContext> PENDING_CONTEXT_CONSTRUCTOR =
             findPendingContextConstructor();
 
+    @Unique
     @Nullable
     private static final Constructor<ModelBakery.BakingResult> RESULT_WITH_STANDALONE_CONSTRUCTOR =
             findResultWithStandaloneConstructor();
 
+    @Unique
     @Nullable
     private static final Method STANDALONE_MODELS_METHOD = findStandaloneModelsMethod();
 

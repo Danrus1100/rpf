@@ -69,7 +69,7 @@ public class RpfCommands<T> {
 
     private int executeClearDebug(CommandContext<T> ctx) {
         RpfDebugSystem.getInstance().clear();
-        sendFeedback(Component.translatable("rpf.debug.clear", RpfDebugSystem.getInstance().isDebug()));
+        sendFeedback(Component.translatable("rpf.debug.clear"));
         return 1;
     }
 
