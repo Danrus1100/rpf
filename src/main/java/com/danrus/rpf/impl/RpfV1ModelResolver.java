@@ -34,7 +34,10 @@ public class RpfV1ModelResolver extends AbstractResolverWithCandidates {
     private final Map<DataComponentMap, ClientItem.Properties> componentsToProperties = Collections.synchronizedMap(new WeakHashMap());
 
     public void resolveAndAppendLayer(ModelUpdateContext context, List<SignedItemModel> candidates, ItemStack stack, ItemOwner entity, Operation<Void> vanilla) {
-        TestsResultCollector collector = RpfDebugSystem.getInstance().optimiseCollector(() -> new LoggingTestsResultCollector(context.location(), ((SignedItemModel)candidates.getFirst()).name()));
+        String initialPackName = candidates.isEmpty() ? "unknown" : candidates.getFirst().name();
+        TestsResultCollector collector = RpfDebugSystem.getInstance().optimiseCollector(
+                () -> new LoggingTestsResultCollector(context.location(), initialPackName)
+        );
         RpfEvent preEvent = new PreModelResolveEvent(context, stack, candidates, collector, entity);
         Rpf.getEventBus().post(preEvent);
         if (!preEvent.isCancelled()) {

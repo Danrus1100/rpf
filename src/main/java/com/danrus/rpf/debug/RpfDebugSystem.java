@@ -9,6 +9,7 @@
 
     import java.nio.file.Path;
     import java.util.*;
+    import java.util.concurrent.ConcurrentHashMap;
     import java.util.function.Consumer;
     import java.util.function.Supplier;
     import java.util.stream.Stream;
@@ -19,9 +20,9 @@
         public static RpfDebugSystem getInstance() { return INSTANCE; }
 
         private final TestsResultCollector DUMMY_COLLECTOR = new DummyTestsResultsCollector();
-        private final Map<Identifier, ItemDump> alreadyLogged = new HashMap<>();
-        private final Map<Identifier, ItemDump> alreadyErrored = new HashMap<>();
-        private boolean debugOutput;
+        private final Map<Identifier, ItemDump> alreadyLogged = new ConcurrentHashMap<>();
+        private final Map<Identifier, ItemDump> alreadyErrored = new ConcurrentHashMap<>();
+        private volatile boolean debugOutput;
 
         private void processItem(TestsResultCollector collector,
                                  Map<Identifier, ItemDump> targetMap,
@@ -59,6 +60,10 @@
             debugOutput = !debugOutput;
             Rpf.getConfig().setDebug(debugOutput);
             Rpf.getConfig().save();
+        }
+
+        public void setDebug(boolean debugOutput) {
+            this.debugOutput = debugOutput;
         }
 
         public boolean isDebug() { return debugOutput; }

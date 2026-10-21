@@ -10,6 +10,7 @@ import com.danrus.rpf.compat.RpfCompatPlugin;
 import com.danrus.rpf.core.init.config.RpfConfig;
 import com.danrus.rpf.core.item.RpfResolversManager;
 import com.danrus.rpf.core.load.ResourceLoadManager;
+import com.danrus.rpf.debug.RpfDebugSystem;
 import com.danrus.rpf.debug.RpfLogger;
 import com.danrus.rpf.impl.RpfExperimentalResolver;
 import com.danrus.rpf.impl.RpfV1ModelResolver;
@@ -28,6 +29,7 @@ public class Rpf {
     public static void init(Path configPath) {
         CONFIG_PATH = configPath;
         CONFIG = RpfConfig.create(configPath);
+        RpfDebugSystem.getInstance().setDebug(CONFIG.isDebug());
         RpfLogger.get().info("I don't like coca-cola. (RPF developer)");
         registerResolvers();
         RpfCompatPlugin.loadCompats();
