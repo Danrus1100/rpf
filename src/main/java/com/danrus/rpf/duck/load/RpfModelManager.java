@@ -10,10 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 public interface RpfModelManager {
-//    List<Map<Identifier, ItemModel>> rpf$getModelMaps();
     List<Map<Identifier, SignedItemModel>> rpf$getSignedModels();
-    List<Map<Identifier, ClientItem.Properties>> rpf$getItemPropertiesMaps();
     ClientItem.Properties rpf$getProperties(RpfModelIdentity identity);
-    SignedItemModel rpf$getVanillaModel(Identifier location);
     ItemModel rpf$getMissingModel();
 }

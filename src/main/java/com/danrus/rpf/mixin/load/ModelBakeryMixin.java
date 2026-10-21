@@ -222,7 +222,6 @@ public abstract class ModelBakeryMixin implements RpfModelBakery {
             ModelBakery.BakingResult result = rpf$createBakingResult(vanillaResult, flatItemModels, flatItemProperties);
             RpfBakingResult rpfResult = (RpfBakingResult) (Object) result;
             rpfResult.rpf$setSignedItemModels(bakedLayers);
-            rpfResult.rpf$setItemPropertiesById(this.rpf$propertiesLayers);
             rpfResult.rpf$addItemPropertiesByIdentity(this.rpf$propertiesByIdentity);
             return result;
         }));

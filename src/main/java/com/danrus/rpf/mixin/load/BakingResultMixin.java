@@ -19,9 +19,6 @@ public class BakingResultMixin implements RpfBakingResult {
     private List<Map<Identifier, SignedItemModel>> modelsList;
 
     @Unique
-    private List<Map<Identifier, ClientItem.Properties>> propertiesList;
-
-    @Unique
     private Map<RpfModelIdentity, ClientItem.Properties> propertiesByIdentity;
 
     @Override
@@ -33,17 +30,6 @@ public class BakingResultMixin implements RpfBakingResult {
     @Override
     public List<Map<Identifier, SignedItemModel>> rpf$getItemSignedModels() {
         return modelsList;
-    }
-
-    @Override
-    public RpfBakingResult rpf$setItemPropertiesById(List<Map<Identifier, ClientItem.Properties>> properties) {
-        this.propertiesList = properties;
-        return this;
-    }
-
-    @Override
-    public List<Map<Identifier, ClientItem.Properties>> rpf$getItemPropertiesById() {
-        return propertiesList;
     }
 
     @Override

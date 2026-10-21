@@ -8,7 +8,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
-import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -21,9 +20,7 @@ public class RpfConfig {
             .create();
     private static final Logger log = LoggerFactory.getLogger(RpfConfig.class);
 
-    @RpfConfigField
     private Identifier resolver;
-    @RpfConfigField
     private boolean isDebug;
 
     public static final String CONFIG_FILE_NAME = "rpf.json";
@@ -58,32 +55,6 @@ public class RpfConfig {
         }
     }
 
-
-    public void reload(Path configPath) {
-        Path configFile = configPath.resolve(CONFIG_FILE_NAME);
-        if (Files.exists(configFile)) {
-            try {
-                RpfConfig loaded = load(configFile);
-                copyAnnotatedFields(loaded, this);
-                log.info("[RPF] Config reloaded successfully.");
-            } catch (Exception e) {
-                log.error("Failed to reload config", e);
-            }
-        }
-    }
-
-    private void copyAnnotatedFields(RpfConfig from, RpfConfig to) throws IllegalAccessException {
-        for (Field field : RpfConfig.class.getDeclaredFields()) {
-            if (field.isAnnotationPresent(RpfConfigField.class)) {
-                field.setAccessible(true);
-
-                Object value = field.get(from);
-                field.set(to, value);
-
-                log.debug("[RPF] Updated config field: {} = {}", field.getName(), value);
-            }
-        }
-    }
 
     public void save() {
         save(Rpf.getConfigPath());

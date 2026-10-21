@@ -13,9 +13,6 @@ public interface RpfBakingResult {
     ModelBakery.BakingResult rpf$setSignedItemModels(List<Map<Identifier, SignedItemModel>> models);
     List<Map<Identifier, SignedItemModel>> rpf$getItemSignedModels();
 
-    RpfBakingResult rpf$setItemPropertiesById(List<Map<Identifier, ClientItem.Properties>> properties);
-    List<Map<Identifier, ClientItem.Properties>> rpf$getItemPropertiesById();
-
     RpfBakingResult rpf$addItemPropertiesByIdentity(Map<RpfModelIdentity, ClientItem.Properties> properties);
     Map<RpfModelIdentity, ClientItem.Properties> rpf$getItemPropertiesByIdentity();
 }

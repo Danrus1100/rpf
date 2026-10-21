@@ -18,7 +18,6 @@ import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.Identifier;
 
-import java.awt.*;
 import java.nio.file.Path;
 import java.util.Comparator;
 import java.util.List;
@@ -133,7 +132,7 @@ public class RpfCommands<T> {
     }
 
     private void sendError(MutableComponent component) {
-        Minecraft.getInstance().gui.hud.getChat().addClientSystemMessage(component.setStyle(component.getStyle().withColor(Color.RED.getRGB())));
+        Minecraft.getInstance().gui.hud.getChat().addClientSystemMessage(component.setStyle(component.getStyle().withColor(0xFF0000)));
     }
 
     private LiteralArgumentBuilder<T> literal(String name) {

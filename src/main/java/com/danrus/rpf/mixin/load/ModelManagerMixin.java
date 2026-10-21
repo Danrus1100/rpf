@@ -4,7 +4,6 @@ import com.danrus.rpf.core.item.RpfModelIdentity;
 import com.danrus.rpf.core.item.RpfResolversManager;
 import com.danrus.rpf.core.item.SignedItemModel;
 import com.danrus.rpf.core.load.ModelManagerHooks;
-import com.danrus.rpf.core.load.ResourceLoadManager;
 import com.danrus.rpf.debug.RpfDebugSystem;
 import com.danrus.rpf.duck.load.RpfBakingResult;
 import com.danrus.rpf.duck.load.RpfModelManager;
@@ -43,9 +42,6 @@ public abstract class ModelManagerMixin implements RpfModelManager {
 
     @Unique
     private List<Map<Identifier, SignedItemModel>> rpf$bakedItemStackSignetModels = List.of();
-
-    @Unique
-    private List<Map<Identifier, ClientItem.Properties>> rpf$itemProperties = List.of();
 
     @Unique
     private Map<RpfModelIdentity, ClientItem.Properties> rpf$itemPropertiesByIdentity = Map.of();
@@ -89,18 +85,12 @@ public abstract class ModelManagerMixin implements RpfModelManager {
                 this.rpf$bakedItemStackSignetModels = new ArrayList<>(signedModels.reversed());
             }
 
-            List<Map<Identifier, ClientItem.Properties>> properties = result.rpf$getItemPropertiesById();
-            if (properties != null) {
-                this.rpf$itemProperties = new ArrayList<>(properties.reversed());
-            }
-
             Map<RpfModelIdentity, ClientItem.Properties> propertiesByIdentity =
                     result.rpf$getItemPropertiesByIdentity();
             if (propertiesByIdentity != null) {
                 this.rpf$itemPropertiesByIdentity = propertiesByIdentity;
             }
 
-            ResourceLoadManager.vanillaModelCache.clear();
             RpfResolversManager.getInstance().applyPendingResolver();
             RpfResolversManager.getInstance().clearCaches();
             RpfDebugSystem.getInstance().clear();
@@ -123,28 +113,6 @@ public abstract class ModelManagerMixin implements RpfModelManager {
     @Override
     public List<Map<Identifier, SignedItemModel>> rpf$getSignedModels() {
         return this.rpf$bakedItemStackSignetModels;
-    }
-
-    @Override
-    public List<Map<Identifier, ClientItem.Properties>> rpf$getItemPropertiesMaps() {
-        return this.rpf$itemProperties;
-    }
-
-    @Override
-    public SignedItemModel rpf$getVanillaModel(Identifier location) {
-        SignedItemModel cached = ResourceLoadManager.vanillaModelCache.get(location);
-        if (cached != null) {
-            return cached;
-        }
-
-        for (Map<Identifier, SignedItemModel> map : this.rpf$bakedItemStackSignetModels) {
-            SignedItemModel model = map.get(location);
-            if (model != null && "vanilla".equals(model.name())) {
-                ResourceLoadManager.vanillaModelCache.put(location, model);
-                return model;
-            }
-        }
-        return null;
     }
 
     @Override
