@@ -144,7 +144,7 @@ public abstract class ModelBakeryMixin implements RpfModelBakery {
             ClientItem clientItem
     ) {
         try {
-            ItemModel.BakingContext context = rpf$createBakingContext(modelBakerImpl, missingModels, clientItem);
+            ItemModel.BakingContext context = rpf$resolveBakingContext(modelBakerImpl, missingModels, clientItem);
             PreBakeEvent preEvent = new PreBakeEvent(clientItem, resourceLocation, context);
             Rpf.getEventBus().post(preEvent);
             if (preEvent.isCancelled()) return null;
@@ -165,7 +165,7 @@ public abstract class ModelBakeryMixin implements RpfModelBakery {
         }
     }
 
-    private ItemModel.BakingContext rpf$createBakingContext(
+    private ItemModel.BakingContext rpf$resolveBakingContext(
             ModelBakery.ModelBakerImpl modelBakerImpl,
             ModelBakery.MissingModels missingModels,
             ClientItem clientItem
@@ -219,7 +219,7 @@ public abstract class ModelBakeryMixin implements RpfModelBakery {
                 }
             }
 
-            ModelBakery.BakingResult result = rpf$createBakingResult(vanillaResult, flatItemModels, flatItemProperties);
+            ModelBakery.BakingResult result = rpf$resolveBakingResult(vanillaResult, flatItemModels, flatItemProperties);
             RpfBakingResult rpfResult = (RpfBakingResult) (Object) result;
             rpfResult.rpf$setSignedItemModels(bakedLayers);
             rpfResult.rpf$addItemPropertiesByIdentity(this.rpf$propertiesByIdentity);
@@ -227,7 +227,7 @@ public abstract class ModelBakeryMixin implements RpfModelBakery {
         }));
     }
 
-    private ModelBakery.BakingResult rpf$createBakingResult(
+    private ModelBakery.BakingResult rpf$resolveBakingResult(
             ModelBakery.BakingResult vanilla,
             Map<Identifier, ItemModel> itemModels,
             Map<Identifier, ClientItem.Properties> itemProperties
