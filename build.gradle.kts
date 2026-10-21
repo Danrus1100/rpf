@@ -22,11 +22,6 @@ fun prop(name: String): String =
 val minecraftVersion = prop("deps.mc")
 val artifactVersion = "${prop("mod.version")}-$minecraftVersion"
 
-val mainBranch = "26.3"
-val gitBranchName = providers.exec {
-    commandLine("git", "rev-parse", "--abbrev-ref", "HEAD")
-}.standardOutput.asText.map { it.trim() }.get()
-
 group = "com.danrus.rpf"
 version = artifactVersion
 
@@ -165,7 +160,7 @@ publishMods {
     val discordWebhookDRRU = findProperty("discord-webhook-dr-ru")
     val discordWebhookDry = findProperty("discord-webhook-dry")
 
-    dryRun = gitBranchName != mainBranch
+    dryRun = false
 
     type = STABLE
 
