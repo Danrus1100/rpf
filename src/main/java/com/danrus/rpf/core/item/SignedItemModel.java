@@ -6,6 +6,7 @@ import com.danrus.rpf.api.event.RpfEvent;
 import com.danrus.rpf.api.event.type.UpdateModelEvent;
 import com.danrus.rpf.api.TestsResultCollector;
 import com.danrus.rpf.debug.RpfDebugSystem;
+import com.danrus.rpf.debug.RpfLogger;
 import net.minecraft.client.renderer.item.ItemModel;
 import net.minecraft.server.packs.PackLocationInfo;
 import net.minecraft.world.entity.ItemOwner;
@@ -31,7 +32,9 @@ public record SignedItemModel(
                 null,
                 collector
             );
-        } catch (Exception e) {
+        } catch (Exception exception) {
+            String modelName = info() == null ? "unknown" : info().id();
+            RpfLogger.get().error("Failed to resolve delegation for model '" + modelName + "'", exception);
             RpfDebugSystem.getInstance().errorItem(collector);
             return true;
         }

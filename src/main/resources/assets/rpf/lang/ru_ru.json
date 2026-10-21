@@ -7,5 +7,6 @@
   "rpf.toggle.off": "выборка RPF отключена. Что-то пошло не так? Сообщите мне об этом в разделе %s!",
   "rpf.toggle.on": "выборка RPF включена",
   "rpf.resolver.current": "Текущая статегия выборки: %s.",
-  "rpf.resolver.changed": "Стратегия выборки измена на %s."
+  "rpf.resolver.changed": "Стратегия выборки измена на %s.",
+  "rpf.resolver.unknown": "Неизвестная стратегия выборки: %s."
 }

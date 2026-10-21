@@ -99,6 +99,10 @@ public class RpfCommands<T> {
 
     private int executeSetCurrentResolver(CommandContext<T> ctx){
         Identifier id = ctx.getArgument("id", Identifier.class);
+        if (!RpfResolversManager.getInstance().getAvailable().contains(id)) {
+            sendError(Component.translatable("rpf.resolver.unknown", id));
+            return 0;
+        }
         RpfResolversManager.getInstance().setPendingResolver(id);
         Minecraft.getInstance().reloadResourcePacks();
         Rpf.getConfig().setResolver(id);

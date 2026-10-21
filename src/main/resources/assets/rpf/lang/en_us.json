@@ -7,5 +7,6 @@
   "rpf.toggle.off": "RPF resolving turned off. Something went wrong? let me know about it on %s!",
   "rpf.toggle.on": "RPF resolving turned on",
   "rpf.resolver.current": "Current resolver is %s.",
-  "rpf.resolver.changed": "Resolver changed to %s."
+  "rpf.resolver.changed": "Resolver changed to %s.",
+  "rpf.resolver.unknown": "Unknown resolver: %s."
 }

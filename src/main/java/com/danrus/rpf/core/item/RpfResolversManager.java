@@ -1,15 +1,10 @@
 package com.danrus.rpf.core.item;
 
 import com.danrus.rpf.api.RpfItemModelResolver;
-import com.danrus.rpf.debug.RpfLogger;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
-import net.minecraft.client.renderer.item.ItemModelResolver;
-import net.minecraft.client.renderer.item.ItemStackRenderState;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.ItemOwner;
-import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,23 +37,30 @@ public class RpfResolversManager {
             Operation<Void> vanilla
     ) {
         try {
-            resolvers.get(currentResolver).resolveAndAppendLayer(
+            currentResolver().resolveAndAppendLayer(
                     context,
                     stack,
                     entity,
                     vanilla
             );
-        } catch (Exception e) {
-            RpfLogger.get().error("Unknown resolver: " + currentResolver);
+        } catch (Exception exception) {
+            log.error(
+                    "Resolver '{}' failed while resolving '{}'; falling back to vanilla.",
+                    currentResolver,
+                    context.location(),
+                    exception
+            );
+            vanilla.call(context.renderState(), stack, context.displayContext(), context.level(), entity, context.seed());
         }
     }
 
     public boolean shouldPlayAnimationOnSwap(ItemStack stack, Operation<Boolean> vanilla) {
         try {
-            return resolvers.get(currentResolver).shouldPlaySwapAnimation(stack, vanilla);
-        } catch (Exception e) {
-            RpfLogger.get().error("Unknown resolver: " + currentResolver);
-            return true;
+            return currentResolver().shouldPlaySwapAnimation(stack, vanilla);
+        } catch (Exception exception) {
+            log.error("Resolver '{}' failed while resolving the swap animation; falling back to vanilla.",
+                    currentResolver, exception);
+            return vanilla.call(stack);
         }
     }
 
@@ -68,6 +70,11 @@ public class RpfResolversManager {
 
     public void applyPendingResolver() {
         if (pendingResolver == null) return;
+        if (!resolvers.containsKey(pendingResolver)) {
+            log.error("Unknown resolver '{}' in the config; keeping '{}'.", pendingResolver, currentResolver);
+            pendingResolver = null;
+            return;
+        }
         currentResolver = pendingResolver;
         pendingResolver = null;
     }
@@ -76,8 +83,27 @@ public class RpfResolversManager {
         return new ArrayList<>(resolvers.keySet());
     }
 
+    private RpfItemModelResolver currentResolver() {
+        RpfItemModelResolver resolver = resolvers.get(currentResolver);
+        if (resolver != null) {
+            return resolver;
+        }
+
+        RpfItemModelResolver fallback = resolvers.get(DEFAULT_RESOLVER);
+        if (fallback == null) {
+            throw new IllegalStateException("Default resolver '" + DEFAULT_RESOLVER + "' is not registered");
+        }
+
+        log.error("Unknown resolver '{}'; falling back to '{}'.", currentResolver, DEFAULT_RESOLVER);
+        currentResolver = DEFAULT_RESOLVER;
+        return fallback;
+    }
+
     private RpfResolversManager() {}
-    public static RpfResolversManager getInstance() { return INSTANCE; }
+
+    public static RpfResolversManager getInstance() {
+        return INSTANCE;
+    }
 
     public Identifier getCurrent() {
         return currentResolver;
