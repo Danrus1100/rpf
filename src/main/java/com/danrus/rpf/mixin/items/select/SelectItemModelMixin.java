@@ -51,11 +51,16 @@ public abstract class SelectItemModelMixin<T> implements DelegateItemModel, RpfI
         if (itemModel instanceof RpfItemModel rpfItemModel) {
             if (prev != null && this.rpf$isFallback()) rpfItemModel.rpf$markAsFallback();
             String propertyValue = object != null ? object.toString() : "null";
-            collector.next(this.getClass(), " proprety: " + propertyValue, rpfItemModel.rpf$isFallback());
+            collector.next(this.getClass(), " property: " + propertyValue, rpfItemModel.rpf$isFallback());
             return rpfItemModel.rpf$doDelegate(context, stack, owner, (ItemModel) (Object) this, collector);
+        } else if (itemModel == null) {
+            collector.delegate(this.getClass(), " property: " + (object == null ? "null" : object));
+            return true;
         } else {
-            collector.delegate(this.getClass(), " proprety: " + object.toString());
-            return itemModel == null || this.rpf$getDelegation();
+            // A model type from another mod: we cannot inspect it, so use it instead of
+            // silently skipping the pack that explicitly selected it.
+            collector.hit(this.getClass(), " property: " + object);
+            return false;
         }
     }
 }

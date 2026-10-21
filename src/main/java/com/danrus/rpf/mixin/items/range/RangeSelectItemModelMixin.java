@@ -83,7 +83,10 @@ public abstract class RangeSelectItemModelMixin implements RpfItemModel, Delegat
             itemModel = i == -1 ? this.fallback : models[i];
         }
         if (!(itemModel instanceof RpfItemModel)) {
-            return this.rpf$getDelegation();
+            // A model type from another mod: cannot inspect its fallback state,
+            // so keep the pack's explicitly selected model.
+            collector.hit(this.getClass(), ": property " + property.toString() + ", value " + f);
+            return false;
         }
         collector.next(this.getClass(),": property " + property.toString() + ", value " + f, isFallback);
         return (((RpfItemModel) itemModel).rpf$doDelegate(context, stack, owner, (ItemModel) (Object) this, collector));
