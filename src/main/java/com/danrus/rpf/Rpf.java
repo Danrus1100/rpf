@@ -1,8 +1,3 @@
-//
-// Source code recreated from a .class file by IntelliJ IDEA
-// (powered by Fernflower decompiler)
-//
-
 package com.danrus.rpf;
 
 import com.danrus.rpf.api.event.RpfEventBus;
@@ -21,7 +16,7 @@ import net.minecraft.resources.Identifier;
 public class Rpf {
     private static Path CONFIG_PATH;
 
-    public static String MOD_ID = "rpf";
+    public static final String MOD_ID = "rpf";
     private static final ResourceLoadManager RESOURCE_LOAD_MANAGER = new ResourceLoadManager();
     private static final RpfEventBus EVENT_BUS = new RpfEventBus();
     private static RpfConfig CONFIG;

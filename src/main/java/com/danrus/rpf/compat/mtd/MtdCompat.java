@@ -1,8 +1,3 @@
-//
-// Source code recreated from a .class file by IntelliJ IDEA
-// (powered by Fernflower decompiler)
-//
-
 package com.danrus.rpf.compat.mtd;
 
 import com.danrus.rpf.compat.RpfCompatInitializer;

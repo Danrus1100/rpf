@@ -1,8 +1,3 @@
-//
-// Source code recreated from a .class file by IntelliJ IDEA
-// (powered by Fernflower decompiler)
-//
-
 package com.danrus.rpf.compat;
 
 import com.danrus.rpf.debug.RpfLogger;
@@ -54,7 +49,7 @@ public abstract class RpfCompatPlugin implements IMixinConfigPlugin {
     }
 
     public String getRefMapperConfig() {
-        return "";
+        return null;
     }
 
     public boolean shouldApplyMixin(String targetClassName, String mixinClassName) {

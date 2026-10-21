@@ -1,7 +1,6 @@
 package com.danrus.rpf.api;
 
 import net.minecraft.resources.Identifier;
-import net.minecraft.resources.Identifier;
 
 public abstract class AbstractTestResultCollector implements TestsResultCollector {
     public final Identifier modelLocation;
