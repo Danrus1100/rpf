@@ -60,7 +60,10 @@ public abstract class RangeSelectItemModelMixin implements RpfItemModel, Delegat
             at = @At("TAIL")
     )
     private void rpf$init(RangeSelectItemModelProperty property, float scale, float[] thresholds, ItemModel[] models, ItemModel fallback, CallbackInfo ci){
-        ((RpfItemModel) this.fallback).rpf$markAsFallback();
+        // The fallback may be baked by another mod and then it has no RPF state to mark.
+        if (this.fallback instanceof RpfItemModel rpfFallback) {
+            rpfFallback.rpf$markAsFallback();
+        }
     }
 
     @Override

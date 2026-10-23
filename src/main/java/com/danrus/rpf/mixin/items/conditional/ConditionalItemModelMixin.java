@@ -17,6 +17,7 @@ import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 
 @Mixin(ConditionalItemModel.class)
 public abstract class ConditionalItemModelMixin implements RpfItemModel {
@@ -44,16 +45,23 @@ public abstract class ConditionalItemModelMixin implements RpfItemModel {
         );
         ItemModel model = isTrue ? onTrue : onFalse;
         if (prev != null && this.rpf$isFallback()) {
-            ((RpfItemModel) onTrue).rpf$markAsFallback();
-            ((RpfItemModel) onFalse).rpf$markAsFallback();
+            rpf$markFallback(onTrue);
+            rpf$markFallback(onFalse);
         }
         if (prev == null) {
-            ((RpfItemModel) onFalse).rpf$markAsFallback();
+            rpf$markFallback(onFalse);
         }
         if (model instanceof RpfItemModel rpfItemModel) {
             collector.next(this.getClass(), " (" + isTrue + ")");
             return rpfItemModel.rpf$doDelegate(context, stack, owner, (ItemModel) (Object) this, collector);
         }
         return this.rpf$isFallback();
+    }
+
+    @Unique
+    private void rpf$markFallback(ItemModel model) {
+        if (model instanceof RpfItemModel rpfItemModel) {
+            rpfItemModel.rpf$markAsFallback();
+        }
     }
 }

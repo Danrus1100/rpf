@@ -44,7 +44,10 @@ public class UnbakedMixin implements DelegateItemModel.Unbaked {
     private void rpf$setFallbackModel(ItemModel.BakingContext context,
                                       Matrix4fc transformation,
                                       CallbackInfoReturnable<ItemModel> cir, @Local ItemModel itemModel) {
-        ((RpfItemModel) itemModel).rpf$markAsFallback();
+        // A fallback baked by another mod has no RPF state to mark.
+        if (itemModel instanceof RpfItemModel rpfItemModel) {
+            rpfItemModel.rpf$markAsFallback();
+        }
     }
 
 

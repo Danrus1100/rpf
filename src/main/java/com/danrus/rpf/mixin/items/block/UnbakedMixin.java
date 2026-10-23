@@ -25,7 +25,11 @@ public class UnbakedMixin {
                                                      Matrix4fc transformation,
                                                      Operation<ItemModel> original) {
         ItemModel wrapper = original.call(context, transformation);
-        ((RpfBlockModelWrapper) wrapper).rpf$setModelLink(model);
+        // Another mod may replace the vanilla wrapper with its own ItemModel (Fusion does this),
+        // in which case there is no link to store and the model must be returned untouched.
+        if (wrapper instanceof RpfBlockModelWrapper rpfWrapper) {
+            rpfWrapper.rpf$setModelLink(model);
+        }
         return wrapper;
     }
 

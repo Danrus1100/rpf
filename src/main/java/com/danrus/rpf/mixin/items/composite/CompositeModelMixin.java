@@ -43,14 +43,20 @@ public abstract class CompositeModelMixin implements RpfItemModel, RpfCompositeM
     @Override
     public boolean rpf$doDelegate(ModelUpdateContext context, ItemStack stack, @Nullable ItemOwner owner, @Nullable ItemModel prev, TestsResultCollector collector) {
         if (rpf$isFallback()) {
-            models.forEach(model ->  ((RpfItemModel) model).rpf$markAsFallback());
+            models.forEach(model -> {
+                if (model instanceof RpfItemModel rpfModel) {
+                    rpfModel.rpf$markAsFallback();
+                }
+            });
         }
         boolean delegate = rpf$getDelegationInitialState();
         collector.info(this.getClass(), " models: " + models.size());
         collector.pushShift();
         for (ItemModel model : models) {
             collector.info("Testing model: " + model.getClass().getSimpleName());
-            if (((RpfItemModel)model).rpf$doDelegate(context, stack, owner, (ItemModel) (Object) this, collector)) {
+            // A layer baked by another mod has no RPF state, so it cannot vote.
+            if (model instanceof RpfItemModel rpfModel
+                    && rpfModel.rpf$doDelegate(context, stack, owner, (ItemModel) (Object) this, collector)) {
                 collector.info("Model " + model.getClass().getSimpleName() + " cancel delegate");
                 delegate = rpf$getDelegationStateWhenDelegate();
             }
